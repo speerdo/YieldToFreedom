@@ -104,7 +104,9 @@ export const GET: APIRoute = async ({ request }) => {
       if (p && typeof p === 'object') {
         const price = asNumber(p.price ?? p.previousClose ?? p.open);
         const lastDiv =
-          asNumber(p.lastDiv) ?? asNumber((p as { dividend?: unknown }).dividend);
+          asNumber((p as { lastDividend?: unknown }).lastDividend) ??
+          asNumber(p.lastDiv) ??
+          asNumber((p as { dividend?: unknown }).dividend);
         const mktCap =
           asNumber(p.mktCap) ?? asNumber((p as { marketCap?: unknown }).marketCap);
 

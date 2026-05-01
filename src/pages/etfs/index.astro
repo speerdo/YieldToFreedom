@@ -22,7 +22,7 @@ const list = await db
     before investing.
   </p>
 
-  <div class="mt-10 space-y-6" id="etf-screener-root" x-data="etfScreener()" x-cloak>
+  <div class="mt-10 space-y-6" id="etf-screener-root" x-data="etfScreener()" x-cloak data-etfs={JSON.stringify(list)}>
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <label class="text-xs font-semibold uppercase text-slate-500">
         Pillar
@@ -131,33 +131,34 @@ const list = await db
   </noscript>
 </Base>
 
-<script define:vars={{ initialRows: list }}>
+<script>
   import Alpine from 'alpinejs';
 
-  function pctFromDecimal(s) {
+  const root = document.getElementById('etf-screener-root');
+  const initialRows = JSON.parse(root?.dataset.etfs ?? '[]');
+
+  function pctFromDecimal(s: unknown): number | null {
     if (s === null || s === undefined || s === '') return null;
     const n = Number(s);
     return Number.isFinite(n) ? n * 100 : null;
   }
 
-  function pillarHTML(pillar) {
-    const p = pillar ?? '';
-    const map = {
+  function pillarHTML(pillar: unknown): string {
+    const p = String(pillar ?? '');
+    const map: Record<string, string> = {
       income: 'bg-orange-50 text-orange-900 ring-orange-700/25',
       stability: 'bg-indigo-50 text-indigo-900 ring-indigo-700/25',
       growth: 'bg-teal-50 text-teal-900 ring-teal-700/25',
       mixed: 'bg-slate-50 text-slate-800 ring-slate-700/25',
     };
-    const cls = map[p] ?? map.mixed;
+    const cls = map[p] ?? map['mixed']!;
     return `<span class="inline-flex rounded-full px-3 py-0.5 text-xs font-semibold capitalize ring-1 ring-inset ${cls}">${p}</span>`;
   }
 
-  function gradeHTML(grade) {
-    const g = (grade ?? '').trim().toUpperCase();
-    if (!g) {
-      return '<span class="text-xs font-medium text-slate-400">—</span>';
-    }
-    const tiers = {
+  function gradeHTML(grade: unknown): string {
+    const g = String(grade ?? '').trim().toUpperCase();
+    if (!g) return '<span class="text-xs font-medium text-slate-400">—</span>';
+    const tiers: Record<string, string> = {
       A: 'bg-emerald-100 text-emerald-900 ring-emerald-600/30',
       B: 'bg-sky-100 text-sky-900 ring-sky-600/25',
       C: 'bg-amber-100 text-amber-900 ring-amber-600/25',
@@ -167,9 +168,20 @@ const list = await db
     return `<span class="inline-flex min-h-7 min-w-7 items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset tabular-nums ${cls}" title="YTF grade — research purposes only.">${g}</span>`;
   }
 
+  interface EtfRow {
+    id: number;
+    ticker: string;
+    name: string;
+    pillar: string;
+    ytfGrade: string | null;
+    dividendFrequency: string | null;
+    trailing12mYield: string | null;
+    expenseRatio: string | null;
+  }
+
   document.addEventListener('alpine:init', () => {
     Alpine.data('etfScreener', () => ({
-      rows: initialRows.map((r) => ({
+      rows: (initialRows as EtfRow[]).map((r) => ({
         id: r.id,
         ticker: r.ticker,
         name: r.name,
@@ -189,16 +201,16 @@ const list = await db
       pillarHTML,
       gradeHTML,
 
-      fmtYieldPct(v) {
+      fmtYieldPct(v: unknown) {
         const p = pctFromDecimal(v);
         return p == null ? '—' : `${p.toFixed(2)}%`;
       },
-      fmtErPct(v) {
+      fmtErPct(v: unknown) {
         const p = pctFromDecimal(v);
         return p == null ? '—' : `${p.toFixed(3)}%`;
       },
 
-      matches(row) {
+      matches(row: EtfRow) {
         if (this.pillar !== 'all' && row.pillar !== this.pillar) return false;
 
         const g = (row.ytfGrade ?? '').trim().toUpperCase();
@@ -221,7 +233,7 @@ const list = await db
       },
 
       get filtered() {
-        return this.rows.filter((row) => this.matches(row));
+        return this.rows.filter((row: EtfRow) => this.matches(row));
       },
 
       get ordered() {
@@ -256,7 +268,7 @@ const list = await db
         return rows;
       },
 
-      toggleSort(key) {
+      toggleSort(key: string) {
         if (this.sort === key) {
           this.dir = this.dir === 'asc' ? 'desc' : 'asc';
         } else {
@@ -268,7 +280,7 @@ const list = await db
         }
       },
 
-      caret(key) {
+      caret(key: string) {
         return this.sort === key ? (this.dir === 'asc' ? '▲' : '▼') : '';
       },
     }));
