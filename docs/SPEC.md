@@ -384,9 +384,9 @@ export const etfs = pgTable('etfs', {
   createdAt:         timestamp('created_at').defaultNow(),
   updatedAt:         timestamp('updated_at').defaultNow(),
 }, (t) => [
-  uniqueIndex('etfs_ticker_idx').on(t.ticker),
   index('etfs_pillar_idx').on(t.pillar),
   index('etfs_grade_idx').on(t.ytfGrade),
+  // ticker uniqueness handled by .unique() on the column — no separate uniqueIndex needed
 ]);
 
 // ─── DIVIDEND HISTORY ─────────────────────────────────────────────────────────
@@ -442,7 +442,7 @@ export const etfGradeHistory = pgTable('etf_grade_history', {
 
 export const users = pgTable('users', {
   id:                   serial('id').primaryKey(),
-  clerkId:              varchar('clerk_id', { length: 100 }).notNull().unique(),
+  clerkId:              varchar('clerk_id', { length: 100 }).notNull(),
   email:                varchar('email', { length: 255 }).notNull(),
   subscriptionTier:     varchar('subscription_tier', { length: 20 }).default('free'),
   // 'free' | 'pro'
@@ -828,16 +828,24 @@ Runs Sunday 03:00 UTC. For each active ETF:
 
 Runs 08:00 UTC. Send pending `grade_alerts` via Resend, mark `email_sent = true`.
 
-### FMP Endpoints Used
+### FMP API Status (Updated May 2026)
 
-| Use Case | Endpoint | Frequency |
-|---|---|---|
-| ETF profile | `GET /etf/info?symbol=` | Nightly |
-| Dividend history | `GET /historical-price-full/stock_dividend/:symbol` | Nightly |
-| EOD prices | `GET /historical-price-full/:symbol` | Nightly |
-| Current quote | `GET /quote/:symbol` | Nightly |
-| Dividend calendar | `GET /stock_dividend_calendar` | Nightly |
-| Holdings breakdown | `GET /etf-holder/:symbol` | Weekly |
+FMP retired `/api/v3` and `/api/v4` on 2025-08-31. All endpoints now use `https://financialmodelingprep.com/stable/`. The current free-tier key has partial access:
+
+| Use Case | Endpoint | Free Tier | Notes |
+|---|---|---|---|
+| ETF profile | `GET /stable/profile?symbol=` | ✅ | Returns price, marketCap, lastDividend, beta, description |
+| Dividend history (per symbol) | `GET /stable/dividends?symbol=` | ❌ 402 | Requires commercial plan |
+| EOD price history | Not yet found | ❌ | Endpoint path unknown |
+| Current quote (ETF) | `GET /stable/quote?symbol=` | ❌ 402 | ETFs require premium |
+| Dividend calendar (filtered) | `GET /stable/dividends-calendar?from=` | ❌ 402 | Requires premium |
+| Holdings breakdown | Not yet found | ❌ | — |
+
+**Derivable from free profile:** `trailing12mYield = lastDividend / price`, `aum ≈ marketCap`
+
+**Unresolvable without premium or alternate source:** dividend history (consistency scoring), expense ratio, dividend frequency, price history.
+
+**Resolution path:** Either upgrade FMP to commercial plan (~$79/mo) or use Twelve Data ($29/mo, display-permissive) as interim. See ACTION_PLAN.md open decision.
 
 > Phase 1 displays end-of-day data only, always labeled "data as of [date]". No live quotes.
 

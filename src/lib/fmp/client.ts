@@ -1,4 +1,5 @@
-const FMP_BASE = 'https://financialmodelingprep.com/api/v3';
+// FMP deprecated /api/v3 and /api/v4 on 2025-08-31; all new endpoints use /stable/
+const FMP_BASE = 'https://financialmodelingprep.com/stable';
 
 function resolveFmpKey(): string {
   const meta =
