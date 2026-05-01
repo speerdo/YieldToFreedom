@@ -2,8 +2,5 @@
   "crons": [
     { "path": "/api/cron/sync-etfs", "schedule": "0 2 * * *" },
     { "path": "/api/cron/grade-etfs", "schedule": "0 3 * * 0" }
-  ],
-  "functions": {
-    "src/pages/api/**/*.ts": { "maxDuration": 60 }
-  }
+  ]
 }

@@ -8,6 +8,7 @@ export default defineConfig({
   adapter: vercel({
     webAnalytics: { enabled: true },
     edgeMiddleware: true,
+    maxDuration: 60,
   }),
   integrations: [clerk()],
 });
