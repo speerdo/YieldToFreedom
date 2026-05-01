@@ -8,11 +8,9 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 
 **How to track progress:** Mark checklist items with `[x]` when done; leave `[ ]` until finished. Update the *last progress update* line whenever you check something in.
 
-*Last progress update: 2026-05-06 — **SPEC v1.1** (Tailwind PostCSS setup, APIs, **`email_subscribers.verification_token`**, sitemap/robots, cron realities). **Sprint 5 (partial):** Content Layer blog (**`src/content.config.ts`**, **`/blog`**), **`GET /sitemap.xml`**, **`public/robots.txt`**, **`vercel.json`** trimmed (**`send-alerts`** deferred until endpoint exists).
+*Last progress update: 2026-05-06 — **Sprint 5:** Six **launch-topic** posts now live under **`src/content/blog/`** (ACTION_PLAN §5.2 set). Homepage hero links to **`/blog`**. **`PUBLIC_GA_MEASUREMENT_ID`** enables optional **GA4** tags from **`Base.astro`**; **`.env.example` + SPEC §15** updated. Still open: **Google Search Console**, **AdSense**, final editorial pass on posts, **`npm run db:migrate`** if needed.
 
-**Already shipped Sprint 4:** **`/compare`**, **`/stack-builder`**, **`/api/etfs/[ticker]/yield-trail`**, Compare link from **`/etfs/[ticker]`**.
-
-Open items: draft **five** remaining launch posts; **`npm run db:migrate`** for subscribe token migration; GA / Search Console / AdSense per Sprint 5.4.*
+**Prior ships (unchanged):** SPEC v1.1, **`/sitemap.xml`**, **`robots.txt`**, Sprint 4 tools.*
 
 ---
 
@@ -64,9 +62,10 @@ Open items: draft **five** remaining launch posts; **`npm run db:migrate`** for 
 | Step | Done |
 |------|------|
 | 5.1 Astro Content Layer + `/blog` + `[slug]` | [x] |
-| 5.2 Six launch ACTION_PLAN articles | [ ] (**2**/6 drafts in **`src/content/blog/`**) |
+| 5.2 Six launch ACTION_PLAN articles | [x] (**6** in **`src/content/blog/`** — editorial pass still useful) |
 | 5.3 Dynamic **`/sitemap.xml`** + **`public/robots.txt`** | [x] |
-| 5.4 Analytics · Search Console · AdSense | [ ] |
+| 5.4 Google Analytics 4 snippet (optional **`PUBLIC_GA_MEASUREMENT_ID`**) | [x] |
+| 5.5 Search Console · AdSense submission | [ ] |
 
 ---
 
@@ -626,17 +625,17 @@ Production implementation: **`src/pages/sitemap.xml.ts`** declares **`export con
 ### 5.4 Analytics & Monetization Setup
 
 - [ ] Connect Google Search Console
-- [ ] Add Google Analytics 4 or Plausible (script in `Base.astro`)
+- [x] GA4 — when `PUBLIC_GA_MEASUREMENT_ID` is set, `src/layouts/Base.astro` injects `gtag.js` + config
 - [ ] Submit AdSense application (requires site to have substantial content)
 
 ### Sprint 5 Completion Criteria
 
 - [x] Blog listing and post pages render (`/blog`, `/blog/[slug]`)
-- [ ] 6 launch posts written and published (**2**/6 drafted in-repo)
+- [x] 6 launch posts drafted in-repo (see §5.2 titles — revise before treating as final editorial)
 - [x] **`/sitemap.xml`** emits ETF URLs + static routes + blog posts (needs live DB hit for ETFs)
 - [x] `public/robots.txt` deployed with sitemap hint + crawler blocks on `/api/`, `/app/`
-- [ ] Analytics script installed
-- [ ] AdSense application submitted
+- [x] Analytics hook (conditional GA4 via **`PUBLIC_GA_MEASUREMENT_ID`**) in **Base layout**
+- [ ] Search Console verified · AdSense application submitted
 
 ---
 

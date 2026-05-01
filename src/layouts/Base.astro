@@ -10,6 +10,12 @@ interface Props {
   schema?: object;
 }
 const { title, description, schema } = Astro.props;
+const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID?.trim();
+
+function gaSrc(measurementId: string): string {
+  const id = encodeURIComponent(measurementId);
+  return `https://www.googletagmanager.com/gtag/js?id=${id}`;
+}
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -19,6 +25,21 @@ const { title, description, schema } = Astro.props;
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="generator" content={Astro.generator} />
     <Seo title={title} description={description} schema={schema} />
+    {
+      gaId ? (
+        <>
+          <script is:inline async src={gaSrc(gaId)} />
+          <script is:inline define:vars={{ gaId }}>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+              window.dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+            gtag('config', gaId);
+          </script>
+        </>
+      ) : null
+    }
   </head>
   <body class="min-h-screen bg-white text-slate-900 antialiased">
     <Header />

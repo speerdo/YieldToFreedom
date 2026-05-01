@@ -1024,6 +1024,9 @@ CRON_SECRET=minimum_32_char_random_string
 PUBLIC_SITE_URL=https://yieldtofreedom.com
 # Legacy alias consumed by helpers: SITE=https://yieldtofreedom.com
 
+# Optional client analytics (SSR-injected scripts in Base.astro when set)
+PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+
 # Migrate after schema updates
 # npm run db:migrate   # applies ./migrations via drizzle-kit
 ```
@@ -1057,8 +1060,7 @@ PUBLIC_SITE_URL=https://yieldtofreedom.com
 - Homepage: `WebSite` + `Organization` JSON-LD
 - **`/sitemap.xml`** — built with `src/pages/sitemap.xml.ts` (`export const prerender = false`) so active ETF URLs (Neon), static routes, and published Markdown posts are enumerated at runtime on Vercel.
 - **`public/robots.txt`** — references `https://yieldtofreedom.com/sitemap.xml`, `Disallow: /api/` and `Disallow: /app/`
-
-### Accessibility
+- **Analytics** — optional GA4: when `PUBLIC_GA_MEASUREMENT_ID` is present, `src/layouts/Base.astro` emits the standard `gtag.js` snippet in `<head>` (no tracking in local dev unless the env var is set).
 
 - WCAG AA minimum
 - Semantic HTML throughout
