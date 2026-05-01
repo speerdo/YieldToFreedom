@@ -1,0 +1,63 @@
+---
+import Base from '../../layouts/Base.astro';
+import { publicSiteOrigin } from '../../lib/site/url';
+
+const site = publicSiteOrigin();
+const published = '2026-05-05';
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'DRIP and Compounding for Income ETFs',
+  datePublished: published,
+  dateModified: published,
+  author: { '@type': 'Organization', name: 'Yield to Freedom', url: site },
+  publisher: { '@type': 'Organization', name: 'Creative Bandit LLC', url: site },
+  description: 'How dividend reinvestment plans (DRIP) interact with income ETFs and long-term compounding.',
+};
+---
+
+<Base
+  title="DRIP & compounding — Yield to Freedom"
+  description="Why reinvesting ETF distributions can accelerate compounding — and when to take cash instead."
+  schema={schema}
+>
+  <article
+    class="max-w-3xl space-y-4 leading-relaxed text-slate-700 [&_a]:font-semibold [&_a]:text-blue-700 hover:[&_a]:text-blue-900 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6 [&_strong]:font-semibold"
+  >
+    <h1 class="text-3xl font-bold tracking-tight text-slate-900">DRIP & compounding</h1>
+    <p>
+      <strong>Dividend reinvestment</strong> (often called DRIP inside brokerage apps) buys additional shares—or
+      fractional shares—automatically whenever a fund distributes cash. Over multi-decade timelines, reinvestment is
+      one of the biggest levers that turns yield into wealth, not just spendable coupons.
+    </p>
+    <h2 class="mt-10 text-xl font-bold text-slate-900">Income ETFs are not all “bond-like” coupons</h2>
+    <p>
+      Vehicles such as <a href="/etfs/JEPI">JEPI</a> or <a href="/etfs/XYLD">XYLD</a> combine equity exposure with
+      option overwriting. NAV can move with the underlying market even while distributions remain elevated. Reinvesting
+      during drawdowns can be psychologically brutal but mechanically accretive; taking cash distributions during those
+      same periods funds living expenses rather than rebuilding share count—both paths are legitimate if intentional.
+    </p>
+    <h2 class="mt-10 text-xl font-bold text-slate-900">Growth-of-income framing</h2>
+    <p>
+      Stability sleeves like <a href="/etfs/SCHD">SCHD</a> or <a href="/etfs/DGRO">DGRO</a> often pair better with a
+      “raise the dividend every year” mental model. DRIP there builds share count while many investors still track
+      forward income per share as the scoreboard.
+    </p>
+    <h2 class="mt-10 text-xl font-bold text-slate-900">Taxes & account placement</h2>
+    <p>
+      In taxable accounts, distributions are generally taxable when paid even if you reinvest. In IRAs and other
+      tax-deferred wrappers, DRIP removes frictional cash drag so more capital stays invested. Always match high-yield
+      sleeves to the account type that fits your tax plan.
+    </p>
+    <p>
+      More context: <a href="/strategy">Strategy overview</a> · <a href="/etfs">ETF directory</a> ·{' '}
+      <a href="/strategy/fi-timeline">FI Score & timelines</a>
+    </p>
+    <footer class="mt-12 border-t border-slate-100 pt-6 text-sm text-slate-600">
+      <p>
+        Educational content only; not tax or investment advice. Consult a professional for your situation.
+      </p>
+    </footer>
+  </article>
+</Base>

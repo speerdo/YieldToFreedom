@@ -1,0 +1,70 @@
+---
+import Base from '../../layouts/Base.astro';
+import { publicSiteOrigin } from '../../lib/site/url';
+
+const site = publicSiteOrigin();
+const published = '2026-05-05';
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'Income Investing Strategy Overview',
+  datePublished: published,
+  dateModified: published,
+  author: {
+    '@type': 'Organization',
+    name: 'Yield to Freedom',
+    url: site,
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'Creative Bandit LLC',
+    url: site,
+  },
+  description:
+    'How Yield to Freedom maps ETFs to Income, Stability, and Growth pillars for long-horizon builders.',
+};
+---
+
+<Base
+  title="Strategy — Yield to Freedom"
+  description="Framework for income-first portfolios: three pillars, dividend cadence, and how we score ETFs for research."
+  schema={schema}
+>
+  <article
+    class="max-w-3xl space-y-4 leading-relaxed text-slate-700 [&_a]:font-semibold [&_a]:text-blue-700 hover:[&_a]:text-blue-900 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6 [&_strong]:font-semibold"
+  >
+    <h1 class="text-3xl font-bold tracking-tight text-slate-900">Income-first strategy</h1>
+    <p>
+      Yield to Freedom is built for investors who want their portfolios to contribute meaningfully toward financial
+      independence—not just headline returns on a brokerage statement.
+    </p>
+    <h2 class="mt-10 text-xl font-bold text-slate-900">Three pillars</h2>
+    <ul>
+      <li><strong>Income —</strong> vehicles designed to maximize distributable yield (often covered-call ETFs, monthly payers).</li>
+      <li><strong>Stability —</strong> dividend growers and quality tilt funds that prioritize durability over raw headline yield.</li>
+      <li><strong>Growth —</strong> core equity beta (and thematic sleeves) where you still want long-term upside alongside some yield.</li>
+    </ul>
+    <p>
+      A simple target allocation is <strong>40% income / 30% stability / 30% growth</strong>—tune it to your age, tax
+      situation, and risk tolerance. See also <a href="/about">About</a> for how we think about tradeoffs.
+    </p>
+    <h2 class="mt-10 text-xl font-bold text-slate-900">Deep dives</h2>
+    <ul>
+      <li><a href="/strategy/drip">DRIP & compounding</a> — why reinvesting distributions matters for income stacks.</li>
+      <li><a href="/strategy/margin">Margin & borrowing</a> — costs, sequencing, and when leverage breaks the psychology of income investing.</li>
+      <li><a href="/strategy/fi-timeline">FI Score & timelines</a> — mapping payouts to recurring expenses.</li>
+    </ul>
+    <h2 class="mt-10 text-xl font-bold text-slate-900">Explore funds</h2>
+    <p>
+      Start with <a href="/etfs/JEPI">JEPI</a>, <a href="/etfs/SCHD">SCHD</a>, and <a href="/etfs/VOO">VOO</a>, then widen
+      from the full <a href="/etfs">ETF directory</a>.
+    </p>
+    <footer class="mt-12 border-t border-slate-100 pt-6 text-sm text-slate-600">
+      <p>
+        Yield to Freedom grades and commentary are informational only and not personalized investment advice. Past
+        distribution rates are not guarantees.
+      </p>
+    </footer>
+  </article>
+</Base>

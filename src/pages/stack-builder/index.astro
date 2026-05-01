@@ -1,0 +1,313 @@
+---
+import { asc, eq } from 'drizzle-orm';
+
+import Base from '../../layouts/Base.astro';
+import Disclaimer from '../../components/ui/Disclaimer.astro';
+import { db } from '../../lib/db';
+import { etfs } from '../../lib/db/schema';
+
+const pack = await db
+  .select({
+    ticker: etfs.ticker,
+    name: etfs.name,
+    pillar: etfs.pillar,
+    trailing12mYield: etfs.trailing12mYield,
+  })
+  .from(etfs)
+  .where(eq(etfs.isActive, true))
+  .orderBy(asc(etfs.ticker));
+
+const PACK_JSON = JSON.stringify(pack);
+const DOUGHNUT_ID = 'yt-stack-pillar-chart';
+---
+
+<Base
+  title="Stack builder — Yield to Freedom"
+  description="Model a simple ETF stack: set capital, allocations, and see estimated monthly dividend income plus pillar balance from stored trailing yields."
+>
+  <article>
+    <h1 class="text-3xl font-bold tracking-tight text-slate-900">Stack builder</h1>
+    <p class="mt-2 max-w-2xl text-slate-600">
+      Paste or pick up to three tickers from our universe — weights normalize to 100%. Estimates assume each holding’s trailing
+      12‑month yield from our Neon snapshot; they are illustrative, not forward‑looking payouts.
+    </p>
+
+    <div id="stack-builder-root" class="mt-10 space-y-8" data-etfs={PACK_JSON} x-data="stackBuilder()" x-cloak>
+      <section class="grid gap-6 lg:grid-cols-3">
+        <label class="block text-xs font-semibold uppercase text-slate-500 lg:col-span-1">
+          Invested capital ($)
+          <input
+            type="number"
+            min="0"
+            step="500"
+            class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-base font-semibold tabular-nums text-slate-900"
+            x-model.number="principal"
+            @input="tick()"
+          />
+        </label>
+        <div class="flex flex-wrap items-end gap-3 lg:col-span-2">
+          <button
+            type="button"
+            class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
+            @click="equalize()"
+          >
+            Equal‑weight selections
+          </button>
+          <p class="text-xs text-slate-500 lg:max-w-md">
+            Weights among selected ETFs are scaled if they don’t sum to 100%.
+          </p>
+        </div>
+      </section>
+
+      <div class="grid gap-8 lg:grid-cols-3">
+        <template x-for="col in [0,1,2]" :key="col">
+          <div class="space-y-2 rounded-xl border border-slate-100 bg-slate-50/40 px-4 py-4">
+            <label class="block text-xs font-semibold uppercase text-slate-500">
+              Holding <span x-text="col + 1"></span>
+            </label>
+            <select
+              class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-900"
+              x-model.number="slotIdx[col]"
+              @change="syncTicker(col); tick()"
+            >
+              <option value="-1">— none —</option>
+              <template x-for="(row, ix) in catalog" :key="row.ticker">
+                <option :value="ix" x-text="`${row.ticker} — ${row.name}`"></option>
+              </template>
+            </select>
+            <label class="mt-2 block text-xs font-semibold uppercase text-slate-500">
+              Weight %
+              <input
+                type="number"
+                min="0"
+                max="100"
+                step="1"
+                class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm tabular-nums text-slate-900"
+                x-model.number.lazy="pct[col]"
+                :disabled="!tickers[col]"
+                @change="tick()"
+              />
+            </label>
+          </div>
+        </template>
+      </div>
+
+      <section class="grid gap-8 lg:grid-cols-2">
+        <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+          <h2 class="text-xs font-semibold uppercase tracking-wide text-slate-500">Estimated dividend income*</h2>
+          <p class="mt-3 text-xs text-slate-500">
+            Raw allocation sum:
+            <span class="tabular-nums font-medium text-slate-700" x-text="pctSum.toFixed(1)"></span>%
+          </p>
+          <p class="mt-4 text-4xl font-bold tabular-nums text-slate-900" x-text="fmtUsd(monthlyIncome)"></p>
+          <p class="mt-1 text-sm text-slate-600">per month · cash · before tax & friction</p>
+          <template x-if="activeRows().length && pctSum > 100">
+            <p class="mt-3 text-xs text-amber-800">
+              Weights above 100% are scaled evenly so the stack uses full principal (each row multiplied by <span class="tabular-nums font-semibold" x-text="pctSum ? (100 / pctSum).toFixed(2) : ''"></span>×).
+            </p>
+          </template>
+          <template x-if="activeRows().length && pctSum > 0 && pctSum < 99.999">
+            <p class="mt-3 text-xs text-sky-900">
+              Weights sum to <span class="tabular-nums font-semibold" x-text="pctSum.toFixed(1)"></span>% — modeling that share of principal in these ETFs with the remainder modeled as idle cash with 0% yield.
+            </p>
+          </template>
+          <template x-if="activeRows().length === 0">
+            <p class="mt-3 text-sm text-slate-500">Choose at least one ETF to see projections.</p>
+          </template>
+        </div>
+        <div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+          <h2 class="text-xs font-semibold uppercase tracking-wide text-slate-500">Pillar balance (weight)</h2>
+          <p class="mt-2 text-xs text-slate-500">
+            Share of normalized allocation riding each Yield to Freedom pillar tag.
+          </p>
+          <div class="relative mx-auto mt-5 h-64 w-full max-w-[20rem]">
+            <canvas id={DOUGHNUT_ID} class="absolute inset-0 max-h-full w-full"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <p class="text-xs text-slate-500">
+        * Twelve equal months of trailing yield — real funds pay on their own calendars; totals will differ. Not financial
+        advice.
+      </p>
+      <Disclaimer />
+    </div>
+  </article>
+</Base>
+
+<script>
+  import Alpine from 'alpinejs';
+
+  import { renderPillarAllocationDoughnut } from '../../lib/charts/pillar-allocation';
+
+  interface EtfPick {
+    ticker: string;
+    name: string;
+    pillar: string;
+    trailing12mYield: string | null;
+  }
+
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('stackBuilder', () => ({
+      catalog: [] as EtfPick[],
+      principal: 25_000,
+      slotIdx: [-1, -1, -1] as number[],
+      tickers: ['', '', ''] as string[],
+      pct: [34, 33, 33] as number[],
+      CANVAS_ID: 'yt-stack-pillar-chart',
+
+      init() {
+        const root = document.getElementById('stack-builder-root');
+        this.catalog = JSON.parse(root?.dataset.etfs ?? '[]') as EtfPick[];
+        for (let i = 0; i < 3; i++) this.syncTicker(i);
+        this.tick(false);
+      },
+
+      normalizedWeights(): { row: EtfPick; portfolioWeight: number }[] {
+        const rows = this.activeRows();
+        const sum = this.pctSum;
+        if (!sum || !rows.length) return [];
+        const cap = Math.min(sum, 100);
+        /** fraction of principal allocated to ETFs (remainder modeled as idle) */
+        const deployed = cap / 100;
+        /** split `deployed` across rows proportional to weights */
+        return rows.map((r) => ({
+          row: r.row,
+          portfolioWeight: deployed * (r.rawPct / sum),
+        }));
+      },
+
+      syncTicker(col: number) {
+        const idx = Number(this.slotIdx[col]);
+        if (!Number.isFinite(idx) || idx < 0) {
+          this.tickers[col] = '';
+          return;
+        }
+        const row = this.catalog[idx];
+        this.tickers[col] = row ? row.ticker.toUpperCase() : '';
+        this.ensureUnique();
+      },
+
+      ensureUnique() {
+        const seen = new Set<string>();
+        for (let i = 0; i < 3; i++) {
+          const t = String(this.tickers[i] ?? '').trim().toUpperCase();
+          if (!t) continue;
+          if (seen.has(t)) {
+            this.tickers[i] = '';
+            this.slotIdx[i] = -1;
+            continue;
+          }
+          seen.add(t);
+        }
+      },
+
+      activeRows(): { col: number; ticker: string; row: EtfPick; rawPct: number }[] {
+        const out: { col: number; ticker: string; row: EtfPick; rawPct: number }[] = [];
+        for (let i = 0; i < 3; i++) {
+          const t = String(this.tickers[i] ?? '').trim().toUpperCase();
+          if (!t) continue;
+          const ix = Number(this.slotIdx[i]);
+          if (!Number.isFinite(ix) || ix < 0) continue;
+          const row = this.catalog[ix];
+          if (!row || row.ticker.toUpperCase() !== t) continue;
+          const rawPct = Number(this.pct[i]);
+          out.push({
+            col: i,
+            ticker: t,
+            row,
+            rawPct: Number.isFinite(rawPct) ? Math.max(rawPct, 0) : 0,
+          });
+        }
+        return out;
+      },
+
+      get pctSum(): number {
+        return this.activeRows().reduce((s, x) => s + x.rawPct, 0);
+      },
+
+      fmtUsd(v: number): string {
+        if (!Number.isFinite(v)) return '—';
+        return `$${v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      },
+
+      get monthlyIncome(): number {
+        let sum = 0;
+        const p = Number(this.principal);
+        const principal = Number.isFinite(p) && p >= 0 ? p : 0;
+
+        const norm = this.normalizedWeights();
+        for (const { row, portfolioWeight } of norm) {
+          const yRaw = Number(row.trailing12mYield);
+          if (!Number.isFinite(yRaw)) continue;
+          const slice = principal * portfolioWeight;
+          sum += slice * yRaw / 12;
+        }
+        return sum;
+      },
+
+      pillarSlices(): { label: string; value: number; color: string }[] {
+        const colors: Record<string, string> = {
+          income: '#fb923c',
+          stability: '#6366f1',
+          growth: '#14b8a6',
+          mixed: '#64748b',
+        };
+        const bucket: Record<string, number> = {};
+        for (const { row, portfolioWeight } of this.normalizedWeights()) {
+          const p = row.pillar || 'mixed';
+          bucket[p] = (bucket[p] ?? 0) + portfolioWeight * 100;
+        }
+        const out: { label: string; value: number; color: string }[] = [];
+        for (const [label, value] of Object.entries(bucket)) {
+          if (!(value > 0)) continue;
+          out.push({
+            label: label.charAt(0).toUpperCase() + label.slice(1),
+            value,
+            color: colors[label] ?? '#94a3b8',
+          });
+        }
+        const idle = 100 - Math.min(this.pctSum, 100);
+        if (idle >= 0.25 && this.activeRows().length) {
+          out.push({ label: 'Cash (idle)', value: idle, color: '#cbd5e1' });
+        }
+        out.sort((a, b) => b.value - a.value);
+        return out;
+      },
+
+      equalize() {
+        const rows = this.activeRows();
+        if (!rows.length) return;
+        const each = Number((100 / rows.length).toFixed(4));
+        for (let i = 0; i < 3; i++) this.pct[i] = 0;
+        for (const r of rows) {
+          this.pct[r.col] = each;
+        }
+        this.tick();
+      },
+
+      tick(debounceChart = true) {
+        if (debounceChart) queueMicrotask(() => this.paintChart());
+        else this.paintChart();
+      },
+
+      paintChart() {
+        const canvas = document.getElementById(this.CANVAS_ID);
+        if (!(canvas instanceof HTMLCanvasElement)) return;
+        const slices = this.pillarSlices();
+        if (!slices.length) {
+          renderPillarAllocationDoughnut(canvas, [], [], []);
+          return;
+        }
+        renderPillarAllocationDoughnut(
+          canvas,
+          slices.map((s) => s.label),
+          slices.map((s) => s.value),
+          slices.map((s) => s.color),
+        );
+      },
+    }));
+  });
+
+  Alpine.start();
+</script>

@@ -83,7 +83,13 @@ const chartId = `dividend-chart-${etf.ticker}`;
           <GradeChip grade={etf.ytfGrade} />
         </div>
         <p class="mt-2 max-w-2xl text-lg text-slate-700">{etf.name}</p>
-        <div class="mt-4 flex flex-wrap gap-3">
+        <div class="mt-4 flex flex-wrap items-center gap-3">
+          <a
+            href={`/compare?a=${etf.ticker}`}
+            class="text-sm font-medium text-blue-800 underline decoration-blue-800/35 hover:text-blue-950 hover:decoration-blue-950/50"
+          >
+            Compare ETFs
+          </a>
           <Badge label={etf.pillar} pillar={etf.pillar} />
           {
             etf.category ? (

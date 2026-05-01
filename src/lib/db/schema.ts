@@ -201,15 +201,20 @@ export const userHoldings = pgTable(
 
 // ─── EMAIL SUBSCRIBERS ────────────────────────────────────────────────────────
 
-export const emailSubscribers = pgTable('email_subscribers', {
-  id: serial('id').primaryKey(),
-  email: varchar('email', { length: 255 }).notNull().unique(),
-  source: varchar('source', { length: 50 }),
-  confirmed: boolean('confirmed').default(false),
-  confirmedAt: timestamp('confirmed_at'),
-  unsubscribed: boolean('unsubscribed').default(false),
-  createdAt: timestamp('created_at').defaultNow(),
-});
+export const emailSubscribers = pgTable(
+  'email_subscribers',
+  {
+    id: serial('id').primaryKey(),
+    email: varchar('email', { length: 255 }).notNull().unique(),
+    source: varchar('source', { length: 50 }),
+    verificationToken: varchar('verification_token', { length: 64 }),
+    confirmed: boolean('confirmed').default(false),
+    confirmedAt: timestamp('confirmed_at'),
+    unsubscribed: boolean('unsubscribed').default(false),
+    createdAt: timestamp('created_at').defaultNow(),
+  },
+  (t) => [index('email_subscribers_verification_token_idx').on(t.verificationToken)],
+);
 
 // ─── GRADE ALERTS ─────────────────────────────────────────────────────────────
 

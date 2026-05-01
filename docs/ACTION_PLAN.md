@@ -8,7 +8,7 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 
 **How to track progress:** Mark checklist items with `[x]` when done; leave `[ ]` until finished. Update the *last progress update* line whenever you check something in.
 
-*Last progress update: 2026-05-05 — User verified **FMP** key access. Sprint 2 MVP shipped: **`/etfs`** + **`/api/etfs`**, static ETF profiles (+ Chart.js + JSON-LD), **grading** (`npm run run-grader`), **cron sync + grade** routes (**`CRON_SECRET`**), homepage refresh. Astro **default static** still bundles server endpoints via **`prerender: false`**. **Todo:** cron smoke-test 5 tickers in prod preview; publish Vercel + env.*
+*Last progress update: 2026-05-06 — **Sprint 4 tools:** **`/compare`** (URL `?a&b&c`, Alpine, TTM dividend-yield curves via **`GET /api/etfs/[ticker]/yield-trail`**), **`/stack-builder`** (baked Neon snapshot, allocations, pillar doughnut). **`/etf/[t]`** links to Compare. Nav + **`.env.example`** (Resend + `PUBLIC_SITE_URL`). Todo: plug **CRON_SECRET** / **Resend** on Vercel; **`npm run db:migrate`** for subscribe token if DB not migrated.*
 
 ---
 
@@ -38,6 +38,22 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 | 2.5 Grader SPEC §11 + `npm run run-grader` | [x] |
 | 2.6 Dividend chart (Chart.js) | [x] |
 | 2.7 Cron **`/api/cron/sync-etfs`** + **`/api/cron/grade-etfs`** | [x] code ([ ] nightly smoke 5 tickers) |
+
+### Sprint 3 — Strategy & capture
+
+| Step | Done |
+|------|------|
+| 3.1 Homepage (hero, pillars, spotlight, capture, footer links) | [x] |
+| 3.2 `POST /api/subscribe` + confirm flow + Neon column | [x] |
+| 3.3 Strategy `/strategy` + drip / margin / FI timeline (+ Article JSON-LD) | [x] |
+| 3.4 About `/about` | [x] |
+
+### Sprint 4 — Tools
+
+| Step | Done |
+|------|------|
+| 4.1 Compare `/compare` (+ **`/api/etfs/[ticker]/yield-trail`**) | [x] |
+| 4.2 Stack Builder `/stack-builder` | [x] |
 
 ---
 
@@ -499,11 +515,11 @@ Each page links to 3–5 relevant ETF profiles.
 
 ### Sprint 3 Completion Criteria
 
-- [ ] Homepage renders with hero, pillar explainer, email capture
-- [ ] Email capture POSTs to `/api/subscribe` and sends confirmation email
-- [ ] All four strategy pages live with Article schema
-- [ ] About page live
-- [ ] All public pages have unique `<title>` and `<meta description>`
+- [x] Homepage renders with hero, pillar explainer, email capture
+- [x] Email capture POSTs to `/api/subscribe` (**Resend sends when `RESEND_API_KEY`** is set — otherwise `{ emailSent:false }`)
+- [x] All four strategy pages live with Article schema
+- [x] About page live
+- [x] All public routes above ship unique `<title>` + `<meta description>` *(spot-check periodically for drift)*
 
 ---
 
@@ -542,10 +558,10 @@ const etfData = await db.select({
 
 ### Sprint 4 Completion Criteria
 
-- [ ] Compare tool works with 2–3 ETFs via URL params
-- [ ] Stack Builder calculates monthly income projection
-- [ ] Pillar balance pie chart renders in Stack Builder
-- [ ] Both tools mobile-responsive
+- [x] Compare tool works with 2–3 ETFs via URL params
+- [x] Stack Builder calculates monthly income projection
+- [x] Pillar balance pie chart renders in Stack Builder
+- [x] Both tools mobile-responsive
 
 ---
 

@@ -1,0 +1,61 @@
+---
+import Base from '../../layouts/Base.astro';
+import { publicSiteOrigin } from '../../lib/site/url';
+
+const site = publicSiteOrigin();
+const published = '2026-05-05';
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'Margin Awareness for Income Investors',
+  datePublished: published,
+  dateModified: published,
+  author: { '@type': 'Organization', name: 'Yield to Freedom', url: site },
+  publisher: { '@type': 'Organization', name: 'Creative Bandit LLC', url: site },
+  description: 'Risks and sequencing notes for investors mixing margin loans with dividend-focused ETFs.',
+};
+---
+
+<Base
+  title="Margin & borrowing — Yield to Freedom"
+  description="Costs, sequencing, and risk disclosures for using margin alongside income ETFs."
+  schema={schema}
+>
+  <article
+    class="max-w-3xl space-y-4 leading-relaxed text-slate-700 [&_a]:font-semibold [&_a]:text-blue-700 hover:[&_a]:text-blue-900 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6 [&_strong]:font-semibold"
+  >
+    <h1 class="text-3xl font-bold tracking-tight text-slate-900">Margin & borrowing</h1>
+    <p class="rounded-lg bg-rose-50 p-4 text-rose-950 ring-1 ring-rose-200">
+      <strong>Warning:</strong> Margin amplifies gains and losses. Brokerages can liquidate holdings during margin
+      calls with no discretion on your timetable. Covered-call ETFs can still swing with equity markets underneath.
+    </p>
+    <h2 class="mt-10 text-xl font-bold text-slate-900">Yield vs. borrowing cost</h2>
+    <p>
+      Investors sometimes compare ETF distribution rates to broker margin APRs—the math can look compelling when markets
+      are calm. Rates float, resets happen, and NAV volatility can overwhelm a narrow “yield minus rate” spread.
+      Stress-test at +200–300 bps on your rate assumption before relying on distributions to carry leverage.
+    </p>
+    <h2 class="mt-10 text-xl font-bold text-slate-900">Liquidity & psychology</h2>
+    <p>
+      Dividend ETFs like <a href="/etfs/SCHD">SCHD</a> or broad growth sleeves like <a href="/etfs/VOO">VOO</a>{' '}
+      trade liquidly, yet rapid drawdowns can force delevering at disadvantageous prints. Decide in advance whether
+      your margin sleeve is tactical (short-lived) or structural (paired with airtight risk limits).
+    </p>
+    <h2 class="mt-10 text-xl font-bold text-slate-900">Income ETFs with income-synthetic wrappers</h2>
+    <p>
+      Covered-call portfolios (<a href="/etfs/QYLD">QYLD</a>, <a href="/etfs/XYLD">XYLD</a>, <a href="/etfs/JEPI">JEPI</a>
+      ) export option premium into yield. That does not remove equity risk; it changes the distribution profile. Mixing
+      those with margin means multiple layers of convexity—understand both before committing.
+    </p>
+    <p>
+      Continue reading: <a href="/strategy">Strategy overview</a> ·{' '}
+      <a href="/strategy/fi-timeline">FI Score & timelines</a>
+    </p>
+    <footer class="mt-12 border-t border-slate-100 pt-6 text-sm text-slate-600">
+      <p>
+        Not individualized advice—speak with a fiduciary professional before implementing leverage strategies.
+      </p>
+    </footer>
+  </article>
+</Base>

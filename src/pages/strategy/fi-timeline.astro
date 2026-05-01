@@ -1,0 +1,60 @@
+---
+import Base from '../../layouts/Base.astro';
+import { publicSiteOrigin } from '../../lib/site/url';
+
+const site = publicSiteOrigin();
+const published = '2026-05-05';
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'FI Score and Freedom Timelines',
+  datePublished: published,
+  dateModified: published,
+  author: { '@type': 'Organization', name: 'Yield to Freedom', url: site },
+  publisher: { '@type': 'Organization', name: 'Creative Bandit LLC', url: site },
+  description: 'How to think about monthly portfolio income versus expense targets on the path to financial independence.',
+};
+---
+
+<Base
+  title="FI Score & timelines — Yield to Freedom"
+  description="Map portfolio income to monthly expenses and stress-test what “enough” really means."
+  schema={schema}
+>
+  <article
+    class="max-w-3xl space-y-4 leading-relaxed text-slate-700 [&_a]:font-semibold [&_a]:text-blue-700 hover:[&_a]:text-blue-900 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6 [&_strong]:font-semibold"
+  >
+    <h1 class="text-3xl font-bold tracking-tight text-slate-900">FI Score & timelines</h1>
+    <p>
+      Financial independence rarely hinges on one number—you need recurring cash flows (or reliably sellable assets)
+      that meet or exceed recurring expenses across realistic stress tests. Yield to Freedom tracks this by comparing
+      <strong>durable portfolio income</strong> to your <strong>monthly expense target</strong>.
+    </p>
+    <h2 class="mt-10 text-xl font-bold text-slate-900">Simple mental model</h2>
+    <p>
+      If your brokerage projects ~$450 of monthly ETF distributions net of withholding and your lean monthly budget is
+      $13,500, you are ~3.3% of the way on an income-only basis—which is why we pair income sleeves with growth and
+      stability pillars instead of chasing the highest headline yield in isolation.
+    </p>
+    <h2 class="mt-10 text-xl font-bold text-slate-900">Why we still show growth sleeves</h2>
+    <p>
+      Names like <a href="/etfs/VOO">VOO</a> or <a href="/etfs/QQQ">QQQ</a> might trail covered-call funds on raw
+      yield, but they anchor long-term purchasing power. The FI timeline is healthier when withdrawals can flex between
+      yield, modest sales, and side income rather than pretending distributions alone will never fluctuate.
+    </p>
+    <h2 class="mt-10 text-xl font-bold text-slate-900">Putting ETFs to work</h2>
+    <p>
+      Browse income-focused funds such as <a href="/etfs/JEPI">JEPI</a>, <a href="/etfs/SPYI">SPYI</a>, and{' '}
+      <a href="/etfs/SCHD">SCHD</a>, blend them deliberately, and record “distribution per $100k invested” in a
+      spreadsheet so you stress-test downturns realistically.
+    </p>
+    <p>
+      Also read <a href="/strategy/drip">DRIP mechanics</a> and{' '}
+      <a href="/strategy">the strategy overview</a>.
+    </p>
+    <footer class="mt-12 border-t border-slate-100 pt-6 text-sm text-slate-600">
+      <p>Numbers here are illustrative; your timeline depends on taxes, withdrawals, wages, healthcare, and other variables.</p>
+    </footer>
+  </article>
+</Base>

@@ -1,0 +1,2 @@
+ALTER TABLE "email_subscribers" ADD COLUMN "verification_token" varchar(64);--> statement-breakpoint
+CREATE INDEX "email_subscribers_verification_token_idx" ON "email_subscribers" USING btree ("verification_token");
