@@ -6,6 +6,27 @@
 
 This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-time work (~5–10 hrs/week alongside contract work). Complete tasks in order — later sprints depend on earlier ones.
 
+**How to track progress:** Mark checklist items with `[x]` when done; leave `[ ]` until finished. Update the *last progress update* line whenever you check something in.
+
+*Last progress update: 2026-05-01 — Sprint 1.1–1.3, 1.8 done; `.env.example` uses `DATABASE_URL`.*
+
+---
+
+## Current sprint — quick status (Sprint 1)
+
+| Step | Done |
+|------|------|
+| 1.1 Initialize project | [x] |
+| 1.2 Install dependencies | [x] |
+| 1.3 Configure Astro (Vercel, Clerk, Tailwind) | [x] |
+| 1.4 Neon + Drizzle | [ ] |
+| 1.5 FMP client | [ ] |
+| 1.6 Seed ETFs | [ ] |
+| 1.7 Vercel project & env | [ ] |
+| 1.8 `.gitignore` | [x] |
+
+> **Tailwind note:** Astro 6 / Vite 7: use **Tailwind v4 via PostCSS** (`@tailwindcss/postcss`, `postcss.config.mjs`), not `@tailwindcss/vite`, until that plugin supports the current Vite resolver.
+
 ---
 
 ## Pre-Work Checklist (Before Any Code)
@@ -47,8 +68,8 @@ npm install astro@6.2.1 @astrojs/vercel@10.0.6 typescript@6.0.3
 npm install drizzle-orm@0.45.2 @neondatabase/serverless@1.1.0
 npm install -D drizzle-kit@0.31.10
 
-# Styling (Tailwind v4 — Vite plugin, no @astrojs/tailwind)
-npm install tailwindcss@4.2.4 @tailwindcss/vite@4.2.4
+# Styling (Tailwind v4 — PostCSS in this repo; see note under Sprint 1 table)
+npm install tailwindcss@4.2.4 @tailwindcss/postcss@4.2.4 postcss
 
 # Auth
 npm install @clerk/astro@3.1.0
@@ -76,7 +97,6 @@ npm install -D @astrojs/check@0.9.9 tsx
 import { defineConfig } from 'astro/config';
 import vercel from '@astrojs/vercel';
 import clerk from '@clerk/astro';
-import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   output: 'static',
@@ -85,9 +105,6 @@ export default defineConfig({
     edgeMiddleware: true,
   }),
   integrations: [clerk()],
-  vite: {
-    plugins: [tailwindcss()],
-  },
 });
 ```
 
@@ -224,18 +241,21 @@ DATABASE_URL=$DEV_DATABASE_URL npx tsx scripts/seed-etfs.ts
 
 ### 1.8 Configure .gitignore
 
+- [x] Done in repo (includes Vercel local output).
+
 ```
 .env
 .env.local
 node_modules/
 dist/
+.vercel/
 .astro/
 ```
 
 ### Sprint 1 Completion Criteria
 
-- [ ] `npm run dev` runs without errors
-- [ ] `npm run build` succeeds
+- [x] `npm run dev` runs without errors
+- [x] `npm run build` succeeds
 - [ ] DB schema applied to dev Neon branch
 - [ ] 5 ETFs seeded and queryable
 - [ ] FMP client returns valid data for JEPI, SCHD, VOO
