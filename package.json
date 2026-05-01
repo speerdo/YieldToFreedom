@@ -14,7 +14,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "seed:etfs": "tsx scripts/seed-etfs.ts"
+    "seed:etfs": "tsx scripts/seed-etfs.ts",
+    "run-grader": "tsx scripts/run-grader.ts"
   },
   "dependencies": {
     "@astrojs/vercel": "10.0.6",

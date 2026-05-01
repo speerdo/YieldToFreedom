@@ -1,0 +1,35 @@
+---
+interface Props {
+  grade?: string | null;
+}
+const { grade } = Astro.props;
+
+const trimmed = grade?.trim().toUpperCase() ?? '';
+
+const tier: Record<string, string> = {
+  A: 'bg-emerald-100 text-emerald-900 ring-emerald-600/30',
+  B: 'bg-sky-100 text-sky-900 ring-sky-600/25',
+  C: 'bg-amber-100 text-amber-900 ring-amber-600/25',
+  D: 'bg-rose-100 text-rose-900 ring-rose-600/30',
+};
+
+const chipClass =
+  trimmed && trimmed in tier
+    ? tier[trimmed]!
+    : 'bg-slate-100 text-slate-700 ring-slate-500/25';
+
+const shell = [
+  'inline-flex min-h-7 min-w-7 items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset tabular-nums',
+  chipClass,
+];
+---
+
+{
+  trimmed ? (
+    <span class:list={shell} title="Yield to Freedom grade — research purposes only.">
+      {trimmed}
+    </span>
+  ) : (
+    <span class="text-xs font-medium text-slate-400">—</span>
+  )
+}

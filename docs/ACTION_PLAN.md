@@ -8,11 +8,13 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 
 **How to track progress:** Mark checklist items with `[x]` when done; leave `[ ]` until finished. Update the *last progress update* line whenever you check something in.
 
-*Last progress update: 2026-05-01 — Sprint §1.4–1.6 done locally (schema migrated, ETFs seeded via `npm run seed:etfs`); `.env.example` extended; `vercel.json` committed (§1.7 partial). **Still todo:** Vercel dashboard + preview deploy (§1.7); add `FMP_API_KEY` and smoke-test JEPI/SCHD/VOO (§1.5).*
+*Last progress update: 2026-05-05 — User verified **FMP** key access. Sprint 2 MVP shipped: **`/etfs`** + **`/api/etfs`**, static ETF profiles (+ Chart.js + JSON-LD), **grading** (`npm run run-grader`), **cron sync + grade** routes (**`CRON_SECRET`**), homepage refresh. Astro **default static** still bundles server endpoints via **`prerender: false`**. **Todo:** cron smoke-test 5 tickers in prod preview; publish Vercel + env.*
 
 ---
 
-## Current sprint — quick status (Sprint 1)
+## Sprint status tracker
+
+### Sprint 1 — Foundation
 
 | Step | Done |
 |------|------|
@@ -20,12 +22,28 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 | 1.2 Install dependencies | [x] |
 | 1.3 Configure Astro (Vercel, Clerk, Tailwind) | [x] |
 | 1.4 Neon + Drizzle | [x] |
-| 1.5 FMP client | [x] in repo · smoke-test pending (`FMP_API_KEY`) |
-| 1.6 Seed ETFs | [x] |
-| 1.7 Vercel project & env | [ ] dashboard ([x] `vercel.json`) |
+| 1.5 FMP client (`src/lib/fmp/client.ts`, `/stable/`) | [x] user-tested key |
+| 1.6 Seed ETFs (`npm run seed:etfs`) | [x] |
+| 1.7 Vercel dashboard + env vars + preview branch | [ ] (`vercel.json` [x]) |
 | 1.8 `.gitignore` | [x] |
 
+### Sprint 2 — ETF directory
+
+| Step | Done |
+|------|------|
+| 2.1 Base layout (`Base`, `Header`, `Footer`, `Seo`) | [x] |
+| 2.2 Shared UI chips | [x] |
+| 2.3 `/etfs/[ticker]` (+JSON-LD, disclaimer, related) | [x] |
+| 2.4 `GET /api/etfs` (+ `GET /api/etfs/[ticker]`) | [x] |
+| 2.5 Grader SPEC §11 + `npm run run-grader` | [x] |
+| 2.6 Dividend chart (Chart.js) | [x] |
+| 2.7 Cron **`/api/cron/sync-etfs`** + **`/api/cron/grade-etfs`** | [x] code ([ ] nightly smoke 5 tickers) |
+
+---
+
 > **Tailwind note:** Astro 6 / Vite 7: use **Tailwind v4 via PostCSS** (`@tailwindcss/postcss`, `postcss.config.mjs`), not `@tailwindcss/vite`, until that plugin supports the current Vite resolver.
+>
+> **Astro server routes:** Astro 6 removed **`output: 'hybrid'`** — **default static** still emits serverless bundles via **`@astrojs/vercel`** when routes declare **`export const prerender = false`**.
 
 ---
 
@@ -263,7 +281,7 @@ dist/
 - [x] `npm run build` succeeds
 - [x] DB schema applied to dev Neon branch *(first migration pushed to linked DB — confirm branch in Neon UI)*
 - [x] 5 ETFs seeded and queryable *(full universe seeded; re-run safe via `ON CONFLICT DO NOTHING`)*
-- [ ] FMP client returns valid data for JEPI, SCHD, VOO *(add `FMP_API_KEY`, run a quick quote fetch)*
+- [x] FMP client returns valid data for JEPI, SCHD, VOO *(user verified API via key smoke test)*
 - [ ] Preview deployment live on Vercel
 - [ ] FMP commercial agreement conversation started
 
@@ -396,7 +414,8 @@ Implement `calculateYtfGrade` in `src/lib/grader/grade.ts` (full implementation 
 
 Run the grader against the full seeded universe:
 ```bash
-DATABASE_URL=$DEV_DATABASE_URL npx tsx scripts/run-grader.ts
+npm run run-grader
+# or: DATABASE_URL=... npx tsx scripts/run-grader.ts
 ```
 
 ### 2.6 DividendChart Component
@@ -417,13 +436,13 @@ npx tsx -e "import('./src/pages/api/cron/sync-etfs.ts')"
 
 ### Sprint 2 Completion Criteria
 
-- [ ] `/etfs` loads with full ETF list
-- [ ] Screener filters work (pillar, grade, frequency)
-- [ ] `/etfs/JEPI` renders correctly with dividend chart
-- [ ] All ETF pages have FinancialProduct JSON-LD
-- [ ] Disclaimer component present on all ETF pages
-- [ ] Grade algorithm run against all ~75 ETFs
-- [ ] Nightly sync tested against 5 tickers
+- [x] `/etfs` loads with full ETF list *(DB snapshot at build/prerender)*
+- [x] Screener filters work (pillar, grade, frequency + search + sort)
+- [x] `/etfs/JEPI` renders *(dividend chart shows data after sync; otherwise empty-state copy)*
+- [x] ETF pages carry `FinancialProduct` JSON-LD
+- [x] Disclaimer block on profile pages
+- [x] Grade algorithm run on entire **seeded** universe (`npm run run-grader`; expand list for “~75 ETFs” plan)
+- [ ] Nightly sync tested against **5 tickers** *(call `GET /api/cron/sync-etfs` with `Authorization: Bearer $CRON_SECRET` in preview)*
 
 ---
 

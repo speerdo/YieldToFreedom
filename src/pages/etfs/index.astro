@@ -1,0 +1,278 @@
+---
+import { asc, eq } from 'drizzle-orm';
+
+import Base from '../../layouts/Base.astro';
+import { db } from '../../lib/db';
+import { etfs } from '../../lib/db/schema';
+
+const list = await db
+  .select()
+  .from(etfs)
+  .where(eq(etfs.isActive, true))
+  .orderBy(asc(etfs.ticker));
+---
+
+<Base
+  title="ETF directory — Yield to Freedom"
+  description="Browse and filter Yield to Freedom's income ETF universe by pillar, grade, payout frequency, and more."
+>
+  <h1 class="text-3xl font-bold tracking-tight text-slate-900">ETF directory</h1>
+  <p class="mt-2 max-w-2xl text-slate-600">
+    Filter our curated universe and open a profile for metrics and payout history — verify all data externally
+    before investing.
+  </p>
+
+  <div class="mt-10 space-y-6" id="etf-screener-root" x-data="etfScreener()" x-cloak>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <label class="text-xs font-semibold uppercase text-slate-500">
+        Pillar
+        <select
+          class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-900"
+          x-model="pillar"
+        >
+          <option value="all">All</option>
+          <option value="income">Income</option>
+          <option value="stability">Stability</option>
+          <option value="growth">Growth</option>
+          <option value="mixed">Mixed</option>
+        </select>
+      </label>
+      <label class="text-xs font-semibold uppercase text-slate-500">
+        Grade
+        <select
+          class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-900"
+          x-model="grade"
+        >
+          <option value="all">All</option>
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+          <option value="D">D</option>
+          <option value="__none">No grade yet</option>
+        </select>
+      </label>
+      <label class="text-xs font-semibold uppercase text-slate-500">
+        Dividend frequency
+        <select
+          class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-900"
+          x-model="frequency"
+        >
+          <option value="all">All</option>
+          <option value="monthly">Monthly</option>
+          <option value="quarterly">Quarterly</option>
+          <option value="annual">Annual</option>
+          <option value="irregular">Irregular</option>
+          <option value="__none">Unknown</option>
+        </select>
+      </label>
+      <label class="text-xs font-semibold uppercase text-slate-500">
+        Search
+        <input
+          type="search"
+          class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-900"
+          placeholder="Ticker or name"
+          x-model="search"
+        />
+      </label>
+    </div>
+
+    <div class="-mx-4 overflow-x-auto sm:mx-0">
+      <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+        <thead class="sticky top-0 bg-slate-50 text-xs font-semibold uppercase text-slate-500">
+          <tr>
+            <th class="cursor-pointer whitespace-nowrap px-4 py-3 hover:text-blue-700" @click="toggleSort('ticker')">
+              Ticker <span x-text="caret('ticker')"></span></th>
+            <th class="min-w-[12rem] cursor-pointer px-4 py-3 hover:text-blue-700" @click="toggleSort('name')">
+              Name <span x-text="caret('name')"></span></th>
+            <th class="cursor-pointer px-4 py-3 hover:text-blue-700" @click="toggleSort('pillar')">
+              Pillar <span x-text="caret('pillar')"></span></th>
+            <th class="cursor-pointer px-4 py-3 hover:text-blue-700" @click="toggleSort('ytf_grade')">
+              Grade <span x-text="caret('ytf_grade')"></span></th>
+            <th class="cursor-pointer whitespace-nowrap px-4 py-3 hover:text-blue-700" @click="toggleSort('trailing_yield')">
+              T12M yield <span x-text="caret('trailing_yield')"></span></th>
+            <th class="cursor-pointer whitespace-nowrap px-4 py-3 hover:text-blue-700" @click="toggleSort('expense')">
+              ER <span x-text="caret('expense')"></span></th>
+            <th class="hidden px-4 py-3 sm:table-cell">Frequency</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 bg-white">
+          <template x-for="row in ordered" :key="row.id">
+            <tr class="hover:bg-blue-50/40">
+              <td class="px-4 py-3 font-semibold text-blue-900">
+                <a
+                  class="underline decoration-blue-700/40 hover:decoration-blue-900"
+                  :href="`/etfs/${row.ticker}`"
+                  x-text="row.ticker"
+                ></a>
+              </td>
+              <td class="px-4 py-3 text-slate-700">
+                <a class="hover:text-blue-800" :href="`/etfs/${row.ticker}`" x-text="row.name"></a>
+              </td>
+              <td class="px-4 py-3" x-html="pillarHTML(row.pillar)"></td>
+              <td class="px-4 py-3" x-html="gradeHTML(row.ytfGrade)"></td>
+              <td class="px-4 py-3 tabular-nums text-slate-800" x-text="fmtYieldPct(row.trailing12mYield)"></td>
+              <td class="px-4 py-3 tabular-nums text-slate-800" x-text="fmtErPct(row.expenseRatio)"></td>
+              <td class="hidden px-4 py-3 text-xs uppercase text-slate-600 sm:table-cell">
+                <span x-text="row.dividendFrequency ?? '—'"></span>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="text-sm text-slate-500"><span x-text="ordered.length"></span> ETFs match filters.</p>
+  </div>
+
+  <noscript class="mt-10 block rounded-xl border border-amber-400 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+    Enable JavaScript for filtering — JSON feed:<code class="ml-2 rounded bg-white px-1 text-xs ring-1 ring-amber-400/70"
+      >/api/etfs</code
+    >
+  </noscript>
+</Base>
+
+<script define:vars={{ initialRows: list }}>
+  import Alpine from 'alpinejs';
+
+  function pctFromDecimal(s) {
+    if (s === null || s === undefined || s === '') return null;
+    const n = Number(s);
+    return Number.isFinite(n) ? n * 100 : null;
+  }
+
+  function pillarHTML(pillar) {
+    const p = pillar ?? '';
+    const map = {
+      income: 'bg-orange-50 text-orange-900 ring-orange-700/25',
+      stability: 'bg-indigo-50 text-indigo-900 ring-indigo-700/25',
+      growth: 'bg-teal-50 text-teal-900 ring-teal-700/25',
+      mixed: 'bg-slate-50 text-slate-800 ring-slate-700/25',
+    };
+    const cls = map[p] ?? map.mixed;
+    return `<span class="inline-flex rounded-full px-3 py-0.5 text-xs font-semibold capitalize ring-1 ring-inset ${cls}">${p}</span>`;
+  }
+
+  function gradeHTML(grade) {
+    const g = (grade ?? '').trim().toUpperCase();
+    if (!g) {
+      return '<span class="text-xs font-medium text-slate-400">—</span>';
+    }
+    const tiers = {
+      A: 'bg-emerald-100 text-emerald-900 ring-emerald-600/30',
+      B: 'bg-sky-100 text-sky-900 ring-sky-600/25',
+      C: 'bg-amber-100 text-amber-900 ring-amber-600/25',
+      D: 'bg-rose-100 text-rose-900 ring-rose-600/30',
+    };
+    const cls = tiers[g] ?? 'bg-slate-100 text-slate-700 ring-slate-500/25';
+    return `<span class="inline-flex min-h-7 min-w-7 items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset tabular-nums ${cls}" title="YTF grade — research purposes only.">${g}</span>`;
+  }
+
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('etfScreener', () => ({
+      rows: initialRows.map((r) => ({
+        id: r.id,
+        ticker: r.ticker,
+        name: r.name,
+        pillar: r.pillar,
+        ytfGrade: r.ytfGrade ?? null,
+        dividendFrequency: r.dividendFrequency ?? null,
+        trailing12mYield: r.trailing12mYield ?? null,
+        expenseRatio: r.expenseRatio ?? null,
+      })),
+      pillar: 'all',
+      grade: 'all',
+      frequency: 'all',
+      search: '',
+      sort: 'ticker',
+      dir: 'asc',
+
+      pillarHTML,
+      gradeHTML,
+
+      fmtYieldPct(v) {
+        const p = pctFromDecimal(v);
+        return p == null ? '—' : `${p.toFixed(2)}%`;
+      },
+      fmtErPct(v) {
+        const p = pctFromDecimal(v);
+        return p == null ? '—' : `${p.toFixed(3)}%`;
+      },
+
+      matches(row) {
+        if (this.pillar !== 'all' && row.pillar !== this.pillar) return false;
+
+        const g = (row.ytfGrade ?? '').trim().toUpperCase();
+        if (this.grade === '__none') {
+          if (g) return false;
+        } else if (this.grade !== 'all' && g !== this.grade) return false;
+
+        const f = (row.dividendFrequency ?? '').toLowerCase();
+        if (this.frequency === '__none') {
+          if (row.dividendFrequency) return false;
+        } else if (this.frequency !== 'all' && f !== this.frequency) return false;
+
+        const q = this.search.trim().toUpperCase();
+        if (q) {
+          if (!row.ticker.toUpperCase().includes(q) && !row.name.toUpperCase().includes(q))
+            return false;
+        }
+
+        return true;
+      },
+
+      get filtered() {
+        return this.rows.filter((row) => this.matches(row));
+      },
+
+      get ordered() {
+        const rows = [...this.filtered];
+        const sign = this.dir === 'asc' ? 1 : -1;
+
+        rows.sort((a, b) => {
+          switch (this.sort) {
+            case 'ticker':
+              return a.ticker.localeCompare(b.ticker) * sign;
+            case 'name':
+              return a.name.localeCompare(b.name) * sign;
+            case 'pillar':
+              return a.pillar.localeCompare(b.pillar) * sign;
+            case 'ytf_grade':
+              return (a.ytfGrade ?? '').localeCompare(b.ytfGrade ?? '') * sign;
+            case 'trailing_yield': {
+              const na = pctFromDecimal(a.trailing12mYield) ?? -Infinity;
+              const nb = pctFromDecimal(b.trailing12mYield) ?? -Infinity;
+              return na === nb ? 0 : na < nb ? -1 * sign : 1 * sign;
+            }
+            case 'expense': {
+              const na = pctFromDecimal(a.expenseRatio) ?? Infinity;
+              const nb = pctFromDecimal(b.expenseRatio) ?? Infinity;
+              return na === nb ? 0 : na < nb ? -1 * sign : 1 * sign;
+            }
+            default:
+              return 0;
+          }
+        });
+
+        return rows;
+      },
+
+      toggleSort(key) {
+        if (this.sort === key) {
+          this.dir = this.dir === 'asc' ? 'desc' : 'asc';
+        } else {
+          this.sort = key;
+          this.dir =
+            key === 'ticker' || key === 'name' || key === 'pillar' || key === 'ytf_grade'
+              ? 'asc'
+              : 'desc';
+        }
+      },
+
+      caret(key) {
+        return this.sort === key ? (this.dir === 'asc' ? '▲' : '▼') : '';
+      },
+    }));
+  });
+
+  Alpine.start();
+</script>

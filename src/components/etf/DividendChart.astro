@@ -1,0 +1,27 @@
+---
+interface Props {
+  labels: string[];
+  amounts: number[];
+  canvasId: string;
+}
+const { labels, amounts, canvasId } = Astro.props;
+const payload = JSON.stringify({ labels, amounts, canvasId });
+---
+
+{
+  labels.length && amounts.length ? (
+    <div
+      class="relative mt-8 h-72 w-full"
+      data-ytf-dividend-chart={payload}
+    >
+      <canvas id={canvasId} />
+    </div>
+  ) : (
+    <p class="mt-6 text-sm text-slate-600">No dividend history in the database yet.</p>
+  )
+}
+
+<script>
+  import { mountDividendChartsFromDom } from '../../lib/charts/dividend-bar';
+  mountDividendChartsFromDom();
+</script>

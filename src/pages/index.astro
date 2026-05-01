@@ -1,16 +1,30 @@
 ---
-import '../styles/global.css';
+import Base from '../layouts/Base.astro';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Base
+  title="Yield to Freedom — Income ETF Research"
+  description="Explore income-forward ETFs mapped to Yield to Freedom pillars — Income, Stability, and Growth. Educational research, not personalized advice."
+>
+  <section class="mx-auto max-w-3xl py-16 text-center">
+    <p class="text-sm font-semibold uppercase tracking-[0.2em] text-blue-700">Creative Bandit LLC</p>
+    <h1 class="mt-6 text-balance text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
+      Build Income. Reach Freedom.
+    </h1>
+    <p class="mt-6 text-lg leading-relaxed text-slate-600">
+      A focused directory for income-oriented ETFs rated with the Yield to Freedom framework — pillar fit,
+      payouts, expenses, size, and stability — for self-directed investors doing their own homework.
+    </p>
+    <div class="mt-10 flex flex-wrap justify-center gap-4">
+      <a
+        href="/etfs"
+        class="inline-flex items-center rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-800"
+      >
+        Explore ETFs
+      </a>
+      <span class="rounded-lg bg-slate-100 px-5 py-2.5 text-sm text-slate-600">
+        Guides & tools coming soon
+      </span>
+    </div>
+  </section>
+</Base>

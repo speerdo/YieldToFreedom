@@ -1,0 +1,203 @@
+---
+import { and, asc, desc, eq, ne } from 'drizzle-orm';
+
+import DividendChart from '../../components/etf/DividendChart.astro';
+import Badge from '../../components/ui/Badge.astro';
+import Card from '../../components/ui/Card.astro';
+import Disclaimer from '../../components/ui/Disclaimer.astro';
+import GradeChip from '../../components/ui/GradeChip.astro';
+import Base from '../../layouts/Base.astro';
+import { db } from '../../lib/db';
+import { etfDividends, etfs } from '../../lib/db/schema';
+
+export async function getStaticPaths() {
+  const all = await db
+    .select({ ticker: etfs.ticker })
+    .from(etfs)
+    .where(eq(etfs.isActive, true));
+  return all.map(({ ticker }) => ({ params: { ticker } }));
+}
+
+const raw = Astro.params.ticker;
+if (!raw) return Astro.redirect('/etfs');
+const ticker = raw.toUpperCase();
+
+const [etf] = await db.select().from(etfs).where(eq(etfs.ticker, ticker)).limit(1);
+if (!etf) return Astro.redirect('/etfs');
+
+const dividends = await db
+  .select()
+  .from(etfDividends)
+  .where(eq(etfDividends.etfId, etf.id))
+  .orderBy(desc(etfDividends.exDate))
+  .limit(48);
+
+const chartOrdered = [...dividends].sort((a, b) => String(a.exDate).localeCompare(String(b.exDate)));
+const chartLabels = chartOrdered.map((d) => String(d.exDate));
+const chartAmounts = chartOrdered.map((d) => Number(d.amount));
+
+function fmtPct(decStr: string | null | undefined, digits = 2): string {
+  if (decStr === null || decStr === undefined || decStr === '') return '—';
+  const v = Number(decStr);
+  if (!Number.isFinite(v)) return '—';
+  return `${(v * 100).toFixed(digits)}%`;
+}
+
+function fmtBillionsUsd(decStr: string | null | undefined): string {
+  if (decStr === null || decStr === undefined || decStr === '') return '—';
+  const v = Number(decStr);
+  if (!Number.isFinite(v)) return '—';
+  const b = v / 1e9;
+  if (b >= 1) return `$${b.toFixed(2)}B`;
+  const m = v / 1e6;
+  if (m >= 1) return `$${m.toFixed(2)}M`;
+  return `$${v.toLocaleString()}`;
+}
+
+const related = await db
+  .select()
+  .from(etfs)
+  .where(and(eq(etfs.isActive, true), eq(etfs.pillar, etf.pillar), ne(etfs.id, etf.id)))
+  .orderBy(asc(etfs.ticker))
+  .limit(8);
+
+const descText = `${etf.name} (${etf.ticker}) — pillar ${etf.pillar}; Yield to Freedom ETF profile & payouts snapshot.`;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'FinancialProduct',
+  name: etf.name,
+  description: `${etf.name} (${etf.ticker}) — income ETF snapshot for research.`,
+};
+
+const chartId = `dividend-chart-${etf.ticker}`;
+---
+
+<Base title={`${etf.ticker} ETF — ${etf.name}`} description={descText.slice(0, 160)} schema={schema}>
+  <article>
+    <div class="flex flex-wrap items-start justify-between gap-6 border-b border-slate-100 pb-8">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-wide text-slate-500">ETF profile</p>
+        <div class="mt-2 flex flex-wrap items-center gap-3">
+          <h1 class="text-4xl font-bold tracking-tight text-slate-900">{etf.ticker}</h1>
+          <GradeChip grade={etf.ytfGrade} />
+        </div>
+        <p class="mt-2 max-w-2xl text-lg text-slate-700">{etf.name}</p>
+        <div class="mt-4 flex flex-wrap gap-3">
+          <Badge label={etf.pillar} pillar={etf.pillar} />
+          {
+            etf.category ? (
+              <Badge label={etf.category.replace(/-/g, ' ')} pillar="mixed" />
+            ) : null
+          }
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-slate-100 bg-slate-50 px-6 py-4 text-xs text-slate-500">
+        <p>YTF grades are research-only — they are not financial advice.</p>
+        {
+          etf.fmpLastSynced ? (
+            <p class="mt-3 font-medium text-slate-700">
+              Snapshot refreshed {(etf.fmpLastSynced instanceof Date
+                ? etf.fmpLastSynced
+                : new Date(String(etf.fmpLastSynced))
+              ).toISOString().slice(0, 10)}
+              .
+            </p>
+          ) : (
+            <p class="mt-3 font-medium text-amber-800">
+              Pricing has not synced from FMP yet — run nightly sync.
+            </p>
+          )
+        }
+      </div>
+    </div>
+
+    <div class="mt-10 grid gap-6 md:grid-cols-3">
+      <Card>
+        <p class="text-xs font-semibold uppercase text-slate-500">Last price</p>
+        <p class="mt-2 text-2xl font-semibold tabular-nums">{etf.lastPrice ?? '—'}</p>
+      </Card>
+      <Card>
+        <p class="text-xs font-semibold uppercase text-slate-500">Trailing 12-mo yield*</p>
+        <p class="mt-2 text-2xl font-semibold tabular-nums">{fmtPct(etf.trailing12mYield)}</p>
+      </Card>
+      <Card>
+        <p class="text-xs font-semibold uppercase text-slate-500">Expense ratio*</p>
+        <p class="mt-2 text-2xl font-semibold tabular-nums">{fmtPct(etf.expenseRatio, 3)}</p>
+      </Card>
+      <Card>
+        <p class="text-xs font-semibold uppercase text-slate-500">Approx. size (market cap)**</p>
+        <p class="mt-2 text-2xl font-semibold tabular-nums">{fmtBillionsUsd(etf.aum)}</p>
+      </Card>
+      <Card>
+        <p class="text-xs font-semibold uppercase text-slate-500">Dividend frequency*</p>
+        <p class="mt-2 text-2xl font-semibold capitalize">{etf.dividendFrequency ?? '—'}</p>
+      </Card>
+      <Card>
+        <p class="text-xs font-semibold uppercase text-slate-500">Yield to Freedom grade</p>
+        <div class="mt-2"><GradeChip grade={etf.ytfGrade} /></div>
+        <p class="mt-2 text-xs tabular-nums text-slate-600">Score {etf.ytfScore ?? '—'}</p>
+      </Card>
+    </div>
+
+    <section class="mt-12">
+      <h2 class="text-xl font-bold text-slate-900">Dividend distributions (stored)</h2>
+      <p class="mt-2 text-sm text-slate-600">
+        Rows below reflect Neon data (filled when FMP nightly sync succeeds).
+      </p>
+      <DividendChart labels={chartLabels} amounts={chartAmounts} canvasId={chartId} />
+      <div class="mt-8 w-full overflow-x-auto">
+        <table class="min-w-full text-sm">
+        <thead class="text-left text-xs font-semibold uppercase text-slate-500">
+          <tr>
+            <th class="py-2 pr-4">Ex-date</th>
+            <th class="py-2 pr-4">Pay date</th>
+            <th class="py-2 pr-4">Amount</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {
+            dividends.map((d) => (
+              <tr>
+                <td class="py-2 pr-4 tabular-nums text-slate-800">{String(d.exDate)}</td>
+                <td class="py-2 pr-4 tabular-nums text-slate-600">
+                  {d.paymentDate ? String(d.paymentDate) : '—'}
+                </td>
+                <td class="py-2 pr-4 tabular-nums text-slate-900">${Number(d.amount).toFixed(4)}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-14">
+      <h2 class="text-xl font-bold text-slate-900">Others in the same pillar</h2>
+      <div class="mt-4 grid gap-3 sm:grid-cols-2">
+        {
+          related.length ? (
+            related.map((x) => (
+              <Card>
+                <a class="text-lg font-semibold text-blue-800 hover:text-blue-950" href={`/etfs/${x.ticker}`}>
+                  {x.ticker}
+                </a>
+                <p class="mt-1 text-sm text-slate-600">{x.name}</p>
+              </Card>
+            ))
+          ) : (
+            <p class="text-sm text-slate-500">No sibling ETFs in this pillar yet.</p>
+          )
+        }
+      </div>
+    </section>
+
+    <p class="mt-10 text-xs text-slate-500">
+      * Dividend cadence / ER / modeled yield hydrate when synced from vendor payloads.** Approximate size derives
+      from market capitalization when disclosed — differs from audited AUM lines in factsheets — confirm filings.
+    </p>
+
+    <Disclaimer />
+  </article>
+</Base>

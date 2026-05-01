@@ -1,0 +1,15 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  schema?: object;
+}
+const { title, description, schema } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin);
+---
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical.toString()} />
+{schema ? (
+  <script type="application/ld+json" is:inline>{JSON.stringify(schema)}</script>
+) : null}

@@ -1,0 +1,27 @@
+---
+interface Props {
+  label: string;
+  pillar?: string;
+}
+
+const { label, pillar = '' } = Astro.props;
+
+const tone: Record<string, string> = {
+  income: 'bg-orange-50 text-orange-900 ring-orange-700/25',
+  stability: 'bg-indigo-50 text-indigo-900 ring-indigo-700/25',
+  growth: 'bg-teal-50 text-teal-900 ring-teal-700/25',
+  mixed: 'bg-slate-50 text-slate-800 ring-slate-700/25',
+};
+
+const pillarKey = pillar.toLowerCase() as keyof typeof tone;
+const classes = pillarKey in tone ? tone[pillarKey] : tone.mixed;
+---
+
+<span
+  class:list={[
+    'inline-flex rounded-full px-3 py-0.5 text-xs font-semibold capitalize ring-1 ring-inset',
+    classes,
+  ]}
+>
+  {label}
+</span>
