@@ -18,8 +18,6 @@ const STATIC_PATHS = [
   '/strategy/margin',
   '/strategy/fi-timeline',
   '/blog',
-  '/subscribe/confirmed',
-  '/subscribe/invalid',
 ] as const;
 
 function escapeXml(s: string): string {
