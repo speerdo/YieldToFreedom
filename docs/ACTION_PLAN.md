@@ -8,7 +8,7 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 
 **How to track progress:** Mark checklist items with `[x]` when done; leave `[ ]` until finished. Update the *last progress update* line whenever you check something in.
 
-*Last progress update: 2026-05-01 — Sprint 1.1–1.3, 1.8 done; `.env.example` uses `DATABASE_URL`.*
+*Last progress update: 2026-05-01 — Sprint §1.4–1.6 done locally (schema migrated, ETFs seeded via `npm run seed:etfs`); `.env.example` extended; `vercel.json` committed (§1.7 partial). **Still todo:** Vercel dashboard + preview deploy (§1.7); add `FMP_API_KEY` and smoke-test JEPI/SCHD/VOO (§1.5).*
 
 ---
 
@@ -19,10 +19,10 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 | 1.1 Initialize project | [x] |
 | 1.2 Install dependencies | [x] |
 | 1.3 Configure Astro (Vercel, Clerk, Tailwind) | [x] |
-| 1.4 Neon + Drizzle | [ ] |
-| 1.5 FMP client | [ ] |
-| 1.6 Seed ETFs | [ ] |
-| 1.7 Vercel project & env | [ ] |
+| 1.4 Neon + Drizzle | [x] |
+| 1.5 FMP client | [x] in repo · smoke-test pending (`FMP_API_KEY`) |
+| 1.6 Seed ETFs | [x] |
+| 1.7 Vercel project & env | [ ] dashboard ([x] `vercel.json`) |
 | 1.8 `.gitignore` | [x] |
 
 > **Tailwind note:** Astro 6 / Vite 7: use **Tailwind v4 via PostCSS** (`@tailwindcss/postcss`, `postcss.config.mjs`), not `@tailwindcss/vite`, until that plugin supports the current Vite resolver.
@@ -130,33 +130,36 @@ export default defineConfig({
 3. Copy the connection strings (pooled) for both branches to `.env`
 
 ```typescript
-// drizzle.config.ts
+// drizzle.config.ts — repo also calls `import 'dotenv/config'` and accepts
+// DATABASE_URL or NEON_DATABASE_CONNECTION_STRING
+import 'dotenv/config';
 import { defineConfig } from 'drizzle-kit';
+
+const url = process.env.DATABASE_URL ?? process.env.NEON_DATABASE_CONNECTION_STRING;
 
 export default defineConfig({
   schema: './src/lib/db/schema.ts',
   out: './migrations',
   dialect: 'postgresql',
-  dbCredentials: { url: process.env.DATABASE_URL! },
+  dbCredentials: { url: url! },
 });
 ```
 
 ```typescript
-// src/lib/db/index.ts
+// src/lib/db/index.ts — resolves URL from import.meta.env (Astro) or process.env (scripts)
 import { drizzle } from 'drizzle-orm/neon-http';
 import { neon } from '@neondatabase/serverless';
 import * as schema from './schema';
 
-const sql = neon(import.meta.env.DATABASE_URL);
-export const db = drizzle(sql, { schema });
+// see repo for resolveDatabaseUrl() + export const db = drizzle(...)
 ```
 
-5. Write the full schema in `src/lib/db/schema.ts` (copy from SPEC.md Section 5)
+5. Write the full schema in `src/lib/db/schema.ts` (copy from SPEC.md Section 5 — **committed**)
 6. Generate and apply first migration:
 
 ```bash
-npx drizzle-kit generate
-DATABASE_URL=$DEV_DATABASE_URL npx drizzle-kit migrate
+npm run db:generate
+npm run db:migrate
 ```
 
 ### 1.5 Build FMP Client
@@ -223,13 +226,15 @@ const ETF_UNIVERSE = [
 ];
 
 for (const etf of ETF_UNIVERSE) {
-  await db.insert(etfs).values(etf).onConflictDoNothing();
+  await db.insert(etfs).values(etf).onConflictDoNothing({ target: etfs.ticker });
   console.log(`Seeded ${etf.ticker}`);
 }
 ```
 
+Seed loads `.env` via `import 'dotenv/config'` (`tsx`).
+
 ```bash
-DATABASE_URL=$DEV_DATABASE_URL npx tsx scripts/seed-etfs.ts
+npm run seed:etfs
 ```
 
 ### 1.7 Set Up Vercel
@@ -237,7 +242,7 @@ DATABASE_URL=$DEV_DATABASE_URL npx tsx scripts/seed-etfs.ts
 1. Create Vercel project, connect GitHub repo
 2. Set all env vars in Vercel dashboard (copy from `.env.example`)
 3. Set production branch to `main`, preview branch to `develop`
-4. Add `vercel.json` with cron config
+4. **Repo:** `[x]` `vercel.json` with cron config (SPEC § Vercel) — wire dashboard when cron routes exist
 
 ### 1.8 Configure .gitignore
 
@@ -256,9 +261,9 @@ dist/
 
 - [x] `npm run dev` runs without errors
 - [x] `npm run build` succeeds
-- [ ] DB schema applied to dev Neon branch
-- [ ] 5 ETFs seeded and queryable
-- [ ] FMP client returns valid data for JEPI, SCHD, VOO
+- [x] DB schema applied to dev Neon branch *(first migration pushed to linked DB — confirm branch in Neon UI)*
+- [x] 5 ETFs seeded and queryable *(full universe seeded; re-run safe via `ON CONFLICT DO NOTHING`)*
+- [ ] FMP client returns valid data for JEPI, SCHD, VOO *(add `FMP_API_KEY`, run a quick quote fetch)*
 - [ ] Preview deployment live on Vercel
 - [ ] FMP commercial agreement conversation started
 
