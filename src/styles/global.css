@@ -3,3 +3,38 @@
 [x-cloak] {
   display: none !important;
 }
+
+/* ── Theme variables ─────────────────────────────────────────────────── */
+
+:root,
+[data-theme="light"] {
+  --bg:        #ffffff;
+  --bg-subtle: #f8fafc;
+  --fg:        #0f172a;
+  --fg-muted:  #475569;
+  --border:    #e2e8f0;
+}
+
+[data-theme="dark"] {
+  --bg:        #0f172a;
+  --bg-subtle: #1e293b;
+  --fg:        #f1f5f9;
+  --fg-muted:  #94a3b8;
+  --border:    #334155;
+}
+
+[data-theme="tan"] {
+  --bg:        #f2e0c4;
+  --bg-subtle: #e8d5b0;
+  --fg:        #3b2410;
+  --fg-muted:  #7a5535;
+  --border:    #c4976a;
+}
+
+[data-theme="purple"] {
+  --bg:        #1a0830;
+  --bg-subtle: #2d1155;
+  --fg:        #f7e9b0;
+  --fg-muted:  #d4a843;
+  --border:    #5a2d82;
+}

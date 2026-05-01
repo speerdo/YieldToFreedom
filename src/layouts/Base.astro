@@ -20,6 +20,12 @@ function gaSrc(measurementId: string): string {
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <script is:inline>
+      (function () {
+        var t = localStorage.getItem('ytf-theme') || 'light';
+        document.documentElement.setAttribute('data-theme', t);
+      })();
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -41,7 +47,7 @@ function gaSrc(measurementId: string): string {
       ) : null
     }
   </head>
-  <body class="min-h-screen bg-white text-slate-900 antialiased">
+  <body class="min-h-screen bg-[var(--bg)] text-[var(--fg)] antialiased">
     <Header />
     <main class="mx-auto max-w-6xl px-4 py-8">
       <slot />

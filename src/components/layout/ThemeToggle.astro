@@ -1,0 +1,53 @@
+---
+const themes = [
+  { id: 'light',  label: 'Light',  bg: '#ffffff' },
+  { id: 'dark',   label: 'Dark',   bg: '#0f172a' },
+  { id: 'tan',    label: 'Tan',    bg: '#f2e0c4' },
+  { id: 'purple', label: 'Purple', bg: '#1a0830' },
+];
+---
+
+<div class="flex items-center gap-1.5" role="group" aria-label="Choose theme">
+  {themes.map(t => (
+    <button
+      data-theme-id={t.id}
+      title={`${t.label} theme`}
+      aria-label={`Switch to ${t.label} theme`}
+      aria-pressed="false"
+      class="theme-swatch h-5 w-5 rounded-full transition-transform hover:scale-110 focus-visible:outline-none"
+      style={`background:${t.bg};`}
+    />
+  ))}
+</div>
+
+<style>
+  .theme-swatch {
+    border: 1px solid color-mix(in srgb, var(--fg) 25%, transparent);
+  }
+  .theme-swatch[aria-pressed="true"] {
+    box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--fg);
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var saved = localStorage.getItem('ytf-theme') || 'light';
+
+    function mark(id) {
+      document.querySelectorAll('.theme-swatch').forEach(function (btn) {
+        btn.setAttribute('aria-pressed', btn.getAttribute('data-theme-id') === id ? 'true' : 'false');
+      });
+    }
+
+    mark(saved);
+
+    document.querySelectorAll('.theme-swatch').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.getAttribute('data-theme-id');
+        document.documentElement.setAttribute('data-theme', id);
+        localStorage.setItem('ytf-theme', id);
+        mark(id);
+      });
+    });
+  })();
+</script>

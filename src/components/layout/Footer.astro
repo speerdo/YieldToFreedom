@@ -11,18 +11,18 @@ const links = [
 ];
 ---
 
-<footer class="mt-16 border-t border-slate-200 bg-slate-50">
-  <div class="mx-auto max-w-6xl px-4 py-10 text-center text-xs text-slate-500">
-    <nav class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-medium text-slate-600">
+<footer class="mt-16 border-t border-[var(--border)] bg-[var(--bg-subtle)]">
+  <div class="mx-auto max-w-6xl px-4 py-10 text-center text-xs text-[var(--fg-muted)]">
+    <nav class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-medium text-[var(--fg-muted)]">
       {
         links.map(({ href, label }) => (
-          <a href={href} class="hover:text-slate-900">
+          <a href={href} class="hover:text-[var(--fg)]">
             {label}
           </a>
         ))
       }
     </nav>
-    <p class="mt-6 font-medium text-slate-700">&copy; {year} Creative Bandit LLC</p>
+    <p class="mt-6 font-medium text-[var(--fg)]">&copy; {year} Creative Bandit LLC</p>
     <p class="mt-3 mx-auto max-w-2xl leading-relaxed">
       Content is educational only and does not constitute financial advice. ETF metrics and Yield to Freedom grades
       reflect historical data from third-party sources — verify before investing.
