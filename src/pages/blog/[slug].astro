@@ -1,0 +1,64 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+
+import Base from '../../layouts/Base.astro';
+import Disclaimer from '../../components/ui/Disclaimer.astro';
+import { publicSiteOrigin } from '../../lib/site/url';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const site = publicSiteOrigin();
+const published = post.data.pubDate.toISOString().slice(0, 10);
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: post.data.title,
+  datePublished: published,
+  dateModified: published,
+  author: { '@type': 'Organization', name: 'Yield to Freedom', url: site },
+  publisher: { '@type': 'Organization', name: 'Creative Bandit LLC', url: site },
+  description: post.data.description,
+};
+---
+
+<Base title={`${post.data.title} — Yield to Freedom`} description={post.data.description} schema={schema}>
+  <article
+    class="max-w-3xl space-y-4 leading-relaxed text-slate-700 [&_a]:font-semibold [&_a]:text-blue-700 hover:[&_a]:text-blue-900 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-6 [&_h2]:mt-10 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-slate-900 [&_strong]:font-semibold"
+  >
+    <header class="border-b border-slate-100 pb-8">
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">{published}</p>
+      <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">{post.data.title}</h1>
+      <p class="mt-3 text-lg text-slate-600">{post.data.description}</p>
+      {
+        post.data.relatedEtfs?.length ? (
+          <p class="mt-4 text-sm text-slate-600">
+            Related profiles:{' '}
+            {post.data.relatedEtfs.map((t, i) => (
+              <>
+                {i > 0 ? ', ' : null}
+                <a href={`/etfs/${t}`}>{t}</a>
+              </>
+            ))}
+          </p>
+        ) : null
+      }
+    </header>
+    <div class="prose-flow">
+      <Content />
+    </div>
+    <Disclaimer />
+  </article>
+</Base>

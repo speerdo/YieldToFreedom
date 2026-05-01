@@ -2,7 +2,9 @@
 
 **Domain:** yieldtofreedom.com  
 **Entity:** Creative Bandit LLC  
-**Version:** 1.0 | May 2026  
+**Version:** 1.1 | May 2026  
+
+> **As-built vs blueprint:** Section 2–4 and the repository tree reflect the running repo (Astro 6 static + Vercel adapter, Tailwind via PostCSS, content collections, subscribe + compare routes). Phase 2 paths remain forward-looking.
 
 ---
 
@@ -88,7 +90,10 @@ Vercel Edge Network
 | Package | Version | Purpose |
 |---|---|---|
 | `tailwindcss` | `4.2.4` | CSS framework (v4 — CSS-first config) |
-| `@tailwindcss/vite` | `4.2.4` | Vite plugin for Tailwind v4 (replaces `@astrojs/tailwind`) |
+| `@tailwindcss/postcss` | `4.2.4` | PostCSS plugin for Tailwind v4 in this repo |
+| `postcss` | `^8.5` | Build pipeline for Tailwind |
+
+> **Resolver note:** Do **not** use `@tailwindcss/vite` with the current Astro 6 + Vite 7 stack in this project; Tailwind is wired through `postcss.config.mjs` instead (see §4).
 
 ### Auth, Payments, Email
 
@@ -134,10 +139,12 @@ yield-to-freedom/
 │
 ├── public/
 │   ├── favicon.svg
-│   ├── og-default.png
-│   └── robots.txt
+│   └── robots.txt                 # Sitemap pointer; disallow /api/, /app/
+│
+├── postcss.config.mjs
 │
 ├── src/
+│   ├── content.config.ts           # Content collections (blog glob loader)
 │   ├── components/
 │   │   ├── ui/
 │   │   │   ├── Button.astro
@@ -173,6 +180,7 @@ yield-to-freedom/
 │   │
 │   ├── pages/
 │   │   ├── index.astro
+│   │   ├── sitemap.xml.ts            # Dynamic sitemap (prerender false; Neon + blog URLs)
 │   │   ├── etfs/
 │   │   │   ├── index.astro
 │   │   │   └── [ticker].astro
@@ -181,13 +189,18 @@ yield-to-freedom/
 │   │   │   ├── drip.astro
 │   │   │   ├── margin.astro
 │   │   │   └── fi-timeline.astro
-│   │   ├── compare.astro
-│   │   ├── stack-builder.astro
+│   │   ├── compare/
+│   │   │   └── index.astro           # URL ?a & b & c · Alpine
+│   │   ├── stack-builder/
+│   │   │   └── index.astro           # Client-only math + Chart.js doughnut
 │   │   ├── blog/
 │   │   │   ├── index.astro
 │   │   │   └── [slug].astro
 │   │   ├── about.astro
-│   │   ├── login.astro
+│   │   ├── login.astro               # Phase 2
+│   │   ├── subscribe/                # Newsletter UX
+│   │   │   ├── confirmed.astro
+│   │   │   └── invalid.astro
 │   │   │
 │   │   ├── app/                      # Phase 2 — SSR, Clerk-protected
 │   │   │   ├── index.astro           # Dashboard
@@ -201,7 +214,12 @@ yield-to-freedom/
 │   │   └── api/
 │   │       ├── etfs/
 │   │       │   ├── index.ts
-│   │       │   └── [ticker].ts
+│   │       │   ├── [ticker].ts
+│   │       │   └── [ticker]/
+│   │       │       └── yield-trail.ts   # GET TTM-style yield series for /compare
+│   │       ├── subscribe/
+│   │       │   ├── index.ts             # POST JSON body opt-in
+│   │       │   └── confirm.ts           # GET ?token= verify + redirect
 │   │       ├── portfolio/
 │   │       │   ├── sync.ts
 │   │       │   └── holdings.ts
@@ -213,42 +231,36 @@ yield-to-freedom/
 │   │       │   └── webhook.ts
 │   │       ├── auth/
 │   │       │   └── sync-user.ts      # Clerk webhook handler
-│   │       ├── subscribe.ts
 │   │       └── cron/
 │   │           ├── sync-etfs.ts
-│   │           ├── grade-etfs.ts
-│   │           └── send-alerts.ts
-│   │
-│   ├── lib/
-│   │   ├── db/
-│   │   │   ├── index.ts
-│   │   │   └── schema.ts
-│   │   ├── fmp/
-│   │   │   ├── client.ts
-│   │   │   ├── etfs.ts
-│   │   │   └── dividends.ts
-│   │   ├── snaptrade/
-│   │   │   └── client.ts
-│   │   ├── grader/
-│   │   │   └── grade.ts
-│   │   ├── stripe/
-│   │   │   └── client.ts
-│   │   └── utils/
-│   │       ├── finance.ts
-│   │       └── format.ts
+│   │           └── grade-etfs.ts     # send-alerts.ts — Phase 2 (not in vercel.json yet)
 │   │
 │   ├── content/
 │   │   └── blog/
 │   │       └── *.md
 │   │
-│   └── middleware.ts
+│   ├── lib/
+│   │   ├── charts/                   # dividend-bar, compare-yield-line, pillar-allocation
+│   │   ├── db/
+│   │   │   ├── index.ts
+│   │   │   └── schema.ts
+│   │   ├── etfs/                     # TTM yield trail math for /compare
+│   │   ├── fmp/
+│   │   │   └── client.ts             # https://financialmodelingprep.com/stable
+│   │   ├── grader/
+│   │   │   ├── grade.ts
+│   │   │   └── run-all.ts
+│   │   ├── http/                     # cron-auth.ts, json-body.ts
+│   │   └── site/                     # publicSiteOrigin() helpers
+│   │
 │
 ├── migrations/
-│   └── 0001_initial.sql
+│   ├── 0000_initial.sql
+│   └── 0001_email_sub_verification_token.sql   # subscribe double opt-in token + index
 │
 └── scripts/
     ├── seed-etfs.ts
-    └── backfill-history.ts
+    └── run-grader.ts              # invoked via npm run run-grader
 ```
 
 ---
@@ -263,64 +275,67 @@ Astro 5 removed the `hybrid` output mode. In Astro 6:
 
 For this project: use `output: 'static'`. All public pages prerender at build time. All `/app/*` pages declare `export const prerender = false`.
 
-### Key Change: Tailwind v4
+### Key Change: Tailwind v4 (PostCSS, not Vite plugin)
 
-Tailwind v4 uses a Vite plugin, not the `@astrojs/tailwind` integration. Configuration is CSS-first — no `tailwind.config.js` required.
+Tailwind v4 ships a PostCSS plugin. **This repo** uses `@tailwindcss/postcss` in `postcss.config.mjs` rather than `@tailwindcss/vite`, because the Vite plugin’s resolver conflicts with Astro 6 / Vite 7 in our setup (`npm run dev` fails to resolve `@import "tailwindcss"` when the plugin is enabled).
+
+Configuration is CSS-first — no required `tailwind.config.js`.
 
 ```javascript
 // astro.config.mjs
 import { defineConfig } from 'astro/config';
 import vercel from '@astrojs/vercel';
 import clerk from '@clerk/astro';
-import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
+  site: 'https://yieldtofreedom.com',
   output: 'static',
   adapter: vercel({
     webAnalytics: { enabled: true },
     edgeMiddleware: true,
   }),
-  integrations: [
-    clerk(),
-  ],
-  vite: {
-    plugins: [tailwindcss()],
-  },
+  integrations: [clerk()],
 });
+```
+
+```javascript
+// postcss.config.mjs
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+  },
+};
 ```
 
 ```css
 /* src/styles/global.css */
 @import "tailwindcss";
 
-/* Custom tokens / theme overrides go here */
+/* Theme tokens / @theme overrides live here */
 ```
 
 ```typescript
-// tsconfig.json
-{
-  "extends": "astro/tsconfigs/strict",
-  "compilerOptions": {
-    "strictNullChecks": true
-  }
-}
+// src/content.config.ts — Content Layer `blog` collection (glob loader + `import { z } from 'astro/zod'`)
 ```
+
+`tsconfig.json` extends `astro/tsconfigs/strict` with `strictNullChecks: true`.
 
 ### Vercel Configuration
 
 ```json
-// vercel.json
+// vercel.json (as deployed — Phase 1)
 {
   "crons": [
-    { "path": "/api/cron/sync-etfs",   "schedule": "0 2 * * *" },
-    { "path": "/api/cron/grade-etfs",  "schedule": "0 3 * * 0" },
-    { "path": "/api/cron/send-alerts", "schedule": "0 8 * * *" }
+    { "path": "/api/cron/sync-etfs", "schedule": "0 2 * * *" },
+    { "path": "/api/cron/grade-etfs", "schedule": "0 3 * * 0" }
   ],
   "functions": {
     "src/pages/api/**/*.ts": { "maxDuration": 60 }
   }
 }
 ```
+
+> **`/api/cron/send-alerts`** is specified for Phase 2 alert email delivery but is **not** registered in `vercel.json` until that route exists in the repo.
 
 ### Drizzle Configuration
 
@@ -513,11 +528,14 @@ export const emailSubscribers = pgTable('email_subscribers', {
   id:          serial('id').primaryKey(),
   email:       varchar('email', { length: 255 }).notNull().unique(),
   source:      varchar('source', { length: 50 }),
+  verificationToken: varchar('verification_token', { length: 64 }), // hashed token for double opt-in
   confirmed:   boolean('confirmed').default(false),
   confirmedAt: timestamp('confirmed_at'),
   unsubscribed: boolean('unsubscribed').default(false),
   createdAt:   timestamp('created_at').defaultNow(),
-});
+}, (t) => [
+  index('email_subscribers_verification_token_idx').on(t.verificationToken),
+]);
 
 // ─── GRADE ALERTS ─────────────────────────────────────────────────────────────
 
@@ -543,9 +561,11 @@ export const gradeAlerts = pgTable('grade_alerts', {
 
 | Method | Path | Purpose |
 |---|---|---|
-| `GET` | `/api/etfs` | ETF screener with filter/sort params |
-| `GET` | `/api/etfs/[ticker]` | Single ETF profile |
-| `POST` | `/api/subscribe` | Email list opt-in |
+| `GET` | `/api/etfs` | ETF screener JSON (optional filters; Phase 1 may return full list) |
+| `GET` | `/api/etfs/[ticker]` | Single ETF row (JSON mirrors `etfs` table) |
+| `GET` | `/api/etfs/[ticker]/yield-trail` | TTM dividend-yield approximation for Compare chart |
+| `POST` | `/api/subscribe` | Newsletter opt-in; emails confirm link via Resend when configured |
+| `GET` | `/api/subscribe/confirm` | `?token=` — verifies double opt-in, redirects to UX page |
 
 ### Authenticated API (Clerk session required)
 
@@ -568,9 +588,9 @@ export const gradeAlerts = pgTable('grade_alerts', {
 
 | Method | Path | Schedule |
 |---|---|---|
-| `GET` | `/api/cron/sync-etfs` | `0 2 * * *` (nightly 02:00 UTC) |
-| `GET` | `/api/cron/grade-etfs` | `0 3 * * 0` (Sunday 03:00 UTC) |
-| `GET` | `/api/cron/send-alerts` | `0 8 * * *` (daily 08:00 UTC) |
+| `GET` | `/api/cron/sync-etfs` | `vercel.json` — `0 2 * * *` (02:00 UTC) |
+| `GET` | `/api/cron/grade-etfs` | `vercel.json` — `0 3 * * 0` (Sun 03:00 UTC) |
+| `GET` | `/api/cron/send-alerts` | *Planned Phase 2* — **not mounted** until route + `vercel.json` entry exist |
 
 ### Screener Query Parameters
 
@@ -631,10 +651,9 @@ GET /api/etfs?pillar=income&grade=A&frequency=monthly&minYield=5&maxEr=0.75&sort
 ### Compare Tool (`/compare`)
 
 - URL-driven state: `/compare?a=JEPI&b=SCHD&c=VOO`
-- Up to 3 ETFs side-by-side
-- Comparison grid: all key metrics + grade + yield chart overlay
-- Add/remove ETF selector
-- No auth required
+- Up to three ETFs via Alpine-driven catalog `<select>`s; URL updates via `history.replaceState`
+- Comparison grid pulls live JSON from **`GET /api/etfs/[ticker]`**; overlay pulls **`GET /api/etfs/[ticker]/yield-trail`**
+- Multi-series trailing-yield overlay (Chart.js scatter + lines; x = ex-date, y ≈ trailing cash yield %)
 
 ### Stack Builder (`/stack-builder`)
 
@@ -645,10 +664,10 @@ GET /api/etfs?pillar=income&grade=A&frequency=monthly&minYield=5&maxEr=0.75&sort
 
 ### Blog (`/blog`)
 
-- Astro content collections (`src/content/blog/*.md`)
-- Index: latest posts with excerpt, category badges
-- Post: full markdown render, reading time, related ETF links
-- JSON-LD: `Article` schema
+- Astro Content Layer (`src/content.config.ts`) with `glob()` loader targeting `src/content/blog/*.md` and Zod schema via `astro/zod`
+- Listing: `/blog`; posts: `/blog/[slug]` where slug matches collection entry id
+- `render()` helper from `astro:content` emits MDX-ish `<Content />` bodies
+- JSON-LD `Article` on posts; listing uses `Blog` schema
 
 ---
 
@@ -824,9 +843,11 @@ Runs Sunday 03:00 UTC. For each active ETF:
 3. Insert into `etf_grade_history`
 4. If grade changed, insert `grade_alerts` rows for all holders
 
-### Daily Alert Delivery (`/api/cron/send-alerts`)
+### Daily Alert Delivery (`/api/cron/send-alerts` — Phase 2)
 
-Runs 08:00 UTC. Send pending `grade_alerts` via Resend, mark `email_sent = true`.
+> **Status:** Cron job described for production alert delivery once holders + Resend alerting exist. **`vercel.json` does not invoke this route yet**; inserting rows into `grade_alerts` continues from `grade-etfs.ts`, but outbound email waits on this endpoint.
+
+Runs 08:00 UTC (planned). Send pending `grade_alerts` via Resend, mark `email_sent = true`.
 
 ### FMP API Status (Updated May 2026)
 
@@ -928,9 +949,10 @@ Plain HTML string templates rendered server-side. No React Email dependency for 
 
 ### Email Capture (Newsletter)
 
-- Form on homepage, blog, stack builder → `POST /api/subscribe`
-- Double opt-in: confirm email via Resend, set `confirmed = true` on click
-- Newsletter delivery via Loops.so (uses Resend as sending infrastructure)
+- Form on homepage (and optionally blog / stack-builder) POSTs JSON to **`/api/subscribe`**
+- Server stores `email_subscribers` row + `verification_token`, sends confirmation via **Resend** when `RESEND_API_KEY` is set (otherwise `{ emailSent: false }` for local/testing)
+- `GET /api/subscribe/confirm?token=` validates token via Neon, clears token, redirects to `/subscribe/confirmed` (Uses `PUBLIC_SITE_URL` / `SITE` / request origin — see `src/lib/site/url.ts`)
+- Dedicated UX routes: **`/subscribe/confirmed`**, **`/subscribe/invalid`**
 
 ---
 
@@ -993,12 +1015,17 @@ STRIPE_PRICE_ANNUAL=price_...
 
 # Resend
 RESEND_API_KEY=re_...
+RESEND_FROM="Yield to Freedom <hello@yieldtofreedom.com>"  # optional verified sender / dev fallback
 
 # Cron
 CRON_SECRET=minimum_32_char_random_string
 
-# App
+# App (server + outbound email links)
 PUBLIC_SITE_URL=https://yieldtofreedom.com
+# Legacy alias consumed by helpers: SITE=https://yieldtofreedom.com
+
+# Migrate after schema updates
+# npm run db:migrate   # applies ./migrations via drizzle-kit
 ```
 
 `PUBLIC_` prefix = exposed to client. All others are server-only. Never commit `.env`.
@@ -1026,10 +1053,10 @@ PUBLIC_SITE_URL=https://yieldtofreedom.com
 
 - Every page: unique `<title>`, `<meta description>`, canonical URL, OG tags
 - ETF pages: `FinancialProduct` JSON-LD
-- Strategy/blog pages: `Article` JSON-LD
+- Strategy/blog pages: `Article` JSON-LD (`Blog` type on `/blog` index)
 - Homepage: `WebSite` + `Organization` JSON-LD
-- Auto-generated XML sitemap (exclude `/app/*`, `/api/*`)
-- `robots.txt`: Disallow `/app/`, Disallow `/api/`
+- **`/sitemap.xml`** — built with `src/pages/sitemap.xml.ts` (`export const prerender = false`) so active ETF URLs (Neon), static routes, and published Markdown posts are enumerated at runtime on Vercel.
+- **`public/robots.txt`** — references `https://yieldtofreedom.com/sitemap.xml`, `Disallow: /api/` and `Disallow: /app/`
 
 ### Accessibility
 

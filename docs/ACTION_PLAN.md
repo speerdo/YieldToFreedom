@@ -8,7 +8,11 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 
 **How to track progress:** Mark checklist items with `[x]` when done; leave `[ ]` until finished. Update the *last progress update* line whenever you check something in.
 
-*Last progress update: 2026-05-06 — **Sprint 4 tools:** **`/compare`** (URL `?a&b&c`, Alpine, TTM dividend-yield curves via **`GET /api/etfs/[ticker]/yield-trail`**), **`/stack-builder`** (baked Neon snapshot, allocations, pillar doughnut). **`/etf/[t]`** links to Compare. Nav + **`.env.example`** (Resend + `PUBLIC_SITE_URL`). Todo: plug **CRON_SECRET** / **Resend** on Vercel; **`npm run db:migrate`** for subscribe token if DB not migrated.*
+*Last progress update: 2026-05-06 — **SPEC v1.1** (Tailwind PostCSS setup, APIs, **`email_subscribers.verification_token`**, sitemap/robots, cron realities). **Sprint 5 (partial):** Content Layer blog (**`src/content.config.ts`**, **`/blog`**), **`GET /sitemap.xml`**, **`public/robots.txt`**, **`vercel.json`** trimmed (**`send-alerts`** deferred until endpoint exists).
+
+**Already shipped Sprint 4:** **`/compare`**, **`/stack-builder`**, **`/api/etfs/[ticker]/yield-trail`**, Compare link from **`/etfs/[ticker]`**.
+
+Open items: draft **five** remaining launch posts; **`npm run db:migrate`** for subscribe token migration; GA / Search Console / AdSense per Sprint 5.4.*
 
 ---
 
@@ -54,6 +58,15 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 |------|------|
 | 4.1 Compare `/compare` (+ **`/api/etfs/[ticker]/yield-trail`**) | [x] |
 | 4.2 Stack Builder `/stack-builder` | [x] |
+
+### Sprint 5 — Blog & SEO
+
+| Step | Done |
+|------|------|
+| 5.1 Astro Content Layer + `/blog` + `[slug]` | [x] |
+| 5.2 Six launch ACTION_PLAN articles | [ ] (**2**/6 drafts in **`src/content/blog/`**) |
+| 5.3 Dynamic **`/sitemap.xml`** + **`public/robots.txt`** | [x] |
+| 5.4 Analytics · Search Console · AdSense | [ ] |
 
 ---
 
@@ -574,21 +587,26 @@ const etfData = await db.select({
 Use Astro content collections:
 
 ```typescript
-// src/content/config.ts
-import { defineCollection, z } from 'astro:content';
-export const collections = {
-  blog: defineCollection({
-    type: 'content',
-    schema: z.object({
-      title: z.string(),
-      description: z.string(),
-      pubDate: z.date(),
-      tags: z.array(z.string()).optional(),
-      relatedEtfs: z.array(z.string()).optional(),
-    }),
+// src/content.config.ts
+import { defineCollection } from 'astro:content';
+import { glob } from 'astro/loaders';
+import { z } from 'astro/zod';
+
+const blog = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/blog' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    pubDate: z.coerce.date(),
+    tags: z.array(z.string()).optional(),
+    relatedEtfs: z.array(z.string()).optional(),
   }),
-};
+});
+
+export const collections = { blog };
 ```
+
+Markdown sources live in **`src/content/blog/*.md`**. Post pages call **`render()`** from **`astro:content`** to obtain the `<Content />` component.
 
 ### 5.2 First 6 Posts (Targets for launch)
 
@@ -603,20 +621,7 @@ Each post links internally to relevant ETF profiles and strategy pages.
 
 ### 5.3 XML Sitemap
 
-```typescript
-// src/pages/sitemap.xml.ts
-import { db } from '../lib/db';
-import { etfs } from '../lib/db/schema';
-import { eq } from 'drizzle-orm';
-
-export async function GET() {
-  const allEtfs = await db.select({ ticker: etfs.ticker }).from(etfs).where(eq(etfs.isActive, true));
-  const etfUrls = allEtfs.map(e => `<url><loc>https://yieldtofreedom.com/etfs/${e.ticker}</loc></url>`);
-  // Add static pages, blog posts
-  const xml = `<?xml version="1.0" encoding="UTF-8"?><urlset ...>${etfUrls.join('')}</urlset>`;
-  return new Response(xml, { headers: { 'Content-Type': 'application/xml' } });
-}
-```
+Production implementation: **`src/pages/sitemap.xml.ts`** declares **`export const prerender = false`**, merges a static route allowlist + active ETF URLs from Drizzle (**requires `DATABASE_URL` at runtime on Vercel**) + **`getCollection('blog')`** slugs.
 
 ### 5.4 Analytics & Monetization Setup
 
@@ -626,10 +631,10 @@ export async function GET() {
 
 ### Sprint 5 Completion Criteria
 
-- [ ] Blog listing and post pages render
-- [ ] 6 launch posts written and published
-- [ ] XML sitemap generates all ETF URLs + static pages
-- [ ] robots.txt in place
+- [x] Blog listing and post pages render (`/blog`, `/blog/[slug]`)
+- [ ] 6 launch posts written and published (**2**/6 drafted in-repo)
+- [x] **`/sitemap.xml`** emits ETF URLs + static routes + blog posts (needs live DB hit for ETFs)
+- [x] `public/robots.txt` deployed with sitemap hint + crawler blocks on `/api/`, `/app/`
 - [ ] Analytics script installed
 - [ ] AdSense application submitted
 
