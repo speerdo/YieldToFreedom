@@ -8,9 +8,9 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 
 **How to track progress:** Mark checklist items with `[x]` when done; leave `[ ]` until finished. Update the *last progress update* line whenever you check something in.
 
-*Last progress update: 2026-05-06 — **Sprint 5:** Six **launch-topic** posts now live under **`src/content/blog/`** (ACTION_PLAN §5.2 set). Homepage hero links to **`/blog`**. **`PUBLIC_GA_MEASUREMENT_ID`** enables optional **GA4** tags from **`Base.astro`**; **`.env.example` + SPEC §15** updated. Still open: **Google Search Console**, **AdSense**, final editorial pass on posts, **`npm run db:migrate`** if needed.
+*Last progress update: 2026-05-01 — **Sprints 1–5 complete** (except §5.5 Search Console/AdSense). Recent additions: Vercel deploy fix (`vercel.json` `functions` pattern removed; `maxDuration: 60` moved to adapter in `astro.config.mjs`), four-mode theme switcher (§5.6) with CSS-variable theming across all components. **Next up: Sprint 6 soft-launch checklist** — start with `/privacy`, `/terms`, and Lighthouse audit.*
 
-**Prior ships (unchanged):** SPEC v1.1, **`/sitemap.xml`**, **`robots.txt`**, Sprint 4 tools.*
+**Prior ships:** SPEC v1.1, six blog posts, `/blog`, `/sitemap.xml`, `robots.txt`, GA4 hook, Sprint 4 tools.*
 
 ---
 
@@ -26,7 +26,7 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 | 1.4 Neon + Drizzle | [x] |
 | 1.5 FMP client (`src/lib/fmp/client.ts`, `/stable/`) | [x] user-tested key |
 | 1.6 Seed ETFs (`npm run seed:etfs`) | [x] |
-| 1.7 Vercel dashboard + env vars + preview branch | [ ] (`vercel.json` [x]) |
+| 1.7 Vercel dashboard + env vars + preview branch | [ ] (`vercel.json` [x]; deploy error fixed — removed invalid `functions` pattern, `maxDuration: 60` in adapter) |
 | 1.8 `.gitignore` | [x] |
 
 ### Sprint 2 — ETF directory
@@ -66,12 +66,15 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 | 5.3 Dynamic **`/sitemap.xml`** + **`public/robots.txt`** | [x] |
 | 5.4 Google Analytics 4 snippet (optional **`PUBLIC_GA_MEASUREMENT_ID`**) | [x] |
 | 5.5 Search Console · AdSense submission | [ ] |
+| 5.6 Four-mode theme switcher (light / dark / tan / purple) | [x] CSS vars on `[data-theme]`; all Tailwind slate classes remapped; 4-quadrant icon in header nav |
 
 ---
 
 > **Tailwind note:** Astro 6 / Vite 7: use **Tailwind v4 via PostCSS** (`@tailwindcss/postcss`, `postcss.config.mjs`), not `@tailwindcss/vite`, until that plugin supports the current Vite resolver.
 >
 > **Astro server routes:** Astro 6 removed **`output: 'hybrid'`** — **default static** still emits serverless bundles via **`@astrojs/vercel`** when routes declare **`export const prerender = false`**.
+>
+> **Vercel `functions` config:** Do **not** use the `functions` key in `vercel.json` with Astro. The adapter uses Vercel's Build Output API and emits functions to `.vercel/output/functions/` — the `src/pages/api/**/*.ts` source-path pattern will never match and causes a build error. Set `maxDuration` via the adapter option in `astro.config.mjs` instead.
 
 ---
 
