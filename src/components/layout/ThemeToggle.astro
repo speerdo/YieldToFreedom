@@ -1,52 +1,106 @@
 ---
 const themes = [
-  { id: 'light',  label: 'Light',  bg: '#ffffff' },
+  { id: 'light',  label: 'Light',  bg: '#e2e8f0' },
   { id: 'dark',   label: 'Dark',   bg: '#0f172a' },
   { id: 'tan',    label: 'Tan',    bg: '#f2e0c4' },
   { id: 'purple', label: 'Purple', bg: '#1a0830' },
 ];
 ---
 
-<div class="flex items-center gap-1.5" role="group" aria-label="Choose theme">
-  {themes.map(t => (
-    <button
-      data-theme-id={t.id}
-      title={`${t.label} theme`}
-      aria-label={`Switch to ${t.label} theme`}
-      aria-pressed="false"
-      class="theme-swatch h-5 w-5 rounded-full transition-transform hover:scale-110 focus-visible:outline-none"
-      style={`background:${t.bg};`}
-    />
-  ))}
+<div class="relative" id="theme-switcher">
+  <!-- Trigger: 4-quadrant circle icon -->
+  <button
+    id="theme-toggle-btn"
+    title="Change theme"
+    aria-label="Open theme switcher"
+    aria-expanded="false"
+    aria-haspopup="true"
+    class="flex items-center text-[var(--fg-muted)] hover:text-[var(--fg)] focus-visible:outline-none"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 16 16" aria-hidden="true">
+      <path d="M8,8 L1,8 A7,7,0,0,1,8,1 Z"  fill="#e2e8f0"/>
+      <path d="M8,8 L8,1 A7,7,0,0,1,15,8 Z" fill="#0f172a"/>
+      <path d="M8,8 L8,15 A7,7,0,0,1,1,8 Z" fill="#f2e0c4"/>
+      <path d="M8,8 L15,8 A7,7,0,0,1,8,15 Z" fill="#1a0830"/>
+      <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+    </svg>
+  </button>
+
+  <!-- Popover swatch box -->
+  <div
+    id="theme-toggle-box"
+    role="group"
+    aria-label="Choose theme"
+    class="absolute right-0 top-full z-10 mt-2 hidden rounded-lg border border-[var(--border)] bg-[var(--bg-card)] p-2 shadow-lg"
+  >
+    <div class="grid grid-cols-2 gap-1.5">
+      {themes.map(t => (
+        <button
+          data-theme-id={t.id}
+          title={`${t.label} theme`}
+          aria-label={`Switch to ${t.label} theme`}
+          aria-pressed="false"
+          class="theme-swatch h-4 w-4 rounded-full focus-visible:outline-none"
+          style={`background:${t.bg};`}
+        />
+      ))}
+    </div>
+  </div>
 </div>
 
 <style>
   .theme-swatch {
-    border: 1px solid color-mix(in srgb, var(--fg) 25%, transparent);
+    border: 1px solid color-mix(in srgb, var(--fg) 20%, transparent);
+    transition: transform 0.1s;
+  }
+  .theme-swatch:hover {
+    transform: scale(1.15);
   }
   .theme-swatch[aria-pressed="true"] {
-    box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--fg);
+    box-shadow: 0 0 0 1.5px var(--bg-card), 0 0 0 3px var(--fg);
   }
 </style>
 
 <script is:inline>
   (function () {
+    var btn = document.getElementById('theme-toggle-btn');
+    var box = document.getElementById('theme-toggle-box');
     var saved = localStorage.getItem('ytf-theme') || 'light';
 
     function mark(id) {
-      document.querySelectorAll('.theme-swatch').forEach(function (btn) {
-        btn.setAttribute('aria-pressed', btn.getAttribute('data-theme-id') === id ? 'true' : 'false');
+      document.querySelectorAll('.theme-swatch').forEach(function (s) {
+        s.setAttribute('aria-pressed', s.getAttribute('data-theme-id') === id ? 'true' : 'false');
       });
+    }
+
+    function close() {
+      box.classList.add('hidden');
+      btn.setAttribute('aria-expanded', 'false');
     }
 
     mark(saved);
 
-    document.querySelectorAll('.theme-swatch').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var id = btn.getAttribute('data-theme-id');
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var isOpen = !box.classList.contains('hidden');
+      if (isOpen) {
+        close();
+      } else {
+        box.classList.remove('hidden');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+
+    document.addEventListener('click', close);
+    box.addEventListener('click', function (e) { e.stopPropagation(); });
+
+    document.querySelectorAll('.theme-swatch').forEach(function (swatch) {
+      swatch.addEventListener('click', function () {
+        var id = swatch.getAttribute('data-theme-id');
         document.documentElement.setAttribute('data-theme', id);
         localStorage.setItem('ytf-theme', id);
         mark(id);
+        close();
       });
     });
   })();
