@@ -31,17 +31,18 @@ const themes = [
     id="theme-toggle-box"
     role="group"
     aria-label="Choose theme"
-    class="absolute right-0 top-full z-10 mt-2 hidden rounded-lg border border-[var(--border)] bg-[var(--bg-card)] p-2 shadow-lg"
+    class="absolute right-0 top-full z-10 mt-2 hidden rounded-lg border border-[var(--border)] bg-[var(--bg-card)] shadow-lg"
+    style="padding: 10px;"
   >
-    <div class="grid grid-cols-2 gap-1.5">
+    <div style="display: grid; grid-template-columns: 20px 20px; gap: 8px;">
       {themes.map(t => (
         <button
           data-theme-id={t.id}
           title={`${t.label} theme`}
           aria-label={`Switch to ${t.label} theme`}
           aria-pressed="false"
-          class="theme-swatch h-4 w-4 rounded-full focus-visible:outline-none"
-          style={`background:${t.bg};`}
+          class="theme-swatch focus-visible:outline-none"
+          style={`background:${t.bg}; width: 20px; height: 20px; border-radius: 50%; display: block; flex-shrink: 0;`}
         />
       ))}
     </div>

@@ -8,8 +8,9 @@ interface Props {
   title: string;
   description: string;
   schema?: object;
+  fullWidth?: boolean;
 }
-const { title, description, schema } = Astro.props;
+const { title, description, schema, fullWidth = false } = Astro.props;
 const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID?.trim();
 
 function gaSrc(measurementId: string): string {
@@ -30,6 +31,9 @@ function gaSrc(measurementId: string): string {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="generator" content={Astro.generator} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet" />
     <Seo title={title} description={description} schema={schema} />
     {
       gaId ? (
@@ -49,7 +53,7 @@ function gaSrc(measurementId: string): string {
   </head>
   <body class="min-h-screen bg-[var(--bg)] text-[var(--fg)] antialiased">
     <Header />
-    <main class="mx-auto max-w-6xl px-4 py-8">
+    <main class={fullWidth ? '' : 'mx-auto max-w-6xl px-4 py-8'}>
       <slot />
     </main>
     <Footer />
