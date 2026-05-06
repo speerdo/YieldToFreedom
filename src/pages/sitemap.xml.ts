@@ -10,6 +10,8 @@ export const prerender = false;
 const STATIC_PATHS = [
   '/',
   '/about',
+  '/privacy',
+  '/terms',
   '/etfs',
   '/compare',
   '/stack-builder',

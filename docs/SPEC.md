@@ -197,6 +197,8 @@ yield-to-freedom/
 │   │   │   ├── index.astro
 │   │   │   └── [slug].astro
 │   │   ├── about.astro
+│   │   ├── privacy.astro
+│   │   ├── terms.astro
 │   │   ├── login.astro               # Phase 2
 │   │   ├── subscribe/                # Newsletter UX
 │   │   │   ├── confirmed.astro

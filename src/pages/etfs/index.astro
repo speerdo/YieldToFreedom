@@ -19,7 +19,8 @@ const list = await db
   <h1 class="text-3xl font-bold tracking-tight text-slate-900">ETF directory</h1>
   <p class="mt-2 max-w-2xl text-slate-600">
     Filter our curated universe and open a profile for metrics and payout history — verify all data externally
-    before investing.
+    before investing. Trailing yield, price, and related fields reflect each fund’s last vendor sync (see{' '}
+    <em>Data as of</em> on the profile).
   </p>
 
   <div class="mt-10 space-y-6" id="etf-screener-root" x-data="etfScreener()" x-cloak data-etfs={JSON.stringify(list)}>

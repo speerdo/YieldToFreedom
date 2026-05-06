@@ -260,7 +260,10 @@ function fmtPct(s: string | null | undefined, digits = 2) {
         <p class="text-sm font-semibold uppercase tracking-[0.15em] text-blue-700">Live data</p>
         <h2 class="font-heading mt-3 text-3xl font-bold text-slate-900 sm:text-4xl">Top-rated ETFs by pillar</h2>
         <p class="mx-auto mt-4 max-w-2xl text-slate-600">
-          Highest Yield to Freedom score in each pillar right now — scores refresh after each weekly data sync.
+          Highest Yield to Freedom score in each pillar right now — scores refresh after each weekly data sync. Yield and
+          expense figures are{' '}
+          <strong class="font-semibold text-slate-700">data as of each ETF’s last vendor sync</strong>
+          {' '}(see the profile for the date).
         </p>
       </div>
 
@@ -283,7 +286,7 @@ function fmtPct(s: string | null | undefined, digits = 2) {
                   <p class="mt-2 line-clamp-2 text-sm text-slate-600">{row.name}</p>
                   <dl class="mt-4 space-y-1.5 text-sm">
                     <div class="flex justify-between gap-4 border-b border-slate-100 pb-1.5">
-                      <dt class="text-slate-500">T12M yield*</dt>
+                      <dt class="text-slate-500">T12M yield</dt>
                       <dd class="font-semibold tabular-nums text-slate-900">{fmtPct(row.trailing12mYield)}</dd>
                     </div>
                     <div class="flex justify-between gap-4">

@@ -9,13 +9,30 @@ const links = [
   { href: '/strategy', label: 'Strategy' },
   { href: '/about', label: 'About' },
 ];
+
+const legalLinks = [
+  { href: '/privacy', label: 'Privacy' },
+  { href: '/terms', label: 'Terms' },
+];
 ---
 
 <footer class="mt-16 border-t border-[var(--border)] bg-[var(--bg-subtle)]">
   <div class="mx-auto max-w-6xl px-4 py-10 text-center text-xs text-[var(--fg-muted)]">
-    <nav class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-medium text-[var(--fg-muted)]">
+    <nav aria-label="Site" class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-medium text-[var(--fg-muted)]">
       {
         links.map(({ href, label }) => (
+          <a href={href} class="hover:text-[var(--fg)]">
+            {label}
+          </a>
+        ))
+      }
+    </nav>
+    <nav
+      aria-label="Legal"
+      class="mt-4 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs font-medium text-[var(--fg-muted)]"
+    >
+      {
+        legalLinks.map(({ href, label }) => (
           <a href={href} class="hover:text-[var(--fg)]">
             {label}
           </a>

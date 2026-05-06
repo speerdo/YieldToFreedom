@@ -29,7 +29,9 @@ const DOUGHNUT_ID = 'yt-stack-pillar-chart';
     <h1 class="text-3xl font-bold tracking-tight text-slate-900">Stack builder</h1>
     <p class="mt-2 max-w-2xl text-slate-600">
       Paste or pick up to three tickers from our universe — weights normalize to 100%. Estimates assume each holding’s trailing
-      12‑month yield from our Neon snapshot; they are illustrative, not forward‑looking payouts.
+      12‑month yield from our Neon snapshot; they are illustrative, not forward‑looking payouts.{' '}
+      <strong class="font-semibold text-slate-800">Data as of last site build</strong>
+      {' '}— open an ETF profile for the vendor sync date.
     </p>
 
     <div id="stack-builder-root" class="mt-10 space-y-8" data-etfs={PACK_JSON} x-data="stackBuilder()" x-cloak>

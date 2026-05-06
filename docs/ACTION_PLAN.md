@@ -8,7 +8,7 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 
 **How to track progress:** Mark checklist items with `[x]` when done; leave `[ ]` until finished. Update the *last progress update* line whenever you check something in.
 
-*Last progress update: 2026-05-01 — **Sprints 1–5 complete** (except §5.5 Search Console/AdSense). Recent additions: Vercel deploy fix (`vercel.json` `functions` pattern removed; `maxDuration: 60` moved to adapter in `astro.config.mjs`), four-mode theme switcher (§5.6) with CSS-variable theming across all components. **Next up: Sprint 6 soft-launch checklist** — start with `/privacy`, `/terms`, and Lighthouse audit.*
+*Last progress update: 2026-05-05 — **Sprint 6**: `/privacy`, `/terms`, footer legal nav, sitemap entries; clarified **data as of** copy on ETF profiles, compare grid, directory intro, homepage spotlight, stack builder. **Next:** Lighthouse (home, ETF, directory), mobile/a11y pass; verify production build + cron when DB/env available.*
 
 **Prior ships:** SPEC v1.1, six blog posts, `/blog`, `/sitemap.xml`, `robots.txt`, GA4 hook, Sprint 4 tools.*
 
@@ -658,10 +658,10 @@ Production implementation: **`src/pages/sitemap.xml.ts`** declares **`export con
 
 **Content:**
 - [ ] Disclaimer visible on all ETF and strategy pages
-- [ ] "Data as of [date]" label on all ETF metric displays
+- [x] "Data as of [date]" label on all ETF metric displays *(profiles + compare grid row + contextual notes on directory / home spotlight / stack builder)*
 - [ ] FMP licensing agreement signed (block public launch if not)
-- [ ] Privacy policy page live (`/privacy`)
-- [ ] Terms of service page live (`/terms`)
+- [x] Privacy policy page live (`/privacy`)
+- [x] Terms of service page live (`/terms`)
 
 **Distribution:**
 - [ ] Launch post: r/dividends

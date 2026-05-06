@@ -104,11 +104,11 @@ const chartId = `dividend-chart-${etf.ticker}`;
         {
           etf.fmpLastSynced ? (
             <p class="mt-3 font-medium text-slate-700">
-              Snapshot refreshed {(etf.fmpLastSynced instanceof Date
+              Data as of {(etf.fmpLastSynced instanceof Date
                 ? etf.fmpLastSynced
                 : new Date(String(etf.fmpLastSynced))
-              ).toISOString().slice(0, 10)}
-              .
+              ).toISOString().slice(0, 10)}{' '}
+              (vendor sync).
             </p>
           ) : (
             <p class="mt-3 font-medium text-amber-800">
