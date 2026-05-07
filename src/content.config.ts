@@ -8,6 +8,8 @@ const blog = defineCollection({
     title: z.string(),
     description: z.string(),
     pubDate: z.coerce.date(),
+    image: z.string().optional(),
+    imageAlt: z.string().optional(),
     tags: z.array(z.string()).optional(),
     relatedEtfs: z.array(z.string()).optional(),
   }),

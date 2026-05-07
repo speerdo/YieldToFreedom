@@ -2,6 +2,8 @@
 title: 'High-Yield ETFs Ranked: Our A-to-D Grading System Explained'
 description: 'How Yield to Freedom scores income ETFs from 0–100 and maps them to letter grades—plus what the score does not capture.'
 pubDate: 2026-05-10
+image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80'
+imageAlt: 'Data analysis and research documents spread across a desk for ETF grading methodology'
 tags: ['grading', 'methodology', 'ytf score']
 ---
 

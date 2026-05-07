@@ -2,6 +2,8 @@
 title: 'What Is JEPI? The Covered Call ETF Explained'
 description: 'A research-oriented overview of how JEPI fits an income sleeve, what option premiums do to risk, and where to verify data before buying.'
 pubDate: 2026-05-01
+image: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=800&q=80'
+imageAlt: 'Person reviewing financial charts and investment data on a screen'
 tags: ['JEPI', 'covered calls', 'income ETFs']
 relatedEtfs: ['JEPI']
 ---

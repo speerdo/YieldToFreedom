@@ -2,6 +2,8 @@
 title: 'JEPI vs JEPQ: Comparing Two JPMorgan Premium Income ETFs'
 description: 'How JEPI weights the S&P 500 while JEPQ tilts Nasdaq-100—and what that implies for payouts, convexity, and concentration risk.'
 pubDate: 2026-05-07
+image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80'
+imageAlt: 'Candlestick trading chart showing market price action and moving averages'
 tags: ['JEPI', 'JEPQ', 'covered calls', 'comparison']
 relatedEtfs: ['JEPI', 'JEPQ']
 ---

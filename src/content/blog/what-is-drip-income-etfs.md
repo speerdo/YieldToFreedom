@@ -2,6 +2,8 @@
 title: 'What Is DRIP and Why It Matters for Income Investors'
 description: 'How automatic reinvestment interacts with high-distribution ETFs, taxes, and your freedom timeline.'
 pubDate: 2026-05-09
+image: 'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&w=800&q=80'
+imageAlt: 'Small green seedling sprouting representing compounding growth through dividend reinvestment'
 tags: ['DRIP', 'dividends', 'compounding']
 relatedEtfs: ['SCHD', 'JEPI']
 ---

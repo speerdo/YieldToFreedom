@@ -2,6 +2,8 @@
 title: 'Building the 40/30/30 Income Portfolio'
 description: 'A practical split between Income, Stability, and Growth pillars—and how to stress-test it before you size positions.'
 pubDate: 2026-05-08
+image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=800&q=80'
+imageAlt: 'Notebook with portfolio allocation plan and pie chart sketched out'
 tags: ['asset allocation', 'pillars', '40/30/30']
 relatedEtfs: ['JEPI', 'SCHD', 'VOO']
 ---

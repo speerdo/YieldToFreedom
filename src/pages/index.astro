@@ -1,4 +1,6 @@
 ---
+import { getCollection } from 'astro:content';
+
 import Base from '../layouts/Base.astro';
 import GradeChip from '../components/ui/GradeChip.astro';
 import { db } from '../lib/db';
@@ -36,6 +38,10 @@ async function spotlightForPillar(pillar: PillarKey) {
     .limit(16);
   return rows.find((r) => r.ytfGrade === 'A') ?? rows[0] ?? null;
 }
+
+const latestPosts = (await getCollection('blog'))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
 
 const spotIncome = await spotlightForPillar('income');
 const spotStability = await spotlightForPillar('stability');
@@ -309,6 +315,68 @@ function fmtPct(s: string | null | undefined, digits = 2) {
         }
       </div>
     </div>
+  </section>
+
+  <!-- ── LATEST FROM THE BLOG ─────────────────────────────────────────── -->
+  <section class="mx-auto max-w-6xl px-6 py-20 sm:py-24">
+    <div class="flex items-end justify-between gap-4">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-[0.15em] text-blue-700">Research</p>
+        <h2 class="font-heading mt-3 text-3xl font-bold text-slate-900 sm:text-4xl">Latest from the blog</h2>
+      </div>
+      <a
+        href="/blog"
+        class="shrink-0 text-sm font-semibold text-blue-700 hover:text-blue-900"
+      >
+        All posts →
+      </a>
+    </div>
+
+    <ul class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        latestPosts.map((post) => (
+          <li class="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+            <a href={`/blog/${post.id}`} class="block" tabindex="-1" aria-hidden="true">
+              <div class="relative aspect-[16/9] overflow-hidden bg-slate-100">
+                {post.data.image ? (
+                  <img
+                    src={post.data.image}
+                    alt={post.data.imageAlt ?? post.data.title}
+                    class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div class="flex h-full items-center justify-center">
+                    <svg class="h-8 w-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3 4.5h18M3 19.5h18" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+            </a>
+            <div class="flex flex-1 flex-col p-5">
+              <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                {post.data.pubDate.toISOString().slice(0, 10)}
+              </p>
+              <h3 class="font-heading mt-2 text-lg font-bold leading-snug text-slate-900">
+                <a class="hover:text-blue-800" href={`/blog/${post.id}`}>
+                  {post.data.title}
+                </a>
+              </h3>
+              <p class="mt-2 flex-1 text-sm leading-relaxed text-slate-600 line-clamp-2">
+                {post.data.description}
+              </p>
+              <a
+                href={`/blog/${post.id}`}
+                class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-blue-700 hover:text-blue-900"
+              >
+                Read more <span aria-hidden="true">→</span>
+              </a>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
   </section>
 
   <!-- ── NEWSLETTER CTA ────────────────────────────────────────────────── -->

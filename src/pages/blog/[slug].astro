@@ -55,6 +55,19 @@ const schema = {
           </p>
         ) : null
       }
+      {
+        post.data.image ? (
+          <div class="mt-8 overflow-hidden rounded-2xl">
+            <img
+              src={post.data.image}
+              alt={post.data.imageAlt ?? post.data.title}
+              class="w-full object-cover"
+              style="aspect-ratio: 16/6; object-position: center;"
+              loading="eager"
+            />
+          </div>
+        ) : null
+      }
     </header>
     <div class="space-y-4">
       <Content />
