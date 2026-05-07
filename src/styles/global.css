@@ -13,39 +13,67 @@
 
 :root,
 [data-theme="light"] {
-  --bg:        #ffffff;
-  --bg-subtle: #f8fafc;
-  --bg-card:   #ffffff;
-  --fg:        #0f172a;
-  --fg-muted:  #475569;
-  --border:    #e2e8f0;
+  --bg:                #ffffff;
+  --bg-subtle:         #f8fafc;
+  --bg-card:           #ffffff;
+  --fg:                #0f172a;
+  --fg-muted:          #475569;
+  --border:            #e2e8f0;
+  --link:              #1d4ed8;  /* blue-700 — 8.6:1 on white ✓ */
+  --link-hover:        #1e3a8a;  /* blue-900 */
+  --btn-primary-bg:    #2563eb;  /* blue-600 */
+  --btn-primary-hover: #3b82f6;  /* blue-500 */
+  --section-ink-bg:    #172554;  /* blue-950 */
+  --section-ink-fg:    #ffffff;
+  --section-ink-muted: #93c5fd;  /* blue-300 */
 }
 
 [data-theme="dark"] {
-  --bg:        #0f172a;
-  --bg-subtle: #111827;
-  --bg-card:   #1e293b;
-  --fg:        #f1f5f9;
-  --fg-muted:  #94a3b8;
-  --border:    #334155;
+  --bg:                #0f172a;
+  --bg-subtle:         #111827;
+  --bg-card:           #1e293b;
+  --fg:                #f1f5f9;
+  --fg-muted:          #94a3b8;
+  --border:            #334155;
+  --link:              #60a5fa;  /* blue-400 — 7.5:1 on #0f172a ✓ */
+  --link-hover:        #93c5fd;  /* blue-300 */
+  --btn-primary-bg:    #3b82f6;  /* blue-500 */
+  --btn-primary-hover: #60a5fa;  /* blue-400 */
+  --section-ink-bg:    #1e293b;  /* slate-800 — distinct from main bg */
+  --section-ink-fg:    #f1f5f9;
+  --section-ink-muted: #94a3b8;  /* slate-400 */
 }
 
 [data-theme="tan"] {
-  --bg:        #f2e0c4;
-  --bg-subtle: #e8d5b0;
-  --bg-card:   #f9edd8;
-  --fg:        #3b2410;
-  --fg-muted:  #7a5535;
-  --border:    #c4976a;
+  --bg:                #f2e0c4;
+  --bg-subtle:         #e8d5b0;
+  --bg-card:           #f9edd8;
+  --fg:                #3b2410;
+  --fg-muted:          #7a5535;
+  --border:            #c4976a;
+  --link:              #1d4ed8;  /* blue-700 — 7.2:1 on #f2e0c4 ✓ */
+  --link-hover:        #1e3a8a;  /* blue-900 */
+  --btn-primary-bg:    #1d4ed8;
+  --btn-primary-hover: #2563eb;
+  --section-ink-bg:    #3b2410;  /* deep tan-brown (matches --fg) */
+  --section-ink-fg:    #f9edd8;
+  --section-ink-muted: #c4976a;  /* border color as muted label */
 }
 
 [data-theme="purple"] {
-  --bg:        #1a0830;
-  --bg-subtle: #130626;
-  --bg-card:   #2d1155;
-  --fg:        #f7e9b0;
-  --fg-muted:  #d4a843;
-  --border:    #5a2d82;
+  --bg:                #1a0830;
+  --bg-subtle:         #130626;
+  --bg-card:           #2d1155;
+  --fg:                #f7e9b0;
+  --fg-muted:          #d4a843;
+  --border:            #5a2d82;
+  --link:              #c084fc;  /* purple-400 — 7.5:1 on #1a0830 ✓ */
+  --link-hover:        #e9d5ff;  /* purple-100 */
+  --btn-primary-bg:    #7c3aed;  /* violet-700 */
+  --btn-primary-hover: #8b5cf6;  /* violet-500 */
+  --section-ink-bg:    #130626;  /* --bg-subtle — very dark purple */
+  --section-ink-fg:    #f7e9b0;
+  --section-ink-muted: #d4a843;
 }
 
 /* ── Remap hard-coded Tailwind color utilities to theme vars ─────────── */
@@ -55,47 +83,194 @@
  * change on light, full theme shift on dark/tan/purple.
  */
 
-/* Text */
+/* Text — page surface */
 [data-theme] .text-slate-900,
 [data-theme] .text-slate-800,
-[data-theme] .text-slate-700 {
-  color: var(--fg);
-}
+[data-theme] .text-slate-700 { color: var(--fg); }
+
 [data-theme] .text-slate-600,
 [data-theme] .text-slate-500,
-[data-theme] .text-slate-400 {
-  color: var(--fg-muted);
-}
+[data-theme] .text-slate-400 { color: var(--fg-muted); }
 
 /* Backgrounds — page / subtle / card surfaces */
-[data-theme] .bg-white {
-  background-color: var(--bg-card);
-}
+[data-theme] .bg-white        { background-color: var(--bg-card); }
 [data-theme] .bg-slate-50,
-[data-theme] .bg-slate-100 {
-  background-color: var(--bg-subtle);
-}
-[data-theme] .bg-slate-50\/40 {
-  background-color: color-mix(in srgb, var(--bg-subtle) 40%, transparent);
-}
-[data-theme] .bg-slate-50\/60 {
-  background-color: color-mix(in srgb, var(--bg-subtle) 60%, transparent);
-}
+[data-theme] .bg-slate-100    { background-color: var(--bg-subtle); }
+[data-theme] .bg-slate-50\/40 { background-color: color-mix(in srgb, var(--bg-subtle) 40%, transparent); }
+[data-theme] .bg-slate-50\/60 { background-color: color-mix(in srgb, var(--bg-subtle) 60%, transparent); }
 
 /* Hover backgrounds */
-[data-theme] .hover\:bg-slate-50:hover {
-  background-color: var(--bg-subtle);
-}
+[data-theme] .hover\:bg-slate-50:hover { background-color: var(--bg-subtle); }
 
 /* Borders */
 [data-theme] .border-slate-100,
 [data-theme] .border-slate-200,
-[data-theme] .border-slate-300 {
-  border-color: var(--border);
-}
+[data-theme] .border-slate-300 { border-color: var(--border); }
 
 /* Divide utilities (table row separators etc.) */
 [data-theme] .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
-[data-theme] .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
-  border-color: var(--border);
+[data-theme] .divide-slate-200 > :not([hidden]) ~ :not([hidden]) { border-color: var(--border); }
+
+/* ── Link / accent text ──────────────────────────────────────────────── */
+
+[data-theme] .text-blue-700,
+[data-theme] .text-blue-800   { color: var(--link); }
+[data-theme] .text-blue-900,
+[data-theme] .text-blue-950   { color: var(--link-hover); }
+
+[data-theme] .hover\:text-blue-700:hover,
+[data-theme] .hover\:text-blue-800:hover { color: var(--link); }
+[data-theme] .hover\:text-blue-900:hover,
+[data-theme] .hover\:text-blue-950:hover { color: var(--link-hover); }
+
+/* Underline decoration colors on links */
+[data-theme] .decoration-blue-800\/35 {
+  text-decoration-color: color-mix(in srgb, var(--link) 35%, transparent);
 }
+[data-theme] .hover\:decoration-blue-950\/50:hover {
+  text-decoration-color: color-mix(in srgb, var(--link-hover) 50%, transparent);
+}
+
+/* Hover row highlights in tables */
+[data-theme] .hover\:bg-blue-50\/40:hover {
+  background-color: color-mix(in srgb, var(--link) 6%, transparent);
+}
+[data-theme] .hover\:bg-blue-50\/30:hover {
+  background-color: color-mix(in srgb, var(--link) 5%, transparent);
+}
+
+/* Article-level links (generated by [&_a]:text-blue-700 compound variants) */
+[data-theme] article a        { color: var(--link); }
+[data-theme] article a:hover  { color: var(--link-hover); }
+
+/* Focus ring on form inputs */
+[data-theme] .focus\:border-blue-400:focus { border-color: var(--link); }
+
+/* ── Primary buttons ─────────────────────────────────────────────────── */
+
+[data-theme] .bg-blue-600                 { background-color: var(--btn-primary-bg); }
+[data-theme] .bg-blue-500                 { background-color: var(--btn-primary-hover); }
+[data-theme] .hover\:bg-blue-500:hover    { background-color: var(--btn-primary-hover); }
+[data-theme] .hover\:bg-blue-400:hover    { background-color: var(--btn-primary-hover); }
+[data-theme] .shadow-blue-900\/40         { --tw-shadow-color: transparent; }
+
+/* ── Dark ink surface (stats strip, etc.) ───────────────────────────── */
+
+[data-theme] .bg-blue-950 {
+  background-color: var(--section-ink-bg);
+  color: var(--section-ink-fg);
+}
+
+/* ── Newsletter CTA section ──────────────────────────────────────────── */
+/*
+ * The CTA section uses a gradient that must adapt per theme.
+ * The .ytf-cta-bg class is applied in index.astro instead of the
+ * raw Tailwind gradient utilities.
+ */
+.ytf-cta-bg {
+  background: linear-gradient(to bottom right, #172554, #1e3a8a, #1e1b4b);
+}
+[data-theme="dark"]   .ytf-cta-bg { background: linear-gradient(to bottom right, #1e293b, #1e293b, #111827); }
+[data-theme="tan"]    .ytf-cta-bg { background: linear-gradient(to bottom right, #3b2410, #4a2d15, #2d1a0a); }
+[data-theme="purple"] .ytf-cta-bg { background: linear-gradient(to bottom right, #130626, #1a0830, #0f0520); }
+
+/* ── Amber / warning surfaces ────────────────────────────────────────── */
+
+[data-theme="dark"] .text-amber-800,
+[data-theme="purple"] .text-amber-800  { color: #fbbf24; }  /* amber-400 — readable on dark */
+
+[data-theme="tan"] .text-amber-800     { color: #78350f; }  /* amber-900 — darker for tan bg */
+
+[data-theme="dark"] .text-amber-900,
+[data-theme="purple"] .text-amber-900  { color: #f59e0b; }  /* amber-500 */
+
+[data-theme="dark"] .bg-amber-50,
+[data-theme="purple"] .bg-amber-50     { background-color: rgba(245, 158, 11, 0.12); }
+
+[data-theme="dark"] .border-amber-400,
+[data-theme="purple"] .border-amber-400 { border-color: rgba(245, 158, 11, 0.45); }
+
+/* ── Rose / danger surfaces ──────────────────────────────────────────── */
+
+[data-theme="dark"] .text-rose-700,
+[data-theme="purple"] .text-rose-700   { color: #fda4af; }  /* rose-300 */
+
+[data-theme="dark"] .text-rose-950,
+[data-theme="purple"] .text-rose-950   { color: #fecdd3; }  /* rose-200 */
+
+[data-theme="dark"] .bg-rose-50,
+[data-theme="purple"] .bg-rose-50      { background-color: rgba(244, 63, 94, 0.1); }
+
+[data-theme="dark"] .ring-rose-200,
+[data-theme="purple"] .ring-rose-200   { --tw-ring-color: rgba(244, 63, 94, 0.3); }
+
+/* ── Grade chips on dark surfaces ────────────────────────────────────── */
+/*
+ * Light-background grade chips (emerald/sky/amber/rose) look jarring on
+ * dark page backgrounds. Remap to dark-tinted backgrounds with light text.
+ */
+
+/* A — emerald */
+[data-theme="dark"] .bg-emerald-100,
+[data-theme="purple"] .bg-emerald-100  { background-color: rgba(16, 185, 129, 0.15); }
+[data-theme="dark"] .text-emerald-900,
+[data-theme="purple"] .text-emerald-900 { color: #6ee7b7; }  /* emerald-300 */
+
+/* B — sky */
+[data-theme="dark"] .bg-sky-100,
+[data-theme="purple"] .bg-sky-100      { background-color: rgba(14, 165, 233, 0.15); }
+[data-theme="dark"] .text-sky-900,
+[data-theme="purple"] .text-sky-900    { color: #7dd3fc; }   /* sky-300 */
+
+/* C — amber (already handled above for warnings; .bg-amber-100 specifically) */
+[data-theme="dark"] .bg-amber-100,
+[data-theme="purple"] .bg-amber-100    { background-color: rgba(245, 158, 11, 0.15); }
+
+/* D — rose */
+[data-theme="dark"] .bg-rose-100,
+[data-theme="purple"] .bg-rose-100     { background-color: rgba(244, 63, 94, 0.15); }
+[data-theme="dark"] .text-rose-900,
+[data-theme="purple"] .text-rose-900   { color: #fda4af; }   /* rose-300 */
+
+/* ── Pillar card badges / chips (homepage) ───────────────────────────── */
+/*
+ * bg-blue-100 / bg-violet-100 / bg-emerald-100 are used for the allocation
+ * badge overlay on pillar card images, and for ETF ticker chips.
+ * On dark surfaces these need dark-tinted equivalents.
+ */
+
+[data-theme="dark"] .bg-blue-100,
+[data-theme="purple"] .bg-blue-100     { background-color: rgba(59, 130, 246, 0.15); }
+/* text-blue-800 already mapped to --link above */
+
+[data-theme="dark"] .bg-violet-100,
+[data-theme="purple"] .bg-violet-100   { background-color: rgba(139, 92, 246, 0.15); }
+[data-theme="dark"] .text-violet-800,
+[data-theme="purple"] .text-violet-800 { color: #a78bfa; }  /* violet-400 */
+[data-theme="dark"] .hover\:bg-violet-600\/20:hover,
+[data-theme="purple"] .hover\:bg-violet-600\/20:hover {
+  background-color: rgba(139, 92, 246, 0.25);
+}
+
+/* bg-emerald-100 already handled above for grade chips */
+[data-theme="dark"] .text-emerald-800,
+[data-theme="purple"] .text-emerald-800 { color: #6ee7b7; }  /* emerald-300 */
+[data-theme="dark"] .hover\:bg-emerald-600\/20:hover,
+[data-theme="purple"] .hover\:bg-emerald-600\/20:hover {
+  background-color: rgba(16, 185, 129, 0.25);
+}
+
+/* Pillar card borders */
+[data-theme="dark"] .border-blue-100,
+[data-theme="purple"] .border-blue-100   { border-color: color-mix(in srgb, var(--link) 30%, transparent); }
+[data-theme="dark"] .border-violet-100,
+[data-theme="purple"] .border-violet-100 { border-color: rgba(139, 92, 246, 0.3); }
+[data-theme="dark"] .border-emerald-100,
+[data-theme="purple"] .border-emerald-100 { border-color: rgba(16, 185, 129, 0.3); }
+
+/* ── Tan theme — pillar card badge text ──────────────────────────────── */
+/*
+ * Tan theme is light-enough that most badges work, but violet-800 on
+ * violet-100 and blue-800 on blue-100 are unchanged (both pass ≥7:1).
+ * No overrides needed for tan.
+ */
