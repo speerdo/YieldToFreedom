@@ -2,6 +2,7 @@
 import { asc, eq } from 'drizzle-orm';
 
 import Base from '../../layouts/Base.astro';
+import Disclaimer from '../../components/ui/Disclaimer.astro';
 import { db } from '../../lib/db';
 import { etfs } from '../../lib/db/schema';
 
@@ -130,6 +131,8 @@ const list = await db
       >/api/etfs</code
     >
   </noscript>
+
+  <Disclaimer />
 </Base>
 
 <script>

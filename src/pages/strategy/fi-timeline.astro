@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import Disclaimer from '../../components/ui/Disclaimer.astro';
 import { publicSiteOrigin } from '../../lib/site/url';
 
 const site = publicSiteOrigin();
@@ -53,8 +54,6 @@ const schema = {
       Also read <a href="/strategy/drip">DRIP mechanics</a> and{' '}
       <a href="/strategy">the strategy overview</a>.
     </p>
-    <footer class="mt-12 border-t border-slate-100 pt-6 text-sm text-slate-600">
-      <p>Numbers here are illustrative; your timeline depends on taxes, withdrawals, wages, healthcare, and other variables.</p>
-    </footer>
+    <Disclaimer />
   </article>
 </Base>

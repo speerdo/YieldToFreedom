@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import Disclaimer from '../../components/ui/Disclaimer.astro';
 import { publicSiteOrigin } from '../../lib/site/url';
 
 const site = publicSiteOrigin();
@@ -60,11 +61,6 @@ const schema = {
       Start with <a href="/etfs/JEPI">JEPI</a>, <a href="/etfs/SCHD">SCHD</a>, and <a href="/etfs/VOO">VOO</a>, then widen
       from the full <a href="/etfs">ETF directory</a>.
     </p>
-    <footer class="mt-12 border-t border-slate-100 pt-6 text-sm text-slate-600">
-      <p>
-        Yield to Freedom grades and commentary are informational only and not personalized investment advice. Past
-        distribution rates are not guarantees.
-      </p>
-    </footer>
+    <Disclaimer />
   </article>
 </Base>

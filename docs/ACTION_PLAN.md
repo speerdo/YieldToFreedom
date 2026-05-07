@@ -8,7 +8,7 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 
 **How to track progress:** Mark checklist items with `[x]` when done; leave `[ ]` until finished. Update the *last progress update* line whenever you check something in.
 
-*Last progress update: 2026-05-05 — **Sprint 6**: `/privacy`, `/terms`, footer legal nav, sitemap entries; clarified **data as of** copy on ETF profiles, compare grid, directory intro, homepage spotlight, stack builder. **Next:** Lighthouse (home, ETF, directory), mobile/a11y pass; verify production build + cron when DB/env available.*
+*Last progress update: 2026-05-06 — **Sprint 6**: Disclaimer component added to ETF directory and all four strategy pages (replaced inline footer text); `npm run build` + `astro check` pass clean (0 errors). **Next:** Lighthouse (home, ETF, directory), mobile/a11y pass; verify production cron when DB/env available.*
 
 **Prior ships:** SPEC v1.1, six blog posts, `/blog`, `/sitemap.xml`, `robots.txt`, GA4 hook, Sprint 4 tools.*
 
@@ -652,12 +652,12 @@ Production implementation: **`src/pages/sitemap.xml.ts`** declares **`export con
 - [ ] Lighthouse audit on homepage, ETF page, screener — target 90+ all metrics
 - [ ] Mobile responsiveness pass on all pages (test at 375px, 768px, 1280px)
 - [ ] Accessibility audit — keyboard navigation, color contrast, alt text
-- [ ] `npm run build` runs clean with zero TypeScript errors
+- [x] `npm run build` runs clean with zero TypeScript errors *(confirmed — `astro check` 0 errors, build completes in ~8s)*
 - [ ] Nightly cron tested end-to-end in production (verify Vercel cron fires, check logs)
 - [ ] Load test `/api/etfs` with 50 concurrent requests
 
 **Content:**
-- [ ] Disclaimer visible on all ETF and strategy pages
+- [x] Disclaimer visible on all ETF and strategy pages *(ETF directory + all four strategy pages; consistent `<Disclaimer />` component throughout)*
 - [x] "Data as of [date]" label on all ETF metric displays *(profiles + compare grid row + contextual notes on directory / home spotlight / stack builder)*
 - [ ] FMP licensing agreement signed (block public launch if not)
 - [x] Privacy policy page live (`/privacy`)

@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import Disclaimer from '../../components/ui/Disclaimer.astro';
 import { publicSiteOrigin } from '../../lib/site/url';
 
 const site = publicSiteOrigin();
@@ -52,10 +53,6 @@ const schema = {
       Continue reading: <a href="/strategy">Strategy overview</a> ·{' '}
       <a href="/strategy/fi-timeline">FI Score & timelines</a>
     </p>
-    <footer class="mt-12 border-t border-slate-100 pt-6 text-sm text-slate-600">
-      <p>
-        Not individualized advice—speak with a fiduciary professional before implementing leverage strategies.
-      </p>
-    </footer>
+    <Disclaimer />
   </article>
 </Base>
