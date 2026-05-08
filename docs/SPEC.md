@@ -37,7 +37,7 @@ Yield to Freedom is an income ETF directory, research platform, and portfolio in
 - **Phase 1 (public):** Static-first income ETF directory, strategy content, and public calculators. Revenue: AdSense + affiliate links.
 - **Phase 2 (authenticated SaaS):** Portfolio dashboard, DRIP modeler, margin timeline, dividend calendar, and grade alerts behind Clerk auth + Stripe subscriptions ($9/mo or $79/yr).
 
-Both phases share one Neon DB instance, one Drizzle ORM layer, one FMP API client, and one Vercel deployment pipeline.
+Both phases share one Neon DB instance, one Drizzle ORM layer, one Tiingo API client, and one Vercel deployment pipeline.
 
 ```
 yieldtofreedom.com/          → Phase 1 (static + server islands)
@@ -60,7 +60,7 @@ Vercel Edge Network
     │               └── Drizzle → Neon DB
     │
     └── Public route → Prerendered HTML or server island
-            └── ETF data from Neon DB (FMP synced nightly)
+            └── ETF data from Neon DB (Tiingo synced nightly)
 ```
 
 ---
@@ -247,7 +247,7 @@ yield-to-freedom/
 │   │   │   ├── index.ts
 │   │   │   └── schema.ts
 │   │   ├── etfs/                     # TTM yield trail math for /compare
-│   │   ├── fmp/
+│   │   ├── tiingo/
 │   │   │   └── client.ts             # https://financialmodelingprep.com/stable
 │   │   ├── grader/
 │   │   │   ├── grade.ts
@@ -396,7 +396,7 @@ export const etfs = pgTable('etfs', {
   return5y:          decimal('return_5y', { precision: 8, scale: 4 }),
   inceptionDate:     date('inception_date'),
   exchange:          varchar('exchange', { length: 10 }),
-  fmpLastSynced:     timestamp('fmp_last_synced'),
+  dataLastSynced:    timestamp('fmp_last_synced'),  -- column kept for compat; tracks Tiingo sync
   isActive:          boolean('is_active').default(true),
   createdAt:         timestamp('created_at').defaultNow(),
   updatedAt:         timestamp('updated_at').defaultNow(),
@@ -634,7 +634,7 @@ GET /api/etfs?pillar=income&grade=A&frequency=monthly&minYield=5&maxEr=0.75&sort
 ### ETF Profile (`/etfs/[ticker]`)
 
 - Static generated at build time (`getStaticPaths` over active ETF universe)
-- Sections: hero (ticker, name, grade), key metrics (yield, ER, AUM, frequency), dividend history chart (Chart.js, last 48 payments), annual yield summary, holdings breakdown (if available from FMP)
+- Sections: hero (ticker, name, grade), key metrics (yield, ER, AUM, frequency), dividend history chart (Chart.js, last 48 payments), annual yield summary
 - Related ETFs in same pillar
 - Links to Compare (pre-populated), Stack Builder (pre-populated)
 - JSON-LD: `FinancialProduct` schema
@@ -831,11 +831,12 @@ export async function POST({ request }) {
 ### Nightly Sync (`/api/cron/sync-etfs`)
 
 Runs 02:00 UTC. For each active ETF:
-1. Fetch ETF profile from FMP (`/etf/info?symbol=`)
-2. Upsert key metrics (price, yield, ER, AUM)
-3. Upsert last 24 dividend records
-4. Upsert last 2 days of EOD prices
-5. Rate limit: 200ms delay between tickers (FMP: 300 req/min on commercial)
+1. Fetch 2-year EOD price history from Tiingo (`/tiingo/daily/<ticker>/prices?startDate=`)
+2. Fetch dividend history from Tiingo (`/tiingo/dividends/<ticker>?startDate=`; falls back to extracting `divCash > 0` from EOD rows)
+3. Fetch meta from Tiingo (`/tiingo/daily/<ticker>`) for name and exchange code
+4. Upsert key metrics (price, trailing yield, exchange, issuer) and today's EOD price row
+5. Upsert last 24 dividend records
+6. Rate limit: 200ms delay between tickers (Tiingo free tier: 500 req/hour)
 
 ### Weekly Grade Recalc (`/api/cron/grade-etfs`)
 
@@ -851,24 +852,26 @@ Runs Sunday 03:00 UTC. For each active ETF:
 
 Runs 08:00 UTC (planned). Send pending `grade_alerts` via Resend, mark `email_sent = true`.
 
-### FMP API Status (Updated May 2026)
+### Tiingo API (Data Provider — Updated May 2026)
 
-FMP retired `/api/v3` and `/api/v4` on 2025-08-31. All endpoints now use `https://financialmodelingprep.com/stable/`. The current free-tier key has partial access:
+Tiingo is the primary data provider, replacing FMP. Auth is via `Authorization: Token <key>` header.
 
-| Use Case | Endpoint | Free Tier | Notes |
+| Use Case | Endpoint | Tier | Notes |
 |---|---|---|---|
-| ETF profile | `GET /stable/profile?symbol=` | ✅ | Returns price, marketCap, lastDividend, beta, description |
-| Dividend history (per symbol) | `GET /stable/dividends?symbol=` | ❌ 402 | Requires commercial plan |
-| EOD price history | Not yet found | ❌ | Endpoint path unknown |
-| Current quote (ETF) | `GET /stable/quote?symbol=` | ❌ 402 | ETFs require premium |
-| Dividend calendar (filtered) | `GET /stable/dividends-calendar?from=` | ❌ 402 | Requires premium |
-| Holdings breakdown | Not yet found | ❌ | — |
+| ETF/stock meta | `GET /tiingo/daily/<ticker>` | Free | Returns name, exchangeCode, description, date range |
+| Latest EOD price | `GET /tiingo/daily/<ticker>/prices` | Free | Returns close, adjClose, OHLCV, divCash, splitFactor |
+| Historical EOD prices | `GET /tiingo/daily/<ticker>/prices?startDate=&endDate=` | Free | Same fields; 2-year lookback default |
+| Dividend history | `GET /tiingo/dividends/<ticker>?startDate=` | Free | exDate, divCash, adjDivCash, declaredDate, payDate |
+| Fund fees (expense ratio) | `GET /tiingo/fundamentals/<ticker>/...` | Power+ | Not yet integrated; ER maintained manually or skipped |
+| AUM / market cap | Not available via Tiingo daily | — | Maintained manually or from a separate source |
 
-**Derivable from free profile:** `trailing12mYield = lastDividend / price`, `aum ≈ marketCap`
+**Key fields returned per EOD row:** `date`, `open`, `high`, `low`, `close`, `adjClose`, `volume`, `divCash` (dividend paid on ex-date), `splitFactor`.
 
-**Unresolvable without premium or alternate source:** dividend history (consistency scoring), expense ratio, dividend frequency, price history.
+**Trailing 12m yield derivation:** sum all `divCash > 0` entries in last 365 days from `/tiingo/dividends/<ticker>`, divide by current `adjClose`.
 
-**Resolution path:** Either upgrade FMP to commercial plan (~$79/mo) or use Twelve Data ($29/mo, display-permissive) as interim. See ACTION_PLAN.md open decision.
+**Expense ratio:** Tiingo's Fund Fees endpoint (Power+ plan) provides this. Until available, existing stored values are preserved across syncs.
+
+**Note:** Tiingo free tier supports 500 req/hour with display-permissive licensing for Phase 1 content. No commercial agreement required for public display.
 
 > Phase 1 displays end-of-day data only, always labeled "data as of [date]". No live quotes.
 
@@ -997,8 +1000,8 @@ Never migrate production without testing on dev branch first. Use Neon's branch 
 # Database
 DATABASE_URL=postgresql://user:pass@host/dbname?sslmode=require
 
-# Financial Modeling Prep
-FMP_API_KEY=your_fmp_commercial_key
+# Tiingo (data provider — replaces FMP)
+TIINGO_API_KEY=your_tiingo_api_key
 
 # SnapTrade (Phase 2)
 SNAPTRADE_CLIENT_ID=your_client_id
@@ -1117,4 +1120,4 @@ img-src 'self' data: https:;
 ---
 
 *SPEC v1.0 — Yield to Freedom / Creative Bandit LLC / May 2026*  
-*Stack: Astro 6 + Neon DB + Vercel + Drizzle ORM + Clerk + Stripe + FMP + SnapTrade + Resend*
+*Stack: Astro 6 + Neon DB + Vercel + Drizzle ORM + Clerk + Stripe + Tiingo + SnapTrade + Resend*

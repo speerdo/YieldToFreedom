@@ -8,7 +8,7 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 
 **How to track progress:** Mark checklist items with `[x]` when done; leave `[ ]` until finished. Update the *last progress update* line whenever you check something in.
 
-*Last progress update: 2026-05-06 — **Sprint 6**: Disclaimer component added to ETF directory and all four strategy pages (replaced inline footer text); `npm run build` + `astro check` pass clean (0 errors). **Next:** Lighthouse (home, ETF, directory), mobile/a11y pass; verify production cron when DB/env available.*
+*Last progress update: 2026-05-08 — **Data provider migration**: Switched from FMP to **Tiingo**. Built `src/lib/tiingo/client.ts` (meta, EOD prices, dividends endpoints). Rewrote `sync-etfs.ts` to use Tiingo with dedicated dividends endpoint + EOD fallback. Renamed `fmpLastSynced` → `dataLastSynced` in TypeScript (DB column unchanged — no migration needed). Updated SPEC.md and ACTION_PLAN.md throughout. `astro check` passes clean (0 errors). **Next:** Set `TIINGO_API_KEY` in Vercel env vars, smoke-test the cron once Tiingo maintenance window clears, then Lighthouse + mobile/a11y pass.*
 
 **Prior ships:** SPEC v1.1, six blog posts, `/blog`, `/sitemap.xml`, `robots.txt`, GA4 hook, Sprint 4 tools.*
 
@@ -24,7 +24,7 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 | 1.2 Install dependencies | [x] |
 | 1.3 Configure Astro (Vercel, Clerk, Tailwind) | [x] |
 | 1.4 Neon + Drizzle | [x] |
-| 1.5 FMP client (`src/lib/fmp/client.ts`, `/stable/`) | [x] user-tested key |
+| 1.5 Tiingo client (`src/lib/tiingo/client.ts`) | [x] client built; key test pending Tiingo maintenance window |
 | 1.6 Seed ETFs (`npm run seed:etfs`) | [x] |
 | 1.7 Vercel dashboard + env vars + preview branch | [ ] (`vercel.json` [x]; deploy error fixed — removed invalid `functions` pattern, `maxDuration: 60` in adapter) |
 | 1.8 `.gitignore` | [x] |
@@ -83,8 +83,7 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 These are long-lead-time items. Start all of them before Sprint 1 coding.
 
 - [ ] **Register `yieldtofreedom.com`** — point nameservers to Vercel immediately
-- [ ] **Contact FMP for Commercial Agreement** — go to `financialmodelingprep.com` and request a Data Display and Licensing Agreement for their Build tier (~$79/mo). This is the longest lead-time item in the project. Do not display FMP data publicly without this signed.
-- [ ] **Interim data source decision** — consider Twelve Data ($29/mo, display-permissive) for Phase 1 development while FMP agreement is being negotiated. The `src/lib/fmp/client.ts` wrapper can swap providers with minimal changes.
+- [x] **Data provider decision** — **Tiingo** selected as primary data provider (display-permissive free tier, no commercial agreement required for Phase 1). `src/lib/tiingo/client.ts` built and integrated. FMP dropped. Tiingo sign-up: [api.tiingo.com](https://api.tiingo.com) — set `TIINGO_API_KEY` in Vercel env vars once account is ready.
 - [ ] **Set up email addresses** — configure `hello@yieldtofreedom.com` and `alerts@yieldtofreedom.com` in Resend
 - [ ] **Create accounts** (if not already done): Neon, Vercel, Clerk, Stripe, Resend, Loops.so, SnapTrade
 
@@ -92,7 +91,7 @@ These are long-lead-time items. Start all of them before Sprint 1 coding.
 
 ## Sprint 1 — Foundation (Weeks 1–2)
 
-**Goal:** Working project scaffold deployed to Vercel, DB running, FMP client tested.
+**Goal:** Working project scaffold deployed to Vercel, DB running, Tiingo client tested.
 
 ### 1.1 Initialize Project
 
@@ -211,24 +210,28 @@ npm run db:generate
 npm run db:migrate
 ```
 
-### 1.5 Build FMP Client
+### 1.5 Build Tiingo Client
+
+`src/lib/tiingo/client.ts` — **complete.** Uses bearer token auth (`Authorization: Token <key>`).
+
+Key exports:
+- `tiingoMeta(ticker)` → name, exchangeCode, description
+- `tiingoPrices(ticker, params?)` → EOD OHLCV + divCash + splitFactor
+- `tiingoDividends(ticker, params?)` → dividend history (exDate, divCash, adjDivCash)
+- `tiingoGet<T>(path, params?)` → generic authenticated GET
 
 ```typescript
-// src/lib/fmp/client.ts
-const FMP_BASE = 'https://financialmodelingprep.com/api/v3';
-const FMP_KEY = import.meta.env.FMP_API_KEY;
-
-export async function fmpGet<T>(path: string, params: Record<string, string> = {}): Promise<T> {
-  const url = new URL(`${FMP_BASE}${path}`);
-  url.searchParams.set('apikey', FMP_KEY);
-  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
-  const res = await fetch(url.toString());
-  if (!res.ok) throw new Error(`FMP ${path} → ${res.status}`);
-  return res.json();
-}
+// src/lib/tiingo/client.ts (excerpt)
+const TIINGO_BASE = 'https://api.tiingo.com';
+// Auth via header: Authorization: Token YOUR_TIINGO_API_KEY
+// Env var: TIINGO_API_KEY
 ```
 
-Test against 5 tickers manually before seeding.
+Test by curling the meta endpoint once your Tiingo key is active:
+```bash
+curl -H "Authorization: Token $TIINGO_API_KEY" \
+  "https://api.tiingo.com/tiingo/daily/JEPI"
+```
 
 ### 1.6 Seed ETF Universe
 
@@ -312,9 +315,9 @@ dist/
 - [x] `npm run build` succeeds
 - [x] DB schema applied to dev Neon branch *(first migration pushed to linked DB — confirm branch in Neon UI)*
 - [x] 5 ETFs seeded and queryable *(full universe seeded; re-run safe via `ON CONFLICT DO NOTHING`)*
-- [x] FMP client returns valid data for JEPI, SCHD, VOO *(user verified API via key smoke test)*
+- [x] Tiingo client built (`src/lib/tiingo/client.ts`) — smoke test pending Tiingo maintenance window
 - [ ] Preview deployment live on Vercel
-- [ ] FMP commercial agreement conversation started
+- [ ] `TIINGO_API_KEY` added to Vercel env vars
 
 ---
 
@@ -457,7 +460,7 @@ Use Chart.js with `client:load`. Chart type: bar chart, x-axis = ex-date, y-axis
 
 Implement `src/pages/api/cron/sync-etfs.ts`:
 1. Verify `CRON_SECRET` bearer token
-2. For each active ETF: fetch FMP profile, upsert metrics, upsert dividends, upsert EOD prices
+2. For each active ETF: fetch Tiingo meta + EOD prices + dividends, upsert metrics and records
 3. Rate limit: `await new Promise(r => setTimeout(r, 200))` between tickers
 
 Test locally:
@@ -659,7 +662,7 @@ Production implementation: **`src/pages/sitemap.xml.ts`** declares **`export con
 **Content:**
 - [x] Disclaimer visible on all ETF and strategy pages *(ETF directory + all four strategy pages; consistent `<Disclaimer />` component throughout)*
 - [x] "Data as of [date]" label on all ETF metric displays *(profiles + compare grid row + contextual notes on directory / home spotlight / stack builder)*
-- [ ] FMP licensing agreement signed (block public launch if not)
+- [x] Data provider: **Tiingo** (display-permissive free tier — no licensing agreement needed for Phase 1)
 - [x] Privacy policy page live (`/privacy`)
 - [x] Terms of service page live (`/terms`)
 
@@ -912,7 +915,7 @@ After Phase 2 launch, recurring tasks:
 | Alert emails | Daily | Vercel Cron → `/api/cron/send-alerts` |
 | Add new ETFs | As needed | Update `scripts/seed-etfs.ts`, run against prod |
 | Blog posts | Weekly | Add `.md` to `src/content/blog/`, push to `develop` |
-| FMP data agreement | Annually | Review and renew commercial license |
+| Tiingo plan review | Annually | Verify tier covers all endpoints in use; upgrade to Power+ for fund fees if needed |
 | Dependency updates | Monthly | `npm outdated`, test on `develop`, merge to `main` |
 
 ---

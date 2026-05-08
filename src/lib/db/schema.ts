@@ -39,7 +39,7 @@ export const etfs = pgTable(
     return5y: decimal('return_5y', { precision: 8, scale: 4 }),
     inceptionDate: date('inception_date'),
     exchange: varchar('exchange', { length: 10 }),
-    fmpLastSynced: timestamp('fmp_last_synced'),
+    dataLastSynced: timestamp('fmp_last_synced'),
     isActive: boolean('is_active').default(true),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),

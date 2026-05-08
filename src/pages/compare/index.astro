@@ -141,7 +141,7 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
     return3y: string | null;
     return5y: string | null;
     inceptionDate: string | null;
-    fmpLastSynced: string | null;
+    dataLastSynced: string | null;
     exchange: string | null;
     [key: string]: unknown;
   }
@@ -345,7 +345,7 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
             return escapeHtml(rowData.inceptionDate ? String(rowData.inceptionDate).slice(0, 10) : '—');
           case 'sync':
             return escapeHtml(
-              rowData.fmpLastSynced != null ? String(rowData.fmpLastSynced).slice(0, 10) : '—',
+              rowData.dataLastSynced != null ? String(rowData.dataLastSynced).slice(0, 10) : '—',
             );
           default:
             return '—';

@@ -45,7 +45,7 @@ export const GET: APIRoute = async ({ params }) => {
 
   return Response.json({
     ticker: etf.ticker,
-    fmpLastSynced: etf.fmpLastSynced ?? null,
+    dataLastSynced: etf.dataLastSynced ?? null,
     points,
   });
 };

@@ -274,3 +274,27 @@
  * violet-100 and blue-800 on blue-100 are unchanged (both pass ≥7:1).
  * No overrides needed for tan.
  */
+
+/* ── ETF card grid (index page) ──────────────────────────────────────── */
+
+/* Card footer tint adapts to theme */
+[data-theme] .bg-slate-50 { background-color: var(--bg-subtle); }
+
+/* Pillar accent stripes */
+[data-theme="dark"] .bg-orange-400  { background-color: #f97316; }
+[data-theme="dark"] .bg-indigo-400  { background-color: #818cf8; }
+[data-theme="dark"] .bg-teal-400    { background-color: #2dd4bf; }
+
+/* Return colors */
+[data-theme] .text-emerald-700      { color: #059669; }
+[data-theme="dark"] .text-emerald-700,
+[data-theme="purple"] .text-emerald-700 { color: #34d399; }
+
+[data-theme] .text-rose-600         { color: #e11d48; }
+[data-theme="dark"] .text-rose-600,
+[data-theme="purple"] .text-rose-600 { color: #fb7185; }
+
+/* Sort pill active state adapts to theme */
+[data-theme] .border-blue-600       { border-color: var(--btn-primary-bg); }
+[data-theme] .hover\:border-blue-400:hover { border-color: var(--link); }
+[data-theme] .hover\:text-blue-700:hover   { color: var(--link); }
