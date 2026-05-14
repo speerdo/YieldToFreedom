@@ -821,22 +821,41 @@ export async function POST({ request }) {
 
 ### ETF Universe
 
-~75 hand-curated income-relevant ETFs seeded once via `scripts/seed-etfs.ts`. New ETFs added manually.
+~165 hand-curated income-relevant ETFs seeded via `scripts/seed-etfs.ts`. New ETFs added manually by updating that file and re-running the script (safe — `ON CONFLICT DO NOTHING`).
 
-**Initial universe:**
-- Income: JEPI, JEPQ, DIVO, IDVO, QDVO, QYLD, RYLD, XYLD, PBDC, SVOL, SPYI, FEPI, CSHI, GPIQ, TOPW, GOOW, NVII
-- Stability: SCHD, VIG, HDV, DVY, SDY, DGRO, NOBL, VYM
-- Growth: VOO, SCHG, QQQ, VGT, IBIT, FBTC
+**Universe categories (by pillar → category):**
+
+*Income pillar:*
+- `covered-call` — JEPI, JEPQ, DIVO, IDVO, QDVO, QYLD, XYLD, RYLD, SPYI, QQQI, IWMI, BTCI, QQQH, SPYH, GPIQ, FEPI, AIPI, NUSI, IWMY, WDTE, QQQY, SPYT, XDTE, QDTE, RDTE, MAGY, YBTC
+- `option-income` — SVOL; YieldMax: YMAG, YMAX, ULTY, TSLY, NVDY, AMZY, MSFO, GOOY, APLY, MSTY, CONY, PLTY, AMDY, FBY, NFLY, PYPY, XOMO, BRKC, DISO, SMCY, CRCO, SNOY, RDYY, DRAY, CVNY, HIYY, ABNY, BABO, GMEY, RBLY, HOOY, TSMY, MRNY, MARO, GDXY, CHPY, GPTY, AIYY, LFGY, MINY, OARK, YBIT, CRSH, DIPS, WNTR, FIAT, YQQQ, QDTY, SDTY, RDTY, MSST, NVIT; Roundhill WeeklyPay: NVDW, TSLW, AAPW, AMDW, AMZW, ARMW, METW, MSFW, MSTW, NFLW, PLTW, GLDW
+- `high-yield` — PBDC, BIZD, KLIP, CSHI, HNDL, MDIV, TOPW, GOOW, NVII
+- `preferred-stock` — PFF, PGX, PFFD, FPE, PFXF, SPFF
+- `reit` — VNQ, IYR, SCHH, XLRE, REM, MORT, KBWY
+- `mlp` — AMLP, MLPA, MLPX, ENFR
+- `bond-income` — HYG, JNK, USHY, BKLN, SRLN, LQD, BNDI, HYBI
+
+*Stability pillar:*
+- `dividend-growth` — SCHD, VIG, HDV, DVY, SDY, DGRO, NOBL, VYM, DGRW, SCHY, SPHD, FVD, IDV, VYMI, PEY, FDL, DIVB, PFM, SPYD, SCHV
+- `bond` — AGG, BND, TLT, TIP, VCIT, TLTI
+
+*Growth pillar:*
+- `total-return` — VOO, IVV, SPY, VTI, SCHG, QQQ, QQQM, VUG, VGT, XLK, IWM, ARKK, IBIT, FBTC
 
 ### Nightly Sync (`/api/cron/sync-etfs`)
 
 Runs 02:00 UTC. For each active ETF:
-1. Fetch 2-year EOD price history from Tiingo (`/tiingo/daily/<ticker>/prices?startDate=`)
-2. Fetch dividend history from Tiingo (`/tiingo/dividends/<ticker>?startDate=`; falls back to extracting `divCash > 0` from EOD rows)
-3. Fetch meta from Tiingo (`/tiingo/daily/<ticker>`) for name and exchange code
-4. Upsert key metrics (price, trailing yield, exchange, issuer) and today's EOD price row
+1. Fetch 5-year EOD price history from Tiingo (`/tiingo/daily/<ticker>/prices?startDate=`)
+2. Fetch dividend history from Tiingo (`/tiingo/dividends/<ticker>?startDate=`; falls back to extracting `divCash > 0` from EOD rows when empty)
+3. Fetch meta from Tiingo (`/tiingo/daily/<ticker>`) for exchange code and inception date (`startDate`)
+4. Upsert key metrics: price, trailing 12m yield, exchange, inception date (first run only), dividend frequency (inferred from 13-month divCash window — first run only), 1y/3y/5y total returns (computed from adjClose ratio), today's EOD price row
 5. Upsert last 24 dividend records
 6. Rate limit: 200ms delay between tickers (Tiingo free tier: 500 req/hour)
+
+**Computed fields:**
+- `return1y` — simple total return: `adjClose_now / adjClose_1yr_ago - 1`
+- `return3y` / `return5y` — annualised CAGR: `(adjClose_now / adjClose_Nyr_ago)^(1/N) - 1`
+- `dividendFrequency` — counts `divCash > 0` rows in last 13 months: ≥10 → monthly, ≥3 → quarterly, ≥1 → annual
+- `inceptionDate` — from Tiingo `startDate` field on first sync; never overwritten
 
 ### Weekly Grade Recalc (`/api/cron/grade-etfs`)
 

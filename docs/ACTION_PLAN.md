@@ -8,7 +8,7 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 
 **How to track progress:** Mark checklist items with `[x]` when done; leave `[ ]` until finished. Update the *last progress update* line whenever you check something in.
 
-*Last progress update: 2026-05-08 — **Data provider migration**: Switched from FMP to **Tiingo**. Built `src/lib/tiingo/client.ts` (meta, EOD prices, dividends endpoints). Rewrote `sync-etfs.ts` to use Tiingo with dedicated dividends endpoint + EOD fallback. Renamed `fmpLastSynced` → `dataLastSynced` in TypeScript (DB column unchanged — no migration needed). Updated SPEC.md and ACTION_PLAN.md throughout. `astro check` passes clean (0 errors). **Next:** Set `TIINGO_API_KEY` in Vercel env vars, smoke-test the cron once Tiingo maintenance window clears, then Lighthouse + mobile/a11y pass.*
+*Last progress update: 2026-05-13 — **ETF universe expanded to ~165 ETFs.** Added comprehensive coverage of Roundhill (RDTE, MAGY, YBTC + 12 WeeklyPay single-stock), YieldMax (MSTY, GOOY fix, 20+ single-stock, 5 short/inverse, 8 sector/portfolio, 5 0DTE/target), NEOS (QQQI, IWMI, BTCI, QQQH, SPYH, BNDI, HYBI, TLTI), and Defiance (WDTE, QQQY, SPYT). `seed-etf-statics.ts` updated to cover all ~165 ETFs. GOOGY ticker corrected to GOOY. **Next:** Set `TIINGO_API_KEY` in Vercel env vars, run `seed-etfs.ts` + `seed-etf-statics.ts` against prod DB, smoke-test cron, then Lighthouse + mobile/a11y pass.*
 
 **Prior ships:** SPEC v1.1, six blog posts, `/blog`, `/sitemap.xml`, `robots.txt`, GA4 hook, Sprint 4 tools.*
 
@@ -233,7 +233,7 @@ curl -H "Authorization: Token $TIINGO_API_KEY" \
   "https://api.tiingo.com/tiingo/daily/JEPI"
 ```
 
-### 1.6 Seed ETF Universe
+### 1.6 Seed ETF Universe (~100 ETFs)
 
 ```typescript
 // scripts/seed-etfs.ts
@@ -475,7 +475,7 @@ npx tsx -e "import('./src/pages/api/cron/sync-etfs.ts')"
 - [x] `/etfs/JEPI` renders *(dividend chart shows data after sync; otherwise empty-state copy)*
 - [x] ETF pages carry `FinancialProduct` JSON-LD
 - [x] Disclaimer block on profile pages
-- [x] Grade algorithm run on entire **seeded** universe (`npm run run-grader`; expand list for “~75 ETFs” plan)
+- [x] Grade algorithm run on entire **seeded** universe (`npm run run-grader`; ~100 ETF universe — see `scripts/seed-etfs.ts`)
 - [ ] Nightly sync tested against **5 tickers** *(call `GET /api/cron/sync-etfs` with `Authorization: Bearer $CRON_SECRET` in preview)*
 
 ---
@@ -913,7 +913,7 @@ After Phase 2 launch, recurring tasks:
 | ETF data sync | Nightly | Vercel Cron → `/api/cron/sync-etfs` |
 | Grade recalculation | Weekly | Vercel Cron → `/api/cron/grade-etfs` |
 | Alert emails | Daily | Vercel Cron → `/api/cron/send-alerts` |
-| Add new ETFs | As needed | Update `scripts/seed-etfs.ts`, run against prod |
+| Add new ETFs | As needed | Update `scripts/seed-etfs.ts`, run against prod; update `scripts/seed-etf-statics.ts` for ER/AUM |
 | Blog posts | Weekly | Add `.md` to `src/content/blog/`, push to `develop` |
 | Tiingo plan review | Annually | Verify tier covers all endpoints in use; upgrade to Power+ for fund fees if needed |
 | Dependency updates | Monthly | `npm outdated`, test on `develop`, merge to `main` |

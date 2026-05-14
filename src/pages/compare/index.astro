@@ -10,6 +10,7 @@ const catalog = await db
   .select({
     ticker: etfs.ticker,
     name: etfs.name,
+    pillar: etfs.pillar,
   })
   .from(etfs)
   .where(eq(etfs.isActive, true))
@@ -31,25 +32,49 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
     </p>
 
     <div id="compare-root" class="mt-10 space-y-8" data-catalog={catalogJson} x-data="compareTool()" x-cloak>
+
+      <!-- pillar filter tabs -->
+      <div x-show="catalog.length > 0" class="flex flex-wrap gap-2">
+        <template x-for="p in pillars" :key="p.value">
+          <button
+            class="rounded-full px-3.5 py-1 text-xs font-semibold capitalize transition-colors"
+            :class="filterPillar === p.value ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+            @click="filterPillar = p.value"
+            x-text="p.label"
+          ></button>
+        </template>
+      </div>
+
       <!-- selectors -->
       <div class="grid gap-4 lg:grid-cols-3" x-show="catalog.length > 0">
         <template x-for="col in [0, 1, 2]" :key="col">
-          <label class="block text-xs font-semibold uppercase text-slate-500">
-            <span x-text="labelFor(col)"></span>
-            <select
-              class="mt-2 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-900"
-              x-model.number="slotIdx[col]"
-              @change="syncIdxToTickers()"
-            >
-              <option value="-1">— none —</option>
-              <template x-for="(row, ix) in catalog" :key="row.ticker">
-                <option :value="ix" x-text="row.ticker"></option>
-              </template>
-            </select>
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-500">
+              <span x-text="labelFor(col)"></span>
+            </label>
+            <div class="relative mt-2 flex items-center gap-2">
+              <span
+                class="inline-block h-3 w-3 flex-none rounded-sm"
+                :style="`background: ${lineColors[col]}`"
+              ></span>
+              <select
+                class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-900"
+                x-model="tickers[col]"
+                @change="onTickerChange(col)"
+              >
+                <option value="">— none —</option>
+                <template x-for="row in filteredCatalog()" :key="row.ticker">
+                  <option
+                    :value="row.ticker"
+                    x-text="`${row.ticker} — ${row.name.length > 38 ? row.name.slice(0, 38) + '…' : row.name}`"
+                  ></option>
+                </template>
+              </select>
+            </div>
             <template x-if="tickers[col] && errors[tickers[col]]">
               <p class="mt-1 text-xs text-rose-700" x-text="errors[tickers[col]]"></p>
             </template>
-          </label>
+          </div>
         </template>
       </div>
 
@@ -59,16 +84,44 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
 
       <div class="rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-3 text-sm text-slate-600" x-cloak>
         <p x-show="loading">Loading snapshots…</p>
-        <p x-show="!loading && usableTickers().length >= 2" class="text-slate-700">
-          <span class="font-medium">Chart legend:</span> approx. trailing ~12‑month dividend yield (% of price at each ex‑date).
-          Thin or missing price history can shorten the curves — nightly FMP sync improves coverage.
-        </p>
       </div>
 
       <!-- chart -->
-      <section class="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm" x-show="usableTickers().length >= 2" x-cloak>
-        <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Yield paths (overlap)</h2>
-        <div class="relative mt-4 h-72 w-full sm:h-80">
+      <section class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm" x-show="usableTickers().length >= 2" x-cloak>
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <!-- mode toggle -->
+          <div class="flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 text-sm font-medium">
+            <button
+              class="rounded-md px-4 py-1.5 transition-colors"
+              :class="chartMode === 'price' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
+              @click="chartMode = 'price'; renderChartOverlay()"
+            >Price</button>
+            <button
+              class="rounded-md px-4 py-1.5 transition-colors"
+              :class="chartMode === 'total-return' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
+              @click="chartMode = 'total-return'; renderChartOverlay()"
+            >Total Return</button>
+          </div>
+          <!-- color legend -->
+          <div class="flex flex-wrap gap-x-5 gap-y-1.5 text-sm">
+            <template x-for="(tk, i) in usableTickers()" :key="tk">
+              <div class="flex items-center gap-2 font-medium text-slate-700">
+                <svg width="24" height="4" class="flex-none overflow-visible">
+                  <line x1="0" y1="2" x2="24" y2="2" :stroke="lineColors[i]" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+                <span x-text="tk" class="font-mono text-xs tracking-tight"></span>
+              </div>
+            </template>
+          </div>
+        </div>
+        <p class="mt-1.5 text-xs text-slate-400" x-text="chartMode === 'total-return' ? 'Price + reinvested dividends · % return from start date' : 'Closing price · % return from start date · dividends not included'"></p>
+        <!-- excluded notice -->
+        <template x-if="noDataFor.length > 0">
+          <p class="mt-3 text-xs text-amber-700 bg-amber-50 rounded px-3 py-1.5">
+            No price history for: <span class="font-mono font-semibold" x-text="noDataFor.join(', ')"></span> — run <code>npm run backfill:prices</code> to populate.
+          </p>
+        </template>
+        <div class="relative mt-5 h-72 w-full sm:h-80">
           <canvas id={CANVAS_ID} class="absolute inset-0 max-h-full w-full"></canvas>
         </div>
       </section>
@@ -114,11 +167,12 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
 
   import { mountCompareYieldChartFromPayload } from '../../lib/charts/compare-yield-line';
 
-  const LINE_COLORS = ['rgb(37, 99, 235)', 'rgb(217, 119, 6)', 'rgb(5, 150, 105)'];
+  const LINE_COLORS = ['rgb(37, 99, 235)', 'rgb(217, 119, 6)', 'rgb(22, 163, 74)'];
 
   interface CatalogRow {
     ticker: string;
     name: string;
+    pillar: string;
   }
 
   interface EtfApiRow {
@@ -176,22 +230,36 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
 
   document.addEventListener('alpine:init', () => {
     Alpine.data('compareTool', () => ({
-      /** selected catalog index per column, or -1 */
-      slotIdx: [-1, -1, -1] as number[],
       tickers: ['', '', ''] as string[],
       catalog: [] as CatalogRow[],
+      filterPillar: 'all' as string,
+      chartMode: 'price' as 'price' | 'total-return',
+      lineColors: LINE_COLORS,
+      pillars: [
+        { value: 'all', label: 'All ETFs' },
+        { value: 'income', label: 'Income' },
+        { value: 'stability', label: 'Stability' },
+        { value: 'growth', label: 'Growth' },
+      ],
       etfByTicker: {} as Record<string, EtfApiRow | undefined>,
-      trailByTicker: {} as Record<string, Array<{ exDate: string; yieldPct: number }>>,
+      priceHistByTicker: {} as Record<string, { pricePoints: Array<{ x: number; value: number }>; totalReturnPoints: Array<{ x: number; value: number }> }>,
       errors: {} as Record<string, string | undefined>,
+      noDataFor: [] as string[],
       loading: false,
       CANVAS_ID: 'ytf-compare-yield-chart',
 
-      catalogIndexByTickerUpper(): Record<string, number> {
-        const m: Record<string, number> = {};
-        this.catalog.forEach((r: CatalogRow, i: number) => {
-          m[r.ticker.toUpperCase()] = i;
-        });
-        return m;
+      filteredCatalog(): CatalogRow[] {
+        if (this.filterPillar === 'all') return this.catalog;
+        const selected = new Set(this.tickers.filter(Boolean));
+        return this.catalog.filter(
+          (r: CatalogRow) => r.pillar === this.filterPillar || selected.has(r.ticker),
+        );
+      },
+
+      tickerSet(): Set<string> {
+        const s = new Set<string>();
+        this.catalog.forEach((r: CatalogRow) => s.add(r.ticker.toUpperCase()));
+        return s;
       },
 
       labelFor(col: number) {
@@ -218,25 +286,22 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
 
       readInitialFromQs(): string[] {
         const sp = new URLSearchParams(window.location.search);
-        const m = this.catalogIndexByTickerUpper();
+        const valid = this.tickerSet();
         const norm = (s: string | null) => String(s ?? '').trim().toUpperCase();
         let a = norm(sp.get('a'));
         let b = norm(sp.get('b'));
         let c = norm(sp.get('c'));
-        const valid = (t: string) => (t && t in m ? t : '');
-        a = valid(a);
-        b = valid(b);
-        c = valid(c);
+        a = valid.has(a) ? a : '';
+        b = valid.has(b) ? b : '';
+        c = valid.has(c) ? c : '';
 
         if (!a && !b && !c) {
-          if (m.JEPI !== undefined && m.SCHD !== undefined) {
-            a = 'JEPI';
-            b = 'SCHD';
-          } else if (this.catalog.length >= 2) {
-            a = this.catalog[0]!.ticker.toUpperCase();
-            b = this.catalog[1]!.ticker.toUpperCase();
+          if (valid.has('JEPI') && valid.has('SCHD')) { a = 'JEPI'; b = 'SCHD'; }
+          else if (this.catalog.length >= 2) {
+            a = this.catalog[0]!.ticker;
+            b = this.catalog[1]!.ticker;
           } else if (this.catalog.length === 1) {
-            a = this.catalog[0]!.ticker.toUpperCase();
+            a = this.catalog[0]!.ticker;
           }
         }
 
@@ -255,7 +320,6 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
         return out;
       },
 
-      /** Unique tickers left-to-right (column order skips empties). */
       usableTickers(): string[] {
         return this.uniqTickersList();
       },
@@ -352,43 +416,18 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
         }
       },
 
-      syncIdxToTickers() {
-        for (let i = 0; i < 3; i++) {
-          const idx = Number(this.slotIdx[i]);
-          if (!Number.isFinite(idx) || idx < 0) {
-            this.tickers[i] = '';
-            continue;
+      onTickerChange(col: number) {
+        // Deduplicate: clear any other slot that already has this ticker
+        const chosen = String(this.tickers[col] ?? '').trim().toUpperCase();
+        if (chosen) {
+          for (let i = 0; i < 3; i++) {
+            if (i !== col && String(this.tickers[i] ?? '').trim().toUpperCase() === chosen) {
+              this.tickers[i] = '';
+            }
           }
-          const row = this.catalog[idx] as CatalogRow | undefined;
-          if (row) this.tickers[i] = row.ticker.toUpperCase();
-          else this.tickers[i] = '';
         }
-        this.ensureNoDuplicateSelections();
         this.refreshUrlQuietly();
         this.scheduleLoad();
-      },
-
-      syncTickersToIdx() {
-        const m = this.catalogIndexByTickerUpper();
-        for (let i = 0; i < 3; i++) {
-          const t = String(this.tickers[i] ?? '').trim().toUpperCase();
-          this.slotIdx[i] = t ? (m[t] ?? -1) : -1;
-        }
-      },
-
-      /** If duplicate tickers picked, blank later columns first */
-      ensureNoDuplicateSelections() {
-        const seen = new Set<string>();
-        for (let i = 0; i < 3; i++) {
-          const upper = String(this.tickers[i] ?? '').trim().toUpperCase();
-          if (!upper) continue;
-          if (seen.has(upper)) {
-            this.tickers[i] = '';
-            this.slotIdx[i] = -1;
-            continue;
-          }
-          seen.add(upper);
-        }
       },
 
       scheduleLoad() {
@@ -408,77 +447,80 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
       renderChartOverlay() {
         const tickersOrdered = this.uniqTickersList();
 
-        const datasets =
-          typeof window === 'undefined'
-            ? []
-            : tickersOrdered.map((tk: string, i: number) => {
-                const trail = this.trailByTicker[tk] ?? [];
-                return {
-                  label: tk,
-                  borderColor: LINE_COLORS[i % LINE_COLORS.length] ?? LINE_COLORS[0]!,
-                  points: trail.map((p: { exDate: string; yieldPct: number }) => ({
-                    x: Date.parse(`${p.exDate}T12:00:00Z`),
-                    y: p.yieldPct,
-                  })),
-                };
-              });
+        const datasets = tickersOrdered.map((tk: string, i: number) => {
+          const hist = this.priceHistByTicker[tk];
+          if (this.chartMode === 'total-return') {
+            const pts = hist?.totalReturnPoints ?? [];
+            return {
+              label: tk,
+              borderColor: LINE_COLORS[i % LINE_COLORS.length] ?? LINE_COLORS[0]!,
+              points: pts.map((p: { x: number; value: number }) => ({ x: p.x, y: p.value })),
+            };
+          }
+          // Price mode: normalize to % change from first point so ETFs at different price levels are comparable
+          const pts = hist?.pricePoints ?? [];
+          const firstVal = pts[0]?.value ?? 1;
+          return {
+            label: tk,
+            borderColor: LINE_COLORS[i % LINE_COLORS.length] ?? LINE_COLORS[0]!,
+            points: pts.map((p: { x: number; value: number }) => ({ x: p.x, y: ((p.value / firstVal) - 1) * 100 })),
+          };
+        });
 
-        mountCompareYieldChartFromPayload({
+        const result = mountCompareYieldChartFromPayload({
           canvasId: this.CANVAS_ID,
           datasets,
+          yMode: 'pct',
         });
+        this.noDataFor = result.excluded;
       },
 
       async pullData() {
         const list = this.uniqTickersList();
         this.loading = true;
 
-        const nextTrail: Record<string, Array<{ exDate: string; yieldPct: number }>> = {};
+        type PriceHist = { pricePoints: Array<{ x: number; value: number }>; totalReturnPoints: Array<{ x: number; value: number }> };
         const nextEtf: Record<string, EtfApiRow | undefined> = {};
+        const nextHist: Record<string, PriceHist> = {};
 
         await Promise.all(
           list.map(async (tk: string) => {
             delete this.errors[tk];
             nextEtf[tk] = undefined;
-            nextTrail[tk] = [];
+            nextHist[tk] = { pricePoints: [], totalReturnPoints: [] };
 
             try {
-              const er = await fetch(`/api/etfs/${encodeURIComponent(tk)}`);
-              if (!er.ok)
-                throw new Error(er.status === 404 ? `Unknown ticker “${tk}”.` : `HTTP ${er.status}`);
-              nextEtf[tk] = (await er.json()) as EtfApiRow;
+              const res = await fetch(`/api/etfs/${encodeURIComponent(tk)}`);
+              if (!res.ok)
+                throw new Error(res.status === 404 ? `Unknown ticker “${tk}”.` : `HTTP ${res.status}`);
+              nextEtf[tk] = (await res.json()) as EtfApiRow;
             } catch (e) {
-              const msg =
-                typeof e === 'object' &&
-                e &&
-                'message' in e &&
-                typeof (e as { message?: string }).message === 'string'
-                  ? (e as { message?: string }).message
-                  : 'Load failed.';
-              this.errors[tk] = msg!;
+              const msg = e instanceof Error ? e.message : 'Load failed.';
+              this.errors[tk] = msg;
             }
 
             if (this.errors[tk]) return;
 
             try {
-              const tr = await fetch(`/api/etfs/${encodeURIComponent(tk)}/yield-trail`);
-              const trBody = (await tr.json()) as {
-                points?: Array<{ exDate: string; yieldPct: number }>;
-              };
-              if (tr.ok && Array.isArray(trBody.points)) nextTrail[tk] = trBody.points;
+              const hr = await fetch(`/api/etfs/${encodeURIComponent(tk)}/price-history`);
+              if (hr.ok) {
+                const body = (await hr.json()) as { pricePoints?: unknown; totalReturnPoints?: unknown };
+                if (Array.isArray(body.pricePoints)) nextHist[tk]!.pricePoints = body.pricePoints as PriceHist['pricePoints'];
+                if (Array.isArray(body.totalReturnPoints)) nextHist[tk]!.totalReturnPoints = body.totalReturnPoints as PriceHist['totalReturnPoints'];
+              }
             } catch {
-              /** yield trail stays empty — ETF profile still renders */
+              /* price history stays empty — metrics table still renders */
             }
           }),
         );
 
         this.etfByTicker = {};
-        this.trailByTicker = {};
+        this.priceHistByTicker = {};
 
         const keep = new Set(list);
         for (const tk of keep) {
           if (!this.errors[tk] && nextEtf[tk]) this.etfByTicker[tk] = nextEtf[tk];
-          this.trailByTicker[tk] = nextTrail[tk] ?? [];
+          this.priceHistByTicker[tk] = nextHist[tk] ?? { pricePoints: [], totalReturnPoints: [] };
         }
 
         this.loading = false;
@@ -487,25 +529,20 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
 
       init() {
         const root = document.getElementById('compare-root');
-        const rawCatalog = JSON.parse(root?.dataset.catalog ?? '[]') as CatalogRow[];
-        this.catalog = rawCatalog;
+        this.catalog = JSON.parse(root?.dataset.catalog ?? '[]') as CatalogRow[];
 
         const slots = this.readInitialFromQs();
-        const mUpper = this.catalogIndexByTickerUpper();
-
+        const seen = new Set<string>();
         for (let i = 0; i < 3; i++) {
           const t = slots[i]?.trim().toUpperCase() ?? '';
-          if (t && t in mUpper) {
+          if (t && !seen.has(t)) {
             this.tickers[i] = t;
-            this.slotIdx[i] = mUpper[t]!;
+            seen.add(t);
           } else {
             this.tickers[i] = '';
-            this.slotIdx[i] = -1;
           }
         }
 
-        this.ensureNoDuplicateSelections();
-        this.syncTickersToIdx();
         this.refreshUrlQuietly();
         queueMicrotask(() => this.pullData());
       },

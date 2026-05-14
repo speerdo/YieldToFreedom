@@ -1,10 +1,10 @@
 import {
   Chart,
   Legend,
+  LineController,
   LineElement,
   LinearScale,
   PointElement,
-  ScatterController,
   Tooltip,
   type Chart as ChartJs,
 } from 'chart.js';
@@ -13,7 +13,7 @@ let registered = false;
 
 function ensureRegistry() {
   if (registered) return;
-  Chart.register(ScatterController, LineElement, PointElement, LinearScale, Tooltip, Legend);
+  Chart.register(LineController, LineElement, PointElement, LinearScale, Tooltip, Legend);
   registered = true;
 }
 
@@ -24,57 +24,75 @@ export interface CompareYieldDatasetPayload {
   points: Array<{ x: number; y: number }>;
 }
 
+/** indexed: 100=start (compare page); price: raw $ close; pct: % from 0; yield: trailing yield % */
+export type ChartYMode = 'indexed' | 'yield' | 'price' | 'pct';
+
 export interface CompareYieldMountPayload {
   canvasId: string;
   datasets: CompareYieldDatasetPayload[];
+  /** 'indexed' = price/TR chart (100 = start); 'yield' = trailing yield % */
+  yMode?: ChartYMode;
 }
 
-/** Destroy any existing Chart on this canvas, then render a multi-line trailing-yield comparison. */
-export function mountCompareYieldChartFromPayload(payload: CompareYieldMountPayload): ChartJs | undefined {
+export interface MountResult {
+  chart: ChartJs | undefined;
+  /** Tickers dropped because they had no chart data */
+  excluded: string[];
+}
+
+/** Destroy any existing Chart on this canvas, then render a multi-line comparison. */
+export function mountCompareYieldChartFromPayload(payload: CompareYieldMountPayload): MountResult {
   ensureRegistry();
 
+  const yMode = payload.yMode ?? 'indexed';
+
   const canvas = document.getElementById(payload.canvasId);
-  if (!(canvas instanceof HTMLCanvasElement)) return undefined;
+  if (!(canvas instanceof HTMLCanvasElement)) return { chart: undefined, excluded: [] };
 
   const existing = Chart.getChart(canvas);
   existing?.destroy();
 
-    const datasets = payload.datasets
-    .filter((d) => d.points.length >= 2)
+  const excluded: string[] = [];
+  const datasets = payload.datasets
+    .filter((d) => {
+      if (d.points.length < 1) { excluded.push(d.label); return false; }
+      return true;
+    })
     .map((d) => ({
-      type: 'scatter' as const,
       label: d.label,
       data: d.points,
       borderColor: d.borderColor,
-      backgroundColor: d.borderColor,
-      borderWidth: 2,
-      showLine: true,
-      tension: 0.2,
-      pointRadius: 2,
-      pointHoverRadius: 4,
+      backgroundColor: 'transparent',
+      borderWidth: 2.5,
+      tension: 0.3,
+      pointRadius: 0,
+      pointHoverRadius: 5,
+      pointHoverBackgroundColor: d.borderColor,
+      fill: false,
     }));
 
-  if (!datasets.length) return undefined;
+  if (!datasets.length) return { chart: undefined, excluded };
 
-  return new Chart(canvas, {
-    type: 'scatter',
+  const chart = new Chart(canvas, {
+    type: 'line',
     data: { datasets },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       interaction: {
-        mode: 'nearest',
+        mode: 'index',
         intersect: false,
         axis: 'x',
       },
       plugins: {
-        legend: {
-          position: 'top',
-          labels: {
-            boxWidth: 12,
-          },
-        },
+        legend: { display: false },
         tooltip: {
+          backgroundColor: 'rgba(15, 23, 42, 0.88)',
+          titleColor: '#94a3b8',
+          bodyColor: '#f1f5f9',
+          borderColor: 'rgba(148, 163, 184, 0.2)',
+          borderWidth: 1,
+          padding: 12,
           callbacks: {
             title(items) {
               const x = items[0]?.parsed.x;
@@ -90,11 +108,23 @@ export function mountCompareYieldChartFromPayload(payload: CompareYieldMountPayl
               }
             },
             label(item) {
-              const raw = typeof item.raw === 'object' && item.raw && 'y' in item.raw ? (item.raw as { y?: number }).y : item.parsed.y;
+              const raw = typeof item.raw === 'object' && item.raw && 'y' in item.raw
+                ? (item.raw as { y?: number }).y
+                : item.parsed.y;
               const y = typeof raw === 'number' ? raw : Number(raw);
               if (!Number.isFinite(y)) return item.dataset.label ?? '';
-              const pct = y.toFixed(2);
-              return `${item.dataset.label ?? ''}: ${pct}%`;
+              const label = item.dataset.label ?? '';
+              if (yMode === 'indexed') {
+                const gain = y - 100;
+                const sign = gain >= 0 ? '+' : '';
+                return `${label}: ${y.toFixed(1)}  (${sign}${gain.toFixed(1)}%)`;
+              }
+              if (yMode === 'price') return `${label}: $${y.toFixed(2)}`;
+              if (yMode === 'pct') {
+                const sign = y >= 0 ? '+' : '';
+                return `${label}: ${sign}${y.toFixed(2)}%`;
+              }
+              return `${label}: ${y.toFixed(2)}%`;
             },
           },
         },
@@ -102,8 +132,12 @@ export function mountCompareYieldChartFromPayload(payload: CompareYieldMountPayl
       scales: {
         x: {
           type: 'linear',
+          grid: { color: 'rgba(148, 163, 184, 0.15)' },
+          border: { display: false },
           ticks: {
             maxTicksLimit: 8,
+            color: '#94a3b8',
+            font: { size: 11 },
             callback(v) {
               const n = Number(v);
               if (!Number.isFinite(n)) return '';
@@ -114,23 +148,26 @@ export function mountCompareYieldChartFromPayload(payload: CompareYieldMountPayl
               }
             },
           },
-          title: { display: true, text: 'Ex-date', color: '#64748b', font: { size: 11 } },
         },
         y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: 'TTM dividend yield (~%)',
-            color: '#64748b',
-            font: { size: 11 },
-          },
+          beginAtZero: false,
+          grid: { color: 'rgba(148, 163, 184, 0.15)' },
+          border: { display: false },
           ticks: {
+            color: '#94a3b8',
+            font: { size: 11 },
             callback(v) {
-              return `${Number(v).toFixed(1)}%`;
+              const n = Number(v);
+              if (yMode === 'indexed') return `${n.toFixed(0)}`;
+              if (yMode === 'price') return `$${n.toFixed(2)}`;
+              if (yMode === 'pct') return `${n >= 0 ? '+' : ''}${n.toFixed(1)}%`;
+              return `${n.toFixed(1)}%`;
             },
           },
         },
       },
     },
   });
+
+  return { chart, excluded };
 }

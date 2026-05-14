@@ -31,6 +31,77 @@ function parseIsoDate(raw: unknown): string | null {
   return d;
 }
 
+function dateYearsAgo(years: number): string {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() - years);
+  return d.toISOString().slice(0, 10);
+}
+
+/**
+ * Compute total annualised returns using split-and-dividend-adjusted prices.
+ * 1-year is simple return; 3-year and 5-year are annualised (CAGR).
+ * Returns null for each horizon if the ETF didn't exist that long ago.
+ */
+function computeReturns(
+  sortedAsc: TiingoEodRow[],
+  latestAdjClose: number,
+): { return1y: string | null; return3y: string | null; return5y: string | null } {
+  function makeReturn(yearsBack: number): string | null {
+    const cutoff = dateYearsAgo(yearsBack);
+
+    // Binary search for last row on or before cutoff
+    let lo = 0;
+    let hi = sortedAsc.length - 1;
+    let best = -1;
+    while (lo <= hi) {
+      const mid = (lo + hi) >>> 1;
+      if (sortedAsc[mid]!.date.slice(0, 10) <= cutoff) {
+        best = mid;
+        lo = mid + 1;
+      } else {
+        hi = mid - 1;
+      }
+    }
+    if (best < 0) return null;
+
+    const anchorRow = sortedAsc[best]!;
+    const anchorDate = anchorRow.date.slice(0, 10);
+    const anchor = asNumber(anchorRow.adjClose ?? anchorRow.close);
+    if (anchor == null || anchor <= 0) return null;
+
+    // Guard: anchor must be within 10 calendar days of the cutoff (ETF too young otherwise)
+    const gapDays = (new Date(cutoff).getTime() - new Date(anchorDate).getTime()) / 86_400_000;
+    if (gapDays > 10) return null;
+
+    const ratio = latestAdjClose / anchor;
+    const r = yearsBack === 1 ? ratio - 1 : Math.pow(ratio, 1 / yearsBack) - 1;
+    return r.toFixed(6);
+  }
+
+  return {
+    return1y: makeReturn(1),
+    return3y: makeReturn(3),
+    return5y: makeReturn(5),
+  };
+}
+
+/**
+ * Infer dividend frequency from EOD rows over the past 13 months.
+ * 13-month window ensures a full calendar year is always covered.
+ */
+function inferDividendFrequency(historyRows: TiingoEodRow[]): string | null {
+  const d = new Date();
+  d.setMonth(d.getMonth() - 13);
+  const cutoff = d.toISOString().slice(0, 10);
+
+  const count = historyRows.filter(r => r.date.slice(0, 10) >= cutoff && r.divCash > 0).length;
+
+  if (count >= 10) return 'monthly';
+  if (count >= 3) return 'quarterly';
+  if (count >= 1) return 'annual';
+  return null;
+}
+
 /** Build dividend DB rows from Tiingo /tiingo/dividends/<ticker> response */
 function buildDividendRows(
   rows: TiingoDividendRow[],
@@ -120,68 +191,71 @@ export const GET: APIRoute = async ({ request }) => {
   let updated = 0;
   let dividendRows = 0;
 
-  // Two-year lookback for dividend history
+  // 5-year lookback covers full return history and 2+ years of dividend data
+  const fiveYearsAgo = new Date();
+  fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
+  const startDate = fiveYearsAgo.toISOString().slice(0, 10);
+
   const twoYearsAgo = new Date();
   twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
-  const startDate = twoYearsAgo.toISOString().slice(0, 10);
+  const divStartDate = twoYearsAgo.toISOString().slice(0, 10);
+
   const todayUtc = new Date().toISOString().slice(0, 10);
 
   for (const row of active) {
     try {
-      // ── 1. Fetch latest EOD price ──────────────────────────────────────────
+      // ── 1. Fetch 5-year EOD price history ─────────────────────────────────
       let latestPrice: number | null = null;
+      let latestAdjClose: number | null = null;
       let historyRows: TiingoEodRow[] = [];
+      let sortedAsc: TiingoEodRow[] = [];
 
       try {
-        // Fetch 2-year history for both price and dividend extraction
         historyRows = await tiingoPrices(row.ticker, { startDate });
         if (historyRows.length > 0) {
-          // Sort newest first; last element is most recent after ascending sort
-          const sorted = [...historyRows].sort((a, b) =>
-            b.date.localeCompare(a.date),
-          );
-          latestPrice = asNumber(sorted[0].adjClose ?? sorted[0].close);
+          sortedAsc = [...historyRows].sort((a, b) => a.date.localeCompare(b.date));
+          const newest = sortedAsc[sortedAsc.length - 1]!;
+          latestAdjClose = asNumber(newest.adjClose ?? newest.close);
+          latestPrice = latestAdjClose;
         }
       } catch {
         // price fetch failed — skip price update for this ticker
       }
 
-      // ── 2. Fetch meta (name, exchange) ────────────────────────────────────
+      // ── 2. Fetch metadata (exchange, inception date) ──────────────────────
       let exchangeCode: string | null = null;
-      let issuerName: string | null = null;
+      let inceptionDate: string | null = null;
       try {
         const meta = await tiingoMeta(row.ticker);
         exchangeCode = meta.exchangeCode ?? null;
-        issuerName = meta.name ?? null;
+        inceptionDate = parseIsoDate(meta.startDate);
       } catch {
         // meta fetch failed — use existing values
       }
 
-      // ── 3. Try dedicated dividends endpoint first ──────────────────────────
+      // ── 3. Try dedicated dividends endpoint, fallback to EOD divCash ──────
       let divRows: TiingoDividendRow[] = [];
       let usedEodFallback = false;
       try {
-        divRows = await tiingoDividends(row.ticker, { startDate });
+        divRows = await tiingoDividends(row.ticker, { startDate: divStartDate });
+        if (divRows.length === 0) usedEodFallback = true;
       } catch {
-        // Fall back to extracting divCash > 0 from EOD history
         usedEodFallback = true;
       }
 
-      // ── 4. Compute trailing 12m yield ──────────────────────────────────────
-      const twelveMonthsAgo = new Date();
-      twelveMonthsAgo.setFullYear(twelveMonthsAgo.getFullYear() - 1);
-      const cutoff = twelveMonthsAgo.toISOString().slice(0, 10);
+      // ── 4. Compute trailing 12m yield ─────────────────────────────────────
+      const cutoff12m = dateYearsAgo(1);
 
       let trailing12mSum = 0;
-      if (divRows.length > 0) {
+      if (!usedEodFallback && divRows.length > 0) {
         for (const d of divRows) {
           const exDate = parseIsoDate(d.exDate);
-          if (exDate && exDate >= cutoff) trailing12mSum += asNumber(d.divCash) ?? 0;
+          if (exDate && exDate >= cutoff12m) trailing12mSum += asNumber(d.divCash) ?? 0;
         }
-      } else if (historyRows.length > 0) {
+      } else {
         for (const r of historyRows) {
-          const exDate = parseIsoDate(r.date);
-          if (exDate && exDate >= cutoff && r.divCash > 0) trailing12mSum += r.divCash;
+          const d = parseIsoDate(r.date);
+          if (d && d >= cutoff12m && r.divCash > 0) trailing12mSum += r.divCash;
         }
       }
 
@@ -190,7 +264,18 @@ export const GET: APIRoute = async ({ request }) => {
           ? (trailing12mSum / latestPrice).toFixed(6)
           : undefined;
 
-      // ── 5. Upsert ETF metrics ──────────────────────────────────────────────
+      // ── 5. Compute total returns (1y / 3y / 5y) from adjClose history ─────
+      const returns =
+        latestAdjClose != null && latestAdjClose > 0 && sortedAsc.length > 0
+          ? computeReturns(sortedAsc, latestAdjClose)
+          : { return1y: null, return3y: null, return5y: null };
+
+      // ── 6. Infer dividend frequency from EOD divCash distribution ─────────
+      const freqInferred = historyRows.length > 0
+        ? inferDividendFrequency(historyRows)
+        : null;
+
+      // ── 7. Upsert ETF metrics ─────────────────────────────────────────────
       await db
         .update(etfs)
         .set({
@@ -201,12 +286,19 @@ export const GET: APIRoute = async ({ request }) => {
           lastYield: trailingYield ?? row.lastYield,
           trailing12mYield: trailingYield ?? row.trailing12mYield,
           exchange: exchangeCode ?? row.exchange,
-          issuer: issuerName ? issuerName.slice(0, 100) : row.issuer,
+          // Only write inceptionDate if not already stored
+          ...(inceptionDate && !row.inceptionDate ? { inceptionDate } : {}),
+          // Inferred frequency only written when not previously set (manual > auto)
+          ...(freqInferred && !row.dividendFrequency ? { dividendFrequency: freqInferred } : {}),
+          // Returns always overwritten with latest data
+          ...(returns.return1y != null ? { return1y: returns.return1y } : {}),
+          ...(returns.return3y != null ? { return3y: returns.return3y } : {}),
+          ...(returns.return5y != null ? { return5y: returns.return5y } : {}),
           dataLastSynced: new Date(),
         })
         .where(eq(etfs.id, row.id));
 
-      // ── 6. Upsert today's EOD price row ───────────────────────────────────
+      // ── 8. Upsert today's EOD price row ──────────────────────────────────
       if (latestPrice != null && latestPrice > 0) {
         const todayRow = historyRows.find((r) => parseIsoDate(r.date) === todayUtc);
         await db
@@ -234,7 +326,7 @@ export const GET: APIRoute = async ({ request }) => {
           });
       }
 
-      // ── 7. Upsert dividend history ─────────────────────────────────────────
+      // ── 9. Upsert dividend history ────────────────────────────────────────
       const dbDivRows = usedEodFallback
         ? buildDividendRowsFromEod(historyRows, row.id)
         : buildDividendRows(divRows, row.id);

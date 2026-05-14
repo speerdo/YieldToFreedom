@@ -1,0 +1,40 @@
+---
+interface Props {
+  ticker: string;
+}
+const { ticker } = Astro.props;
+const canvasId = `prc-${ticker}`;
+---
+
+<section
+  data-ytf-price-return-chart={ticker}
+  data-canvas-id={canvasId}
+  class="mt-10 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm"
+>
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Performance — last 14 months</h2>
+      <p data-chart-desc class="mt-0.5 text-xs text-slate-400">Closing price indexed to 100 at start · dividends excluded</p>
+    </div>
+    <div class="flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 text-sm font-medium">
+      <button
+        data-mode="price"
+        class="rounded-md bg-white px-4 py-1.5 text-slate-900 shadow-sm transition-colors"
+      >Price</button>
+      <button
+        data-mode="total-return"
+        class="rounded-md px-4 py-1.5 text-slate-500 transition-colors hover:text-slate-700"
+      >Total Return</button>
+    </div>
+  </div>
+  <div class="relative mt-5 h-64 w-full sm:h-72">
+    <canvas id={canvasId} class="absolute inset-0 max-h-full w-full"></canvas>
+    <p data-loading class="absolute inset-0 flex items-center justify-center text-sm text-slate-400">Loading…</p>
+    <p data-empty hidden class="absolute inset-0 flex items-center justify-center text-sm text-slate-400">No price history available yet.</p>
+  </div>
+</section>
+
+<script>
+  import { mountPriceReturnChartsFromDom } from '../../lib/charts/price-return-chart';
+  mountPriceReturnChartsFromDom();
+</script>
