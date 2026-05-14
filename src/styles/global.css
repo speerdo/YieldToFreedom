@@ -2,7 +2,7 @@
 
 @theme {
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-heading: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-heading: 'DM Serif Display', Georgia, serif;
 }
 
 [x-cloak] {
