@@ -145,6 +145,8 @@
 
 /* Focus ring on form inputs */
 [data-theme] .focus\:border-blue-400:focus { border-color: var(--link); }
+[data-theme] .focus-within\:border-blue-400:focus-within { border-color: var(--link); }
+[data-theme] .focus-within\:ring-blue-400:focus-within { --tw-ring-color: var(--link); }
 
 /* ── Primary buttons ─────────────────────────────────────────────────── */
 

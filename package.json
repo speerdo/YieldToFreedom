@@ -18,6 +18,8 @@
     "seed:statics": "tsx scripts/seed-etf-statics.ts",
     "fill:missing": "tsx scripts/fill-missing-data.ts",
     "backfill:prices": "tsx scripts/backfill-prices.ts",
+    "backfill:dividends": "tsx scripts/backfill-dividends.ts",
+    "backfill:metadata": "tsx scripts/backfill-metadata.ts",
     "run-grader": "tsx scripts/run-grader.ts"
   },
   "dependencies": {
