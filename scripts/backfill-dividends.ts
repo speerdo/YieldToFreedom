@@ -63,7 +63,7 @@ for (const etf of targets) {
     } catch (inner) {
       const msg = inner instanceof Error ? inner.message : String(inner);
       if (msg.includes('429')) throw inner;
-      console.log(`  – ${etf.ticker.padEnd(6)} not in Tiingo (${msg})`);
+      console.log(`  - ${etf.ticker.padEnd(6)} not in Tiingo (${msg})`);
       skipped++;
       continue;
     }
@@ -88,7 +88,7 @@ for (const etf of targets) {
       .filter((r): r is NonNullable<typeof r> => r !== null);
 
     if (!divRows.length) {
-      console.log(`  – ${etf.ticker.padEnd(6)} no dividends in price history`);
+      console.log(`  - ${etf.ticker.padEnd(6)} no dividends in price history`);
       skipped++;
       continue;
     }

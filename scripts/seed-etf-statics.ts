@@ -26,50 +26,50 @@ const STATICS: Record<
     dividendFrequency: string;
   }
 > = {
-  // ── Covered-call — JPMorgan ───────────────────────────────────────────────
+  // ── Covered-call - JPMorgan ───────────────────────────────────────────────
   JEPI:  { expenseRatio: '0.0035', aum: '37000000000',   issuer: 'JPMorgan',        dividendFrequency: 'monthly'  },
   JEPQ:  { expenseRatio: '0.0035', aum: '22000000000',   issuer: 'JPMorgan',        dividendFrequency: 'monthly'  },
-  // ── Covered-call — Amplify ────────────────────────────────────────────────
+  // ── Covered-call - Amplify ────────────────────────────────────────────────
   DIVO:  { expenseRatio: '0.0055', aum: '3400000000',    issuer: 'Amplify',         dividendFrequency: 'monthly'  },
   IDVO:  { expenseRatio: '0.0055', aum: '350000000',     issuer: 'Amplify',         dividendFrequency: 'monthly'  },
   QDVO:  { expenseRatio: '0.0059', aum: '80000000',      issuer: 'Amplify',         dividendFrequency: 'monthly'  },
-  // ── Covered-call — Global X ───────────────────────────────────────────────
+  // ── Covered-call - Global X ───────────────────────────────────────────────
   QYLD:  { expenseRatio: '0.0060', aum: '7300000000',    issuer: 'Global X',        dividendFrequency: 'monthly'  },
   XYLD:  { expenseRatio: '0.0060', aum: '2600000000',    issuer: 'Global X',        dividendFrequency: 'monthly'  },
   RYLD:  { expenseRatio: '0.0060', aum: '1400000000',    issuer: 'Global X',        dividendFrequency: 'monthly'  },
-  // ── Covered-call — NEOS ───────────────────────────────────────────────────
+  // ── Covered-call - NEOS ───────────────────────────────────────────────────
   SPYI:  { expenseRatio: '0.0068', aum: '3200000000',    issuer: 'NEOS',            dividendFrequency: 'monthly'  },
   QQQI:  { expenseRatio: '0.0068', aum: '2000000000',    issuer: 'NEOS',            dividendFrequency: 'monthly'  },
   IWMI:  { expenseRatio: '0.0068', aum: '300000000',     issuer: 'NEOS',            dividendFrequency: 'monthly'  },
   BTCI:  { expenseRatio: '0.0068', aum: '200000000',     issuer: 'NEOS',            dividendFrequency: 'monthly'  },
   QQQH:  { expenseRatio: '0.0068', aum: '150000000',     issuer: 'NEOS',            dividendFrequency: 'monthly'  },
   SPYH:  { expenseRatio: '0.0068', aum: '150000000',     issuer: 'NEOS',            dividendFrequency: 'monthly'  },
-  // ── Covered-call — Goldman Sachs ──────────────────────────────────────────
+  // ── Covered-call - Goldman Sachs ──────────────────────────────────────────
   GPIQ:  { expenseRatio: '0.0029', aum: '2500000000',    issuer: 'Goldman Sachs',   dividendFrequency: 'monthly'  },
-  // ── Covered-call — REX Shares ─────────────────────────────────────────────
+  // ── Covered-call - REX Shares ─────────────────────────────────────────────
   FEPI:  { expenseRatio: '0.0065', aum: '500000000',     issuer: 'REX Shares',      dividendFrequency: 'monthly'  },
   AIPI:  { expenseRatio: '0.0065', aum: '500000000',     issuer: 'REX Shares',      dividendFrequency: 'monthly'  },
-  // ── Covered-call — Nationwide ─────────────────────────────────────────────
+  // ── Covered-call - Nationwide ─────────────────────────────────────────────
   NUSI:  { expenseRatio: '0.0068', aum: '800000000',     issuer: 'Nationwide',      dividendFrequency: 'monthly'  },
-  // ── Covered-call — Defiance ───────────────────────────────────────────────
+  // ── Covered-call - Defiance ───────────────────────────────────────────────
   IWMY:  { expenseRatio: '0.0099', aum: '200000000',     issuer: 'Defiance',        dividendFrequency: 'monthly'  },
   WDTE:  { expenseRatio: '0.0099', aum: '800000000',     issuer: 'Defiance',        dividendFrequency: 'weekly'   },
   QQQY:  { expenseRatio: '0.0099', aum: '500000000',     issuer: 'Defiance',        dividendFrequency: 'weekly'   },
   SPYT:  { expenseRatio: '0.0099', aum: '200000000',     issuer: 'Defiance',        dividendFrequency: 'monthly'  },
-  // ── Covered-call — Roundhill ──────────────────────────────────────────────
+  // ── Covered-call - Roundhill ──────────────────────────────────────────────
   XDTE:  { expenseRatio: '0.0095', aum: '600000000',     issuer: 'Roundhill',       dividendFrequency: 'weekly'   },
   QDTE:  { expenseRatio: '0.0095', aum: '400000000',     issuer: 'Roundhill',       dividendFrequency: 'weekly'   },
   RDTE:  { expenseRatio: '0.0095', aum: '300000000',     issuer: 'Roundhill',       dividendFrequency: 'weekly'   },
   MAGY:  { expenseRatio: '0.0095', aum: '200000000',     issuer: 'Roundhill',       dividendFrequency: 'weekly'   },
   YBTC:  { expenseRatio: '0.0095', aum: '200000000',     issuer: 'Roundhill',       dividendFrequency: 'weekly'   },
 
-  // ── Option-income — Simplify ──────────────────────────────────────────────
+  // ── Option-income - Simplify ──────────────────────────────────────────────
   SVOL:  { expenseRatio: '0.0104', aum: '900000000',     issuer: 'Simplify',        dividendFrequency: 'monthly'  },
-  // ── Option-income — YieldMax basket funds ─────────────────────────────────
+  // ── Option-income - YieldMax basket funds ─────────────────────────────────
   YMAG:  { expenseRatio: '0.0129', aum: '800000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   YMAX:  { expenseRatio: '0.0129', aum: '2000000000',    issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   ULTY:  { expenseRatio: '0.0099', aum: '700000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
-  // ── Option-income — YieldMax single-stock ─────────────────────────────────
+  // ── Option-income - YieldMax single-stock ─────────────────────────────────
   TSLY:  { expenseRatio: '0.0099', aum: '1500000000',    issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   NVDY:  { expenseRatio: '0.0099', aum: '1400000000',    issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   AMZY:  { expenseRatio: '0.0099', aum: '500000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
@@ -101,7 +101,7 @@ const STATICS: Record<
   TSMY:  { expenseRatio: '0.0099', aum: '80000000',      issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   MRNY:  { expenseRatio: '0.0099', aum: '100000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   MARO:  { expenseRatio: '0.0099', aum: '100000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
-  // ── Option-income — YieldMax sector / portfolio ───────────────────────────
+  // ── Option-income - YieldMax sector / portfolio ───────────────────────────
   GDXY:  { expenseRatio: '0.0099', aum: '200000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   CHPY:  { expenseRatio: '0.0099', aum: '150000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   GPTY:  { expenseRatio: '0.0099', aum: '150000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
@@ -110,19 +110,19 @@ const STATICS: Record<
   MINY:  { expenseRatio: '0.0099', aum: '80000000',      issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   OARK:  { expenseRatio: '0.0099', aum: '200000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   YBIT:  { expenseRatio: '0.0099', aum: '300000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
-  // ── Option-income — YieldMax short / inverse ──────────────────────────────
+  // ── Option-income - YieldMax short / inverse ──────────────────────────────
   CRSH:  { expenseRatio: '0.0099', aum: '200000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   DIPS:  { expenseRatio: '0.0099', aum: '150000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   WNTR:  { expenseRatio: '0.0099', aum: '100000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   FIAT:  { expenseRatio: '0.0099', aum: '80000000',      issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   YQQQ:  { expenseRatio: '0.0099', aum: '100000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
-  // ── Option-income — YieldMax 0DTE / target-distribution ───────────────────
+  // ── Option-income - YieldMax 0DTE / target-distribution ───────────────────
   QDTY:  { expenseRatio: '0.0099', aum: '200000000',     issuer: 'YieldMax',        dividendFrequency: 'weekly'   },
   SDTY:  { expenseRatio: '0.0099', aum: '300000000',     issuer: 'YieldMax',        dividendFrequency: 'weekly'   },
   RDTY:  { expenseRatio: '0.0099', aum: '150000000',     issuer: 'YieldMax',        dividendFrequency: 'weekly'   },
   MSST:  { expenseRatio: '0.0099', aum: '300000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   NVIT:  { expenseRatio: '0.0099', aum: '200000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
-  // ── Option-income — Roundhill WeeklyPay ───────────────────────────────────
+  // ── Option-income - Roundhill WeeklyPay ───────────────────────────────────
   NVDW:  { expenseRatio: '0.0099', aum: '200000000',     issuer: 'Roundhill',       dividendFrequency: 'weekly'   },
   TSLW:  { expenseRatio: '0.0099', aum: '150000000',     issuer: 'Roundhill',       dividendFrequency: 'weekly'   },
   AAPW:  { expenseRatio: '0.0099', aum: '100000000',     issuer: 'Roundhill',       dividendFrequency: 'weekly'   },
@@ -245,9 +245,9 @@ for (const [ticker, vals] of Object.entries(STATICS)) {
     console.log(`  ✓ ${ticker}`);
     updated++;
   } else {
-    console.log(`  – ${ticker} (not found in DB)`);
+    console.log(`  - ${ticker} (not found in DB)`);
     skipped++;
   }
 }
 
-console.log(`\nDone — ${updated} updated, ${skipped} skipped.`);
+console.log(`\nDone - ${updated} updated, ${skipped} skipped.`);

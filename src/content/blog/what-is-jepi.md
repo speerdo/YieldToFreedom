@@ -16,12 +16,12 @@ You still own broad U.S. large-cap exposure (mirroring the S&P 500 with a rules-
 
 ## Why trailing yield is not a guarantee
 
-“Trailing 12‑month yield” is backward-looking math on prior distributions. Option income, dividend cuts, and NAV movement can all change what you receive next quarter. Always match fund documents, tax character, and your own liquidity needs before sizing a position.
+“Trailing 12-month yield” is backward-looking math on prior distributions. Option income, dividend cuts, and NAV movement can all change what you receive next quarter. Always match fund documents, tax character, and your own liquidity needs before sizing a position.
 
 ## Dig deeper on Yield to Freedom
 
-- [JEPI profile & payout snapshot](/etfs/JEPI) (our Neon + FMP snapshot — **verify externally**)
-- [DRIP & compounding](/strategy/drip) — when reinvesting distributions helps or hurts your plan
-- [Compare ETFs](/compare?a=JEPI&b=SCHD) — line up JEPI next to a dividend-growth anchor
+- [JEPI profile & payout snapshot](/etfs/JEPI) (our Neon + FMP snapshot - **verify externally**)
+- [DRIP & compounding](/strategy/drip) - when reinvesting distributions helps or hurts your plan
+- [Compare ETFs](/compare?a=JEPI&b=SCHD) - line up JEPI next to a dividend-growth anchor
 
-*Educational only — not investment advice.*
+*Educational only - not investment advice.*

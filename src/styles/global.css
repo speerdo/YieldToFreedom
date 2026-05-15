@@ -19,7 +19,7 @@
   --fg:                #0f172a;
   --fg-muted:          #475569;
   --border:            #e2e8f0;
-  --link:              #1d4ed8;  /* blue-700 — 8.6:1 on white ✓ */
+  --link:              #1d4ed8;  /* blue-700 - 8.6:1 on white ✓ */
   --link-hover:        #1e3a8a;  /* blue-900 */
   --btn-primary-bg:    #2563eb;  /* blue-600 */
   --btn-primary-hover: #3b82f6;  /* blue-500 */
@@ -35,11 +35,11 @@
   --fg:                #f1f5f9;
   --fg-muted:          #94a3b8;
   --border:            #334155;
-  --link:              #60a5fa;  /* blue-400 — 7.5:1 on #0f172a ✓ */
+  --link:              #60a5fa;  /* blue-400 - 7.5:1 on #0f172a ✓ */
   --link-hover:        #93c5fd;  /* blue-300 */
   --btn-primary-bg:    #3b82f6;  /* blue-500 */
   --btn-primary-hover: #60a5fa;  /* blue-400 */
-  --section-ink-bg:    #1e293b;  /* slate-800 — distinct from main bg */
+  --section-ink-bg:    #1e293b;  /* slate-800 - distinct from main bg */
   --section-ink-fg:    #f1f5f9;
   --section-ink-muted: #94a3b8;  /* slate-400 */
 }
@@ -51,7 +51,7 @@
   --fg:                #3b2410;
   --fg-muted:          #7a5535;
   --border:            #c4976a;
-  --link:              #1d4ed8;  /* blue-700 — 7.2:1 on #f2e0c4 ✓ */
+  --link:              #1d4ed8;  /* blue-700 - 7.2:1 on #f2e0c4 ✓ */
   --link-hover:        #1e3a8a;  /* blue-900 */
   --btn-primary-bg:    #1d4ed8;
   --btn-primary-hover: #2563eb;
@@ -67,11 +67,11 @@
   --fg:                #f7e9b0;
   --fg-muted:          #d4a843;
   --border:            #5a2d82;
-  --link:              #c084fc;  /* purple-400 — 7.5:1 on #1a0830 ✓ */
+  --link:              #c084fc;  /* purple-400 - 7.5:1 on #1a0830 ✓ */
   --link-hover:        #e9d5ff;  /* purple-100 */
   --btn-primary-bg:    #7c3aed;  /* violet-700 */
   --btn-primary-hover: #8b5cf6;  /* violet-500 */
-  --section-ink-bg:    #130626;  /* --bg-subtle — very dark purple */
+  --section-ink-bg:    #130626;  /* --bg-subtle - very dark purple */
   --section-ink-fg:    #f7e9b0;
   --section-ink-muted: #d4a843;
 }
@@ -79,11 +79,11 @@
 /* ── Remap hard-coded Tailwind color utilities to theme vars ─────────── */
 /*
  * Unlayered rules always win over @layer utilities, so no !important needed.
- * Light-theme vars match the original Tailwind values exactly — zero visual
+ * Light-theme vars match the original Tailwind values exactly - zero visual
  * change on light, full theme shift on dark/tan/purple.
  */
 
-/* Text — page surface */
+/* Text - page surface */
 [data-theme] .text-slate-900,
 [data-theme] .text-slate-800,
 [data-theme] .text-slate-700 { color: var(--fg); }
@@ -92,7 +92,7 @@
 [data-theme] .text-slate-500,
 [data-theme] .text-slate-400 { color: var(--fg-muted); }
 
-/* Backgrounds — page / subtle / card surfaces */
+/* Backgrounds - page / subtle / card surfaces */
 [data-theme] .bg-white        { background-color: var(--bg-card); }
 [data-theme] .bg-slate-50,
 [data-theme] .bg-slate-100    { background-color: var(--bg-subtle); }
@@ -179,9 +179,9 @@
 /* ── Amber / warning surfaces ────────────────────────────────────────── */
 
 [data-theme="dark"] .text-amber-800,
-[data-theme="purple"] .text-amber-800  { color: #fbbf24; }  /* amber-400 — readable on dark */
+[data-theme="purple"] .text-amber-800  { color: #fbbf24; }  /* amber-400 - readable on dark */
 
-[data-theme="tan"] .text-amber-800     { color: #78350f; }  /* amber-900 — darker for tan bg */
+[data-theme="tan"] .text-amber-800     { color: #78350f; }  /* amber-900 - darker for tan bg */
 
 [data-theme="dark"] .text-amber-900,
 [data-theme="purple"] .text-amber-900  { color: #f59e0b; }  /* amber-500 */
@@ -212,23 +212,23 @@
  * dark page backgrounds. Remap to dark-tinted backgrounds with light text.
  */
 
-/* A — emerald */
+/* A - emerald */
 [data-theme="dark"] .bg-emerald-100,
 [data-theme="purple"] .bg-emerald-100  { background-color: rgba(16, 185, 129, 0.15); }
 [data-theme="dark"] .text-emerald-900,
 [data-theme="purple"] .text-emerald-900 { color: #6ee7b7; }  /* emerald-300 */
 
-/* B — sky */
+/* B - sky */
 [data-theme="dark"] .bg-sky-100,
 [data-theme="purple"] .bg-sky-100      { background-color: rgba(14, 165, 233, 0.15); }
 [data-theme="dark"] .text-sky-900,
 [data-theme="purple"] .text-sky-900    { color: #7dd3fc; }   /* sky-300 */
 
-/* C — amber (already handled above for warnings; .bg-amber-100 specifically) */
+/* C - amber (already handled above for warnings; .bg-amber-100 specifically) */
 [data-theme="dark"] .bg-amber-100,
 [data-theme="purple"] .bg-amber-100    { background-color: rgba(245, 158, 11, 0.15); }
 
-/* D — rose */
+/* D - rose */
 [data-theme="dark"] .bg-rose-100,
 [data-theme="purple"] .bg-rose-100     { background-color: rgba(244, 63, 94, 0.15); }
 [data-theme="dark"] .text-rose-900,
@@ -270,7 +270,7 @@
 [data-theme="dark"] .border-emerald-100,
 [data-theme="purple"] .border-emerald-100 { border-color: rgba(16, 185, 129, 0.3); }
 
-/* ── Tan theme — pillar card badge text ──────────────────────────────── */
+/* ── Tan theme - pillar card badge text ──────────────────────────────── */
 /*
  * Tan theme is light-enough that most badges work, but violet-800 on
  * violet-100 and blue-800 on blue-100 are unchanged (both pass ≥7:1).

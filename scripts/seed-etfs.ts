@@ -63,7 +63,7 @@ const ETF_UNIVERSE = [
   { ticker: 'WDTE',  name: 'Defiance S&P 500 Enhanced Options Income ETF',          pillar: 'income',    category: 'covered-call',   incomeSynthetic: true  },
   { ticker: 'QQQY',  name: 'Defiance Nasdaq-100 Enhanced Options Income ETF',       pillar: 'income',    category: 'covered-call',   incomeSynthetic: true  },
   { ticker: 'SPYT',  name: 'Defiance S&P 500 Target Income ETF',                    pillar: 'income',    category: 'covered-call',   incomeSynthetic: true  },
-  // Roundhill — index 0DTE
+  // Roundhill - index 0DTE
   { ticker: 'XDTE',  name: 'Roundhill S&P 500 0DTE Covered Call Strategy ETF',      pillar: 'income',    category: 'covered-call',   incomeSynthetic: true  },
   { ticker: 'QDTE',  name: 'Roundhill NASDAQ-100 0DTE Covered Call Strategy ETF',   pillar: 'income',    category: 'covered-call',   incomeSynthetic: true  },
   { ticker: 'RDTE',  name: 'Roundhill Russell 2000 0DTE Covered Call Strategy ETF', pillar: 'income',    category: 'covered-call',   incomeSynthetic: true  },
@@ -73,11 +73,11 @@ const ETF_UNIVERSE = [
   // ── Income / Option-income (single-stock & basket) ───────────────────────
   // Simplify
   { ticker: 'SVOL',  name: 'Simplify Volatility Premium ETF',                       pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
-  // YieldMax — Magnificent 7 & basket funds
+  // YieldMax - Magnificent 7 & basket funds
   { ticker: 'YMAG',  name: 'YieldMax Magnificent 7 Fund of Option Income ETFs',     pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'YMAX',  name: 'YieldMax Universe Fund of Option Income ETFs',          pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'ULTY',  name: 'YieldMax Ultra Option Income Strategy ETF',             pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
-  // YieldMax — mega-cap single-stock
+  // YieldMax - mega-cap single-stock
   { ticker: 'TSLY',  name: 'YieldMax TSLA Option Income Strategy ETF',              pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'NVDY',  name: 'YieldMax NVDA Option Income Strategy ETF',              pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'AMZY',  name: 'YieldMax AMZN Option Income Strategy ETF',              pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
@@ -87,7 +87,7 @@ const ETF_UNIVERSE = [
   { ticker: 'MSTY',  name: 'YieldMax MSTR Option Income Strategy ETF',              pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'CONY',  name: 'YieldMax COIN Option Income Strategy ETF',              pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'PLTY',  name: 'YieldMax PLTR Option Income Strategy ETF',              pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
-  // YieldMax — large-cap single-stock
+  // YieldMax - large-cap single-stock
   { ticker: 'AMDY',  name: 'YieldMax AMD Option Income Strategy ETF',               pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'FBY',   name: 'YieldMax META Option Income Strategy ETF',              pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'NFLY',  name: 'YieldMax NFLX Option Income Strategy ETF',              pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
@@ -110,7 +110,7 @@ const ETF_UNIVERSE = [
   { ticker: 'TSMY',  name: 'YieldMax TSM Option Income Strategy ETF',               pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'MRNY',  name: 'YieldMax MRNA Option Income Strategy ETF',              pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'MARO',  name: 'YieldMax MARA Option Income Strategy ETF',              pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
-  // YieldMax — sector / portfolio
+  // YieldMax - sector / portfolio
   { ticker: 'GDXY',  name: 'YieldMax Gold Miners Option Income Strategy ETF',       pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'CHPY',  name: 'YieldMax Semiconductor Option Income Strategy ETF',     pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'GPTY',  name: 'YieldMax AI & Tech Option Income Strategy ETF',         pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
@@ -119,21 +119,21 @@ const ETF_UNIVERSE = [
   { ticker: 'MINY',  name: 'YieldMax Mining Option Income Strategy ETF',            pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'OARK',  name: 'YieldMax Innovation Option Income Strategy ETF',        pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'YBIT',  name: 'YieldMax Bitcoin Option Income Strategy ETF',           pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
-  // YieldMax — short / inverse income
+  // YieldMax - short / inverse income
   { ticker: 'CRSH',  name: 'YieldMax Short TSLA Option Income Strategy ETF',        pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'DIPS',  name: 'YieldMax Short NVDA Option Income Strategy ETF',        pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'WNTR',  name: 'YieldMax Short MSTR Option Income Strategy ETF',        pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'FIAT',  name: 'YieldMax Short COIN Option Income Strategy ETF',        pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'YQQQ',  name: 'YieldMax Short NASDAQ-100 Option Income Strategy ETF',  pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
-  // YieldMax — 0DTE / target-distribution
+  // YieldMax - 0DTE / target-distribution
   { ticker: 'QDTY',  name: 'YieldMax Nasdaq-100 Target Distribution ETF',           pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'SDTY',  name: 'YieldMax S&P 500 Target Distribution ETF',              pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'RDTY',  name: 'YieldMax Russell 2000 Target Distribution ETF',         pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'MSST',  name: 'YieldMax MSTR 2x Option Income Strategy ETF',           pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'NVIT',  name: 'YieldMax NVDA 2x Option Income Strategy ETF',           pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
-  // YieldMax — Target 12 sector
+  // YieldMax - Target 12 sector
   { ticker: 'SOXY',  name: 'YieldMax Target 12 Semiconductor Option Income ETF',    pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
-  // GraniteShares YieldBOOST — single-stock & basket
+  // GraniteShares YieldBOOST - single-stock & basket
   { ticker: 'YBST',  name: 'GraniteShares YieldBOOST Single Stock Universe ETF',   pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'YBTY',  name: 'GraniteShares YieldBOOST TopYielders ETF',              pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'AMYY',  name: 'GraniteShares YieldBOOST AMD ETF',                      pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
@@ -153,7 +153,7 @@ const ETF_UNIVERSE = [
   { ticker: 'SIOO',  name: 'VistaShares Target 15 S&P 100 Distribution ETF',        pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   // Simplify
   { ticker: 'MAXI',  name: 'Simplify Bitcoin Strategy PLUS Income ETF',             pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
-  // Roundhill — WeeklyPay single-stock
+  // Roundhill - WeeklyPay single-stock
   { ticker: 'NVDW',  name: 'Roundhill NVDA WeeklyPay ETF',                          pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'TSLW',  name: 'Roundhill TSLA WeeklyPay ETF',                          pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'AAPW',  name: 'Roundhill AAPL WeeklyPay ETF',                          pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
@@ -169,7 +169,7 @@ const ETF_UNIVERSE = [
   { ticker: 'COIW',  name: 'Roundhill COIN WeeklyPay ETF',                          pillar: 'income',    category: 'option-income',  incomeSynthetic: true  },
   { ticker: 'YETH',  name: 'Roundhill Ether Covered Call Strategy ETF',             pillar: 'income',    category: 'covered-call',   incomeSynthetic: true  },
 
-  // Amplify — covered-call income
+  // Amplify - covered-call income
   { ticker: 'BITY',  name: 'Amplify Bitcoin 2% Monthly Option Income ETF',          pillar: 'income',    category: 'covered-call',   incomeSynthetic: true  },
   { ticker: 'BAGY',  name: 'Amplify Bitcoin Max Income Covered Call ETF',           pillar: 'income',    category: 'covered-call',   incomeSynthetic: true  },
   { ticker: 'HCOW',  name: 'Amplify COWS Covered Call ETF',                         pillar: 'income',    category: 'covered-call',   incomeSynthetic: true  },
@@ -213,7 +213,7 @@ const ETF_UNIVERSE = [
   { ticker: 'CSHI',  name: 'NEOS Enhanced Income Cash Alternative ETF',             pillar: 'income',    category: 'high-yield',     incomeSynthetic: true  },
   { ticker: 'HNDL',  name: 'Nationwide 7HANDL Index ETF',                           pillar: 'income',    category: 'high-yield',     incomeSynthetic: false },
   { ticker: 'MDIV',  name: 'First Trust Multi-Asset Diversified Income Index ETF',  pillar: 'income',    category: 'high-yield',     incomeSynthetic: false },
-  { ticker: 'TOPW',  name: 'Tidal ETF Trust — Income ETF',                          pillar: 'income',    category: 'high-yield',     incomeSynthetic: false },
+  { ticker: 'TOPW',  name: 'Tidal ETF Trust - Income ETF',                          pillar: 'income',    category: 'high-yield',     incomeSynthetic: false },
   { ticker: 'GOOW',  name: 'Goose Hollow Tactical Allocation ETF',                  pillar: 'income',    category: 'high-yield',     incomeSynthetic: false },
   { ticker: 'NVII',  name: 'NorthStar Income ETF',                                  pillar: 'income',    category: 'high-yield',     incomeSynthetic: false },
   { ticker: 'YYY',   name: 'Amplify High Income ETF',                               pillar: 'income',    category: 'high-yield',     incomeSynthetic: false },
@@ -314,4 +314,4 @@ for (const etf of ETF_UNIVERSE) {
   console.log(`  seeded ${etf.ticker}`);
 }
 
-console.log(`\nDone — ${ETF_UNIVERSE.length} ETFs in universe.`);
+console.log(`\nDone - ${ETF_UNIVERSE.length} ETFs in universe.`);

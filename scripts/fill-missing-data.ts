@@ -1,11 +1,11 @@
 /**
  * One-shot backfill for ETFs missing market data or static metadata.
  *
- * Phase 1 — Static patch:
+ * Phase 1 - Static patch:
  *   Writes expense ratio, AUM, issuer, and dividend frequency for the 65 ETFs
  *   added in May 2026. Skips tickers that already have an expenseRatio set.
  *
- * Phase 2 — Tiingo market data:
+ * Phase 2 - Tiingo market data:
  *   Fetches price, trailing yield, returns, and inferred frequency for every
  *   ETF where lastPrice is NULL. Same logic as the sync-etfs cron.
  *
@@ -27,7 +27,7 @@ import {
 } from '../src/lib/tiingo/client';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PHASE 1 — STATIC METADATA
+// PHASE 1 - STATIC METADATA
 // expenseRatio: decimal fraction  (0.0068 = 0.68%)
 // aum: full USD                   (259_000_000 = $259M)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -252,7 +252,7 @@ function buildDivRowsFromEod(rows: TiingoEodRow[], etfId: number) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PHASE 1 — apply statics for new ETFs missing expenseRatio
+// PHASE 1 - apply statics for new ETFs missing expenseRatio
 // ─────────────────────────────────────────────────────────────────────────────
 console.log('\n══ Phase 1: static metadata ══');
 
@@ -262,13 +262,13 @@ for (const [ticker, vals] of Object.entries(NEW_STATICS)) {
     .from(etfs).where(eq(etfs.ticker, ticker)).limit(1);
 
   if (!existing.length) {
-    console.log(`  ✗ ${ticker} not in DB — skipping`);
+    console.log(`  ✗ ${ticker} not in DB - skipping`);
     staticSkipped++;
     continue;
   }
 
   if (existing[0]!.expenseRatio != null) {
-    console.log(`  · ${ticker} already has ER — skipping`);
+    console.log(`  · ${ticker} already has ER - skipping`);
     staticSkipped++;
     continue;
   }
@@ -286,7 +286,7 @@ for (const [ticker, vals] of Object.entries(NEW_STATICS)) {
 console.log(`\nStatics: ${staticUpdated} updated, ${staticSkipped} skipped.\n`);
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PHASE 2 — fetch Tiingo for ETFs missing price data
+// PHASE 2 - fetch Tiingo for ETFs missing price data
 //
 // ONE call per ETF: the EOD /prices endpoint includes divCash on each row,
 // so we derive yield, frequency, and dividend history from it without needing
@@ -310,7 +310,7 @@ let marketUpdated = 0, marketFailed = 0;
 
 for (const row of missing) {
   try {
-    // Single Tiingo call — re-throw 429 so the outer catch can break cleanly.
+    // Single Tiingo call - re-throw 429 so the outer catch can break cleanly.
     let historyRows: TiingoEodRow[];
     try {
       historyRows = await tiingoPrices(row.ticker, { startDate: twoYearsAgo });
@@ -321,7 +321,7 @@ for (const row of missing) {
     }
 
     if (historyRows.length === 0) {
-      console.log(`  – ${row.ticker.padEnd(6)} not in Tiingo`);
+      console.log(`  - ${row.ticker.padEnd(6)} not in Tiingo`);
       continue; // don't count as updated, don't sleep-penalise
     }
 

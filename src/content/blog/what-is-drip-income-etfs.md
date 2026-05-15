@@ -12,7 +12,7 @@ relatedEtfs: ['SCHD', 'JEPI']
 
 ## When reinvestment shines
 
-If your goal is **maximum long-run share count** and you don’t need the cash today, reinvesting can compound through sideways and down markets—buying more shares when prices are lower and fewer when they’re higher (classic dollar-cost-averaging mechanics on the distribution stream).
+If your goal is **maximum long-run share count** and you don’t need the cash today, reinvesting can compound through sideways and down markets, buying more shares when prices are lower and fewer when they’re higher (classic dollar-cost-averaging mechanics on the distribution stream).
 
 ## When taking cash is rational
 
@@ -20,8 +20,8 @@ If you’re funding living expenses, paying down high-interest debt, or rebalanc
 
 ## Income ETFs add a wrinkle
 
-Funds with option overlays or variable payouts can show **lumpy** distribution paths. DRIP still works mechanically, but mentally separate **yield today** from **wealth tomorrow**—high coupons are not a substitute for understanding NAV path and tax character.
+Funds with option overlays or variable payouts can show **lumpy** distribution paths. DRIP still works mechanically, but mentally separate **yield today** from **wealth tomorrow**. High coupons are not a substitute for understanding NAV path and tax character.
 
 **Go deeper:** our stand-alone guide [DRIP & compounding](/strategy/drip) walks through scenarios and trade-offs.
 
-*Educational only — not investment advice.*
+*Educational only - not investment advice.*

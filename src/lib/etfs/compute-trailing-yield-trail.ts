@@ -1,6 +1,6 @@
 /**
  * Reconstruct approximate trailing-twelve-month cash yield % at each ex-date:
- * TTMSUM(ex) = sum(dividend amounts with ex strictly after ex−365d and ≤ ex),
+ * TTMSUM(ex) = sum(dividend amounts with ex strictly after ex-365d and ≤ ex),
  * denominator = closing price from etfPrices on or before `ex`, else ETF last price fallback.
  * All dates are UTC calendar YYYY-MM-DD strings.
  */

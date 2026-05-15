@@ -12,15 +12,15 @@ const posts = (await getCollection('blog')).sort(
 const schema = {
   '@context': 'https://schema.org',
   '@type': 'Blog',
-  name: 'Yield to Freedom — Income ETF research',
-  description: 'Articles on income ETFs, dividends, and our 40/30/30 framework — educational, not advice.',
+  name: 'Yield to Freedom - Income ETF research',
+  description: 'Articles on income ETFs, dividends, and our 40/30/30 framework - educational, not advice.',
   url: `${site}/blog`,
   publisher: { '@type': 'Organization', name: 'Creative Bandit LLC', url: site },
 };
 ---
 
 <Base
-  title="Blog — Yield to Freedom"
+  title="Blog - Yield to Freedom"
   description="Research notes and explainers on income ETFs, dividends, and building cash-flow-oriented portfolios."
   schema={schema}
 >
@@ -28,12 +28,12 @@ const schema = {
     <h1 class="text-3xl font-bold tracking-tight text-slate-900">Blog</h1>
     <p class="mt-2 text-slate-600">
       Long-form notes that pair with our <a class="font-semibold text-blue-700 hover:text-blue-900" href="/etfs">ETF directory</a> and <a class="font-semibold text-blue-700 hover:text-blue-900" href="/strategy">strategy guides</a>. Everything here is
-      educational — verify data and fit with your own plan.
+      educational - verify data and fit with your own plan.
     </p>
 
     {
       posts.length === 0 ? (
-        <p class="mt-10 text-slate-500">No posts yet — check back soon.</p>
+        <p class="mt-10 text-slate-500">No posts yet - check back soon.</p>
       ) : (
         <ul class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => (

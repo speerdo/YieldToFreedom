@@ -22,16 +22,16 @@ const DOUGHNUT_ID = 'yt-stack-pillar-chart';
 ---
 
 <Base
-  title="Stack builder — Yield to Freedom"
+  title="Stack builder - Yield to Freedom"
   description="Model a simple ETF stack: set capital, allocations, and see estimated monthly dividend income plus pillar balance from stored trailing yields."
 >
   <article>
     <h1 class="text-3xl font-bold tracking-tight text-slate-900">Stack builder</h1>
     <p class="mt-2 max-w-2xl text-slate-600">
-      Paste or pick up to three tickers from our universe — weights normalize to 100%. Estimates assume each holding’s trailing
-      12‑month yield from our Neon snapshot; they are illustrative, not forward‑looking payouts.{' '}
-      <strong class="font-semibold text-slate-800">Data as of last site build</strong>
-      {' '}— open an ETF profile for the vendor sync date.
+      Paste or pick up to three tickers from our universe - weights normalize to 100%. Estimates assume each holding’s trailing
+      12-month yield from our Neon snapshot; they are illustrative, not forward-looking payouts.{' '}
+      <strong class="font-semibold text-slate-800">Data as of last site build</strong>.
+      Open an ETF profile for the vendor sync date.
     </p>
 
     <div id="stack-builder-root" class="mt-10 space-y-8" data-etfs={PACK_JSON} x-data="stackBuilder()" x-cloak>
@@ -53,7 +53,7 @@ const DOUGHNUT_ID = 'yt-stack-pillar-chart';
             class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
             @click="equalize()"
           >
-            Equal‑weight selections
+            Equal-weight selections
           </button>
           <p class="text-xs text-slate-500 lg:max-w-md">
             Weights among selected ETFs are scaled if they don’t sum to 100%.
@@ -72,9 +72,9 @@ const DOUGHNUT_ID = 'yt-stack-pillar-chart';
               x-model.number="slotIdx[col]"
               @change="syncTicker(col); tick()"
             >
-              <option value="-1">— none —</option>
+              <option value="-1">(none)</option>
               <template x-for="(row, ix) in catalog" :key="row.ticker">
-                <option :value="ix" x-text="`${row.ticker} — ${row.name}`"></option>
+                <option :value="ix" x-text="`${row.ticker} - ${row.name}`"></option>
               </template>
             </select>
             <label class="mt-2 block text-xs font-semibold uppercase text-slate-500">
@@ -110,7 +110,7 @@ const DOUGHNUT_ID = 'yt-stack-pillar-chart';
           </template>
           <template x-if="activeRows().length && pctSum > 0 && pctSum < 99.999">
             <p class="mt-3 text-xs text-sky-900">
-              Weights sum to <span class="tabular-nums font-semibold" x-text="pctSum.toFixed(1)"></span>% — modeling that share of principal in these ETFs with the remainder modeled as idle cash with 0% yield.
+              Weights sum to <span class="tabular-nums font-semibold" x-text="pctSum.toFixed(1)"></span>% - modeling that share of principal in these ETFs with the remainder modeled as idle cash with 0% yield.
             </p>
           </template>
           <template x-if="activeRows().length === 0">
@@ -129,7 +129,7 @@ const DOUGHNUT_ID = 'yt-stack-pillar-chart';
       </section>
 
       <p class="text-xs text-slate-500">
-        * Twelve equal months of trailing yield — real funds pay on their own calendars; totals will differ. Not financial
+        * Twelve equal months of trailing yield - real funds pay on their own calendars; totals will differ. Not financial
         advice.
       </p>
       <Disclaimer />
@@ -229,7 +229,7 @@ const DOUGHNUT_ID = 'yt-stack-pillar-chart';
       },
 
       fmtUsd(v: number): string {
-        if (!Number.isFinite(v)) return '—';
+        if (!Number.isFinite(v)) return '-';
         return `$${v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       },
 

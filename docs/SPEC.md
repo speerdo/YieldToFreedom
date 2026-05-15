@@ -1,17 +1,17 @@
-# Yield to Freedom — Technical Specification
+# Yield to Freedom - Technical Specification
 
 **Domain:** yieldtofreedom.com  
 **Entity:** Creative Bandit LLC  
 **Version:** 1.1 | May 2026  
 
-> **As-built vs blueprint:** Section 2–4 and the repository tree reflect the running repo (Astro 6 static + Vercel adapter, Tailwind via PostCSS, content collections, subscribe + compare routes). Phase 2 paths remain forward-looking.
+> **As-built vs blueprint:** Section 2-4 and the repository tree reflect the running repo (Astro 6 static + Vercel adapter, Tailwind via PostCSS, content collections, subscribe + compare routes). Phase 2 paths remain forward-looking.
 
 ---
 
 ## Table of Contents
 
 1. [Project Overview](#1-project-overview)
-2. [Tech Stack — Pinned Versions](#2-tech-stack--pinned-versions)
+2. [Tech Stack - Pinned Versions](#2-tech-stack--pinned-versions)
 3. [Repository Structure](#3-repository-structure)
 4. [Astro Configuration](#4-astro-configuration)
 5. [Database Schema](#5-database-schema)
@@ -65,7 +65,7 @@ Vercel Edge Network
 
 ---
 
-## 2. Tech Stack — Pinned Versions
+## 2. Tech Stack - Pinned Versions
 
 > All versions are the latest stable releases as of May 2026. Pin these in package.json.
 
@@ -89,7 +89,7 @@ Vercel Edge Network
 
 | Package | Version | Purpose |
 |---|---|---|
-| `tailwindcss` | `4.2.4` | CSS framework (v4 — CSS-first config) |
+| `tailwindcss` | `4.2.4` | CSS framework (v4 - CSS-first config) |
 | `@tailwindcss/postcss` | `4.2.4` | PostCSS plugin for Tailwind v4 in this repo |
 | `postcss` | `^8.5` | Build pipeline for Tailwind |
 
@@ -204,7 +204,7 @@ yield-to-freedom/
 │   │   │   ├── confirmed.astro
 │   │   │   └── invalid.astro
 │   │   │
-│   │   ├── app/                      # Phase 2 — SSR, Clerk-protected
+│   │   ├── app/                      # Phase 2 - SSR, Clerk-protected
 │   │   │   ├── index.astro           # Dashboard
 │   │   │   ├── portfolio.astro
 │   │   │   ├── drip.astro
@@ -235,7 +235,7 @@ yield-to-freedom/
 │   │       │   └── sync-user.ts      # Clerk webhook handler
 │   │       └── cron/
 │   │           ├── sync-etfs.ts
-│   │           └── grade-etfs.ts     # send-alerts.ts — Phase 2 (not in vercel.json yet)
+│   │           └── grade-etfs.ts     # send-alerts.ts - Phase 2 (not in vercel.json yet)
 │   │
 │   ├── content/
 │   │   └── blog/
@@ -272,8 +272,8 @@ yield-to-freedom/
 ### Key Change from Blueprint: Astro 6 Output Modes
 
 Astro 5 removed the `hybrid` output mode. In Astro 6:
-- `output: 'static'` — prerender by default; individual pages opt into SSR with `export const prerender = false`
-- `output: 'server'` — SSR by default; individual pages opt into static with `export const prerender = true`
+- `output: 'static'` - prerender by default; individual pages opt into SSR with `export const prerender = false`
+- `output: 'server'` - SSR by default; individual pages opt into static with `export const prerender = true`
 
 For this project: use `output: 'static'`. All public pages prerender at build time. All `/app/*` pages declare `export const prerender = false`.
 
@@ -281,7 +281,7 @@ For this project: use `output: 'static'`. All public pages prerender at build ti
 
 Tailwind v4 ships a PostCSS plugin. **This repo** uses `@tailwindcss/postcss` in `postcss.config.mjs` rather than `@tailwindcss/vite`, because the Vite plugin’s resolver conflicts with Astro 6 / Vite 7 in our setup (`npm run dev` fails to resolve `@import "tailwindcss"` when the plugin is enabled).
 
-Configuration is CSS-first — no required `tailwind.config.js`.
+Configuration is CSS-first - no required `tailwind.config.js`.
 
 ```javascript
 // astro.config.mjs
@@ -317,7 +317,7 @@ export default {
 ```
 
 ```typescript
-// src/content.config.ts — Content Layer `blog` collection (glob loader + `import { z } from 'astro/zod'`)
+// src/content.config.ts - Content Layer `blog` collection (glob loader + `import { z } from 'astro/zod'`)
 ```
 
 `tsconfig.json` extends `astro/tsconfigs/strict` with `strictNullChecks: true`.
@@ -325,7 +325,7 @@ export default {
 ### Vercel Configuration
 
 ```json
-// vercel.json (as deployed — Phase 1)
+// vercel.json (as deployed - Phase 1)
 {
   "crons": [
     { "path": "/api/cron/sync-etfs", "schedule": "0 2 * * *" },
@@ -403,7 +403,7 @@ export const etfs = pgTable('etfs', {
 }, (t) => [
   index('etfs_pillar_idx').on(t.pillar),
   index('etfs_grade_idx').on(t.ytfGrade),
-  // ticker uniqueness handled by .unique() on the column — no separate uniqueIndex needed
+  // ticker uniqueness handled by .unique() on the column - no separate uniqueIndex needed
 ]);
 
 // ─── DIVIDEND HISTORY ─────────────────────────────────────────────────────────
@@ -567,7 +567,7 @@ export const gradeAlerts = pgTable('grade_alerts', {
 | `GET` | `/api/etfs/[ticker]` | Single ETF row (JSON mirrors `etfs` table) |
 | `GET` | `/api/etfs/[ticker]/yield-trail` | TTM dividend-yield approximation for Compare chart |
 | `POST` | `/api/subscribe` | Newsletter opt-in; emails confirm link via Resend when configured |
-| `GET` | `/api/subscribe/confirm` | `?token=` — verifies double opt-in, redirects to UX page |
+| `GET` | `/api/subscribe/confirm` | `?token=` - verifies double opt-in, redirects to UX page |
 
 ### Authenticated API (Clerk session required)
 
@@ -590,9 +590,9 @@ export const gradeAlerts = pgTable('grade_alerts', {
 
 | Method | Path | Schedule |
 |---|---|---|
-| `GET` | `/api/cron/sync-etfs` | `vercel.json` — `0 2 * * *` (02:00 UTC) |
-| `GET` | `/api/cron/grade-etfs` | `vercel.json` — `0 3 * * 0` (Sun 03:00 UTC) |
-| `GET` | `/api/cron/send-alerts` | *Planned Phase 2* — **not mounted** until route + `vercel.json` entry exist |
+| `GET` | `/api/cron/sync-etfs` | `vercel.json` - `0 2 * * *` (02:00 UTC) |
+| `GET` | `/api/cron/grade-etfs` | `vercel.json` - `0 3 * * 0` (Sun 03:00 UTC) |
+| `GET` | `/api/cron/send-alerts` | *Planned Phase 2* - **not mounted** until route + `vercel.json` entry exist |
 
 ### Screener Query Parameters
 
@@ -643,10 +643,10 @@ GET /api/etfs?pillar=income&grade=A&frequency=monthly&minYield=5&maxEr=0.75&sort
 
 ### Strategy Pages (`/strategy/*`)
 
-- `/strategy` — index with links to sub-pages and 3-pillar diagram
-- `/strategy/drip` — DRIP mechanics, compounding math, example scenarios
-- `/strategy/margin` — margin arbitrage explainer, risk section
-- `/strategy/fi-timeline` — FI Score concept, milestone framework
+- `/strategy` - index with links to sub-pages and 3-pillar diagram
+- `/strategy/drip` - DRIP mechanics, compounding math, example scenarios
+- `/strategy/margin` - margin arbitrage explainer, risk section
+- `/strategy/fi-timeline` - FI Score concept, milestone framework
 - JSON-LD: `Article` schema on each page
 - Disclaimer on pages referencing ETF data
 
@@ -682,7 +682,7 @@ All `/app/*` pages declare `export const prerender = false`. All require active 
 Free tier and pro tier both see this page.
 
 - Portfolio value (total), monthly income (projected), pillar balance (pie chart)
-- FI Score bar (pro only — blurred with upgrade CTA for free)
+- FI Score bar (pro only - blurred with upgrade CTA for free)
 - Holdings table with grade chips
 - Quick-add holding form (free: max 5 holdings)
 - "Connect Brokerage" CTA (pro only)
@@ -702,7 +702,7 @@ Pro only.
 
 - Input: monthly contribution, projection years, per-holding DRIP toggle
 - Output: Chart.js line chart (portfolio value + monthly income over time)
-- Saved scenarios (store in `user_scenarios` table — add to schema in Sprint 8)
+- Saved scenarios (store in `user_scenarios` table - add to schema in Sprint 8)
 
 ### Margin Timeline (`/app/margin`)
 
@@ -821,25 +821,25 @@ export async function POST({ request }) {
 
 ### ETF Universe
 
-~165 hand-curated income-relevant ETFs seeded via `scripts/seed-etfs.ts`. New ETFs added manually by updating that file and re-running the script (safe — `ON CONFLICT DO NOTHING`).
+~165 hand-curated income-relevant ETFs seeded via `scripts/seed-etfs.ts`. New ETFs added manually by updating that file and re-running the script (safe - `ON CONFLICT DO NOTHING`).
 
 **Universe categories (by pillar → category):**
 
 *Income pillar:*
-- `covered-call` — JEPI, JEPQ, DIVO, IDVO, QDVO, QYLD, XYLD, RYLD, SPYI, QQQI, IWMI, BTCI, QQQH, SPYH, GPIQ, FEPI, AIPI, NUSI, IWMY, WDTE, QQQY, SPYT, XDTE, QDTE, RDTE, MAGY, YBTC
-- `option-income` — SVOL; YieldMax: YMAG, YMAX, ULTY, TSLY, NVDY, AMZY, MSFO, GOOY, APLY, MSTY, CONY, PLTY, AMDY, FBY, NFLY, PYPY, XOMO, BRKC, DISO, SMCY, CRCO, SNOY, RDYY, DRAY, CVNY, HIYY, ABNY, BABO, GMEY, RBLY, HOOY, TSMY, MRNY, MARO, GDXY, CHPY, GPTY, AIYY, LFGY, MINY, OARK, YBIT, CRSH, DIPS, WNTR, FIAT, YQQQ, QDTY, SDTY, RDTY, MSST, NVIT; Roundhill WeeklyPay: NVDW, TSLW, AAPW, AMDW, AMZW, ARMW, METW, MSFW, MSTW, NFLW, PLTW, GLDW
-- `high-yield` — PBDC, BIZD, KLIP, CSHI, HNDL, MDIV, TOPW, GOOW, NVII
-- `preferred-stock` — PFF, PGX, PFFD, FPE, PFXF, SPFF
-- `reit` — VNQ, IYR, SCHH, XLRE, REM, MORT, KBWY
-- `mlp` — AMLP, MLPA, MLPX, ENFR
-- `bond-income` — HYG, JNK, USHY, BKLN, SRLN, LQD, BNDI, HYBI
+- `covered-call` - JEPI, JEPQ, DIVO, IDVO, QDVO, QYLD, XYLD, RYLD, SPYI, QQQI, IWMI, BTCI, QQQH, SPYH, GPIQ, FEPI, AIPI, NUSI, IWMY, WDTE, QQQY, SPYT, XDTE, QDTE, RDTE, MAGY, YBTC
+- `option-income` - SVOL; YieldMax: YMAG, YMAX, ULTY, TSLY, NVDY, AMZY, MSFO, GOOY, APLY, MSTY, CONY, PLTY, AMDY, FBY, NFLY, PYPY, XOMO, BRKC, DISO, SMCY, CRCO, SNOY, RDYY, DRAY, CVNY, HIYY, ABNY, BABO, GMEY, RBLY, HOOY, TSMY, MRNY, MARO, GDXY, CHPY, GPTY, AIYY, LFGY, MINY, OARK, YBIT, CRSH, DIPS, WNTR, FIAT, YQQQ, QDTY, SDTY, RDTY, MSST, NVIT; Roundhill WeeklyPay: NVDW, TSLW, AAPW, AMDW, AMZW, ARMW, METW, MSFW, MSTW, NFLW, PLTW, GLDW
+- `high-yield` - PBDC, BIZD, KLIP, CSHI, HNDL, MDIV, TOPW, GOOW, NVII
+- `preferred-stock` - PFF, PGX, PFFD, FPE, PFXF, SPFF
+- `reit` - VNQ, IYR, SCHH, XLRE, REM, MORT, KBWY
+- `mlp` - AMLP, MLPA, MLPX, ENFR
+- `bond-income` - HYG, JNK, USHY, BKLN, SRLN, LQD, BNDI, HYBI
 
 *Stability pillar:*
-- `dividend-growth` — SCHD, VIG, HDV, DVY, SDY, DGRO, NOBL, VYM, DGRW, SCHY, SPHD, FVD, IDV, VYMI, PEY, FDL, DIVB, PFM, SPYD, SCHV
-- `bond` — AGG, BND, TLT, TIP, VCIT, TLTI
+- `dividend-growth` - SCHD, VIG, HDV, DVY, SDY, DGRO, NOBL, VYM, DGRW, SCHY, SPHD, FVD, IDV, VYMI, PEY, FDL, DIVB, PFM, SPYD, SCHV
+- `bond` - AGG, BND, TLT, TIP, VCIT, TLTI
 
 *Growth pillar:*
-- `total-return` — VOO, IVV, SPY, VTI, SCHG, QQQ, QQQM, VUG, VGT, XLK, IWM, ARKK, IBIT, FBTC
+- `total-return` - VOO, IVV, SPY, VTI, SCHG, QQQ, QQQM, VUG, VGT, XLK, IWM, ARKK, IBIT, FBTC
 
 ### Nightly Sync (`/api/cron/sync-etfs`)
 
@@ -847,15 +847,15 @@ Runs 02:00 UTC. For each active ETF:
 1. Fetch 5-year EOD price history from Tiingo (`/tiingo/daily/<ticker>/prices?startDate=`)
 2. Fetch dividend history from Tiingo (`/tiingo/dividends/<ticker>?startDate=`; falls back to extracting `divCash > 0` from EOD rows when empty)
 3. Fetch meta from Tiingo (`/tiingo/daily/<ticker>`) for exchange code and inception date (`startDate`)
-4. Upsert key metrics: price, trailing 12m yield, exchange, inception date (first run only), dividend frequency (inferred from 13-month divCash window — first run only), 1y/3y/5y total returns (computed from adjClose ratio), today's EOD price row
+4. Upsert key metrics: price, trailing 12m yield, exchange, inception date (first run only), dividend frequency (inferred from 13-month divCash window - first run only), 1y/3y/5y total returns (computed from adjClose ratio), today's EOD price row
 5. Upsert last 24 dividend records
 6. Rate limit: 200ms delay between tickers (Tiingo free tier: 500 req/hour)
 
 **Computed fields:**
-- `return1y` — simple total return: `adjClose_now / adjClose_1yr_ago - 1`
-- `return3y` / `return5y` — annualised CAGR: `(adjClose_now / adjClose_Nyr_ago)^(1/N) - 1`
-- `dividendFrequency` — counts `divCash > 0` rows in last 13 months: ≥10 → monthly, ≥3 → quarterly, ≥1 → annual
-- `inceptionDate` — from Tiingo `startDate` field on first sync; never overwritten
+- `return1y` - simple total return: `adjClose_now / adjClose_1yr_ago - 1`
+- `return3y` / `return5y` - annualised CAGR: `(adjClose_now / adjClose_Nyr_ago)^(1/N) - 1`
+- `dividendFrequency` - counts `divCash > 0` rows in last 13 months: ≥10 → monthly, ≥3 → quarterly, ≥1 → annual
+- `inceptionDate` - from Tiingo `startDate` field on first sync; never overwritten
 
 ### Weekly Grade Recalc (`/api/cron/grade-etfs`)
 
@@ -865,13 +865,13 @@ Runs Sunday 03:00 UTC. For each active ETF:
 3. Insert into `etf_grade_history`
 4. If grade changed, insert `grade_alerts` rows for all holders
 
-### Daily Alert Delivery (`/api/cron/send-alerts` — Phase 2)
+### Daily Alert Delivery (`/api/cron/send-alerts` - Phase 2)
 
 > **Status:** Cron job described for production alert delivery once holders + Resend alerting exist. **`vercel.json` does not invoke this route yet**; inserting rows into `grade_alerts` continues from `grade-etfs.ts`, but outbound email waits on this endpoint.
 
 Runs 08:00 UTC (planned). Send pending `grade_alerts` via Resend, mark `email_sent = true`.
 
-### Tiingo API (Data Provider — Updated May 2026)
+### Tiingo API (Data Provider - Updated May 2026)
 
 Tiingo is the primary data provider, replacing FMP. Auth is via `Authorization: Token <key>` header.
 
@@ -882,7 +882,7 @@ Tiingo is the primary data provider, replacing FMP. Auth is via `Authorization: 
 | Historical EOD prices | `GET /tiingo/daily/<ticker>/prices?startDate=&endDate=` | Free | Same fields; 2-year lookback default |
 | Dividend history | `GET /tiingo/dividends/<ticker>?startDate=` | Free | exDate, divCash, adjDivCash, declaredDate, payDate |
 | Fund fees (expense ratio) | `GET /tiingo/fundamentals/<ticker>/...` | Power+ | Not yet integrated; ER maintained manually or skipped |
-| AUM / market cap | Not available via Tiingo daily | — | Maintained manually or from a separate source |
+| AUM / market cap | Not available via Tiingo daily | - | Maintained manually or from a separate source |
 
 **Key fields returned per EOD row:** `date`, `open`, `high`, `low`, `close`, `adjClose`, `volume`, `divCash` (dividend paid on ex-date), `splitFactor`.
 
@@ -898,7 +898,7 @@ Tiingo is the primary data provider, replacing FMP. Auth is via `Authorization: 
 
 ## 11. ETF Grading Algorithm
 
-Scores 0–100, maps to A/B/C/D grade. Designed for the Yield to Freedom strategy, not general ETF quality.
+Scores 0-100, maps to A/B/C/D grade. Designed for the Yield to Freedom strategy, not general ETF quality.
 
 | Criterion | Weight | Scoring Notes |
 |---|---|---|
@@ -911,10 +911,10 @@ Scores 0–100, maps to A/B/C/D grade. Designed for the Yield to Freedom strateg
 
 | Score | Grade |
 |---|---|
-| 80–100 | A |
-| 60–79 | B |
-| 40–59 | C |
-| 0–39 | D |
+| 80-100 | A |
+| 60-79 | B |
+| 40-59 | C |
+| 0-39 | D |
 
 All grade displays must include: *"YTF grades are for research and educational purposes only and do not constitute financial advice."*
 
@@ -964,10 +964,10 @@ Always verify webhook signature with `stripe.webhooks.constructEvent` before pro
 
 ### Transactional Emails (Resend)
 
-1. **Welcome** — on `user.created` Clerk webhook
-2. **Grade Change Alert** — daily cron from `grade_alerts` table
-3. **Subscription Confirmation** — on Stripe `customer.subscription.created`
-4. **Payment Failed Warning** — on Stripe `invoice.payment_failed`
+1. **Welcome** - on `user.created` Clerk webhook
+2. **Grade Change Alert** - daily cron from `grade_alerts` table
+3. **Subscription Confirmation** - on Stripe `customer.subscription.created`
+4. **Payment Failed Warning** - on Stripe `invoice.payment_failed`
 
 Plain HTML string templates rendered server-side. No React Email dependency for v1.
 
@@ -975,7 +975,7 @@ Plain HTML string templates rendered server-side. No React Email dependency for 
 
 - Form on homepage (and optionally blog / stack-builder) POSTs JSON to **`/api/subscribe`**
 - Server stores `email_subscribers` row + `verification_token`, sends confirmation via **Resend** when `RESEND_API_KEY` is set (otherwise `{ emailSent: false }` for local/testing)
-- `GET /api/subscribe/confirm?token=` validates token via Neon, clears token, redirects to `/subscribe/confirmed` (Uses `PUBLIC_SITE_URL` / `SITE` / request origin — see `src/lib/site/url.ts`)
+- `GET /api/subscribe/confirm?token=` validates token via Neon, clears token, redirects to `/subscribe/confirmed` (Uses `PUBLIC_SITE_URL` / `SITE` / request origin - see `src/lib/site/url.ts`)
 - Dedicated UX routes: **`/subscribe/confirmed`**, **`/subscribe/invalid`**
 
 ---
@@ -988,12 +988,12 @@ Plain HTML string templates rendered server-side. No React Email dependency for 
 |---|---|---|---|
 | Production | `main` | yieldtofreedom.com | `main` |
 | Preview | `develop` | ytf-preview.vercel.app | `dev` |
-| Local | — | localhost:4321 | `dev` |
+| Local | - | localhost:4321 | `dev` |
 
 ### Git Workflow
 
-- `main` — production only, PR required, no direct pushes
-- `develop` — active development, Vercel preview on every push
+- `main` - production only, PR required, no direct pushes
+- `develop` - active development, Vercel preview on every push
 - Feature branches for anything touching DB schema
 
 ### Migration Workflow
@@ -1009,7 +1009,7 @@ DATABASE_URL=$DEV_DATABASE_URL npx drizzle-kit migrate
 DATABASE_URL=$PROD_DATABASE_URL npx drizzle-kit migrate
 ```
 
-Never migrate production without testing on dev branch first. Use Neon's branch feature — dev branch is a copy of production schema.
+Never migrate production without testing on dev branch first. Use Neon's branch feature - dev branch is a copy of production schema.
 
 ---
 
@@ -1019,7 +1019,7 @@ Never migrate production without testing on dev branch first. Use Neon's branch 
 # Database
 DATABASE_URL=postgresql://user:pass@host/dbname?sslmode=require
 
-# Tiingo (data provider — replaces FMP)
+# Tiingo (data provider - replaces FMP)
 TIINGO_API_KEY=your_tiingo_api_key
 
 # SnapTrade (Phase 2)
@@ -1082,9 +1082,9 @@ PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 - ETF pages: `FinancialProduct` JSON-LD
 - Strategy/blog pages: `Article` JSON-LD (`Blog` type on `/blog` index)
 - Homepage: `WebSite` + `Organization` JSON-LD
-- **`/sitemap.xml`** — built with `src/pages/sitemap.xml.ts` (`export const prerender = false`) so active ETF URLs (Neon), static routes, and published Markdown posts are enumerated at runtime on Vercel.
-- **`public/robots.txt`** — references `https://yieldtofreedom.com/sitemap.xml`, `Disallow: /api/` and `Disallow: /app/`
-- **Analytics** — optional GA4: when `PUBLIC_GA_MEASUREMENT_ID` is present, `src/layouts/Base.astro` emits the standard `gtag.js` snippet in `<head>` (no tracking in local dev unless the env var is set).
+- **`/sitemap.xml`** - built with `src/pages/sitemap.xml.ts` (`export const prerender = false`) so active ETF URLs (Neon), static routes, and published Markdown posts are enumerated at runtime on Vercel.
+- **`public/robots.txt`** - references `https://yieldtofreedom.com/sitemap.xml`, `Disallow: /api/` and `Disallow: /app/`
+- **Analytics** - optional GA4: when `PUBLIC_GA_MEASUREMENT_ID` is present, `src/layouts/Base.astro` emits the standard `gtag.js` snippet in `<head>` (no tracking in local dev unless the env var is set).
 
 - WCAG AA minimum
 - Semantic HTML throughout
@@ -1118,7 +1118,7 @@ Always use `stripe.webhooks.constructEvent` with the raw request body before acc
 
 ### SnapTrade
 
-- `snaptradeUserSecret` lives in encrypted session or derived per-request via HMAC — never stored in DB in plaintext
+- `snaptradeUserSecret` lives in encrypted session or derived per-request via HMAC - never stored in DB in plaintext
 - All brokerage connections are read-only
 - Brokerage credentials never touch YTF servers
 
@@ -1138,5 +1138,5 @@ img-src 'self' data: https:;
 
 ---
 
-*SPEC v1.0 — Yield to Freedom / Creative Bandit LLC / May 2026*  
+*SPEC v1.0 - Yield to Freedom / Creative Bandit LLC / May 2026*  
 *Stack: Astro 6 + Neon DB + Vercel + Drizzle ORM + Clerk + Stripe + Tiingo + SnapTrade + Resend*

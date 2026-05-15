@@ -58,7 +58,7 @@ const pillarCopy = [
     key: 'income' as PillarKey,
     title: 'Income',
     blurb:
-      'Prioritize distributable cash flow — covered-call premiums, BDC-style payouts, and other sleeves engineered to pay you while you stay invested.',
+      'Prioritize distributable cash flow - covered-call premiums, BDC-style payouts, and other sleeves engineered to pay you while you stay invested.',
     examples: [
       { ticker: 'JEPI', href: '/etfs/JEPI' },
       { ticker: 'JEPQ', href: '/etfs/JEPQ' },
@@ -120,15 +120,15 @@ const colorMap = {
 };
 
 function fmtPct(s: string | null | undefined, digits = 2) {
-  if (s === null || s === undefined || s === '') return '—';
+  if (s === null || s === undefined || s === '') return '-';
   const n = Number(s);
-  return Number.isFinite(n) ? `${(n * 100).toFixed(digits)}%` : '—';
+  return Number.isFinite(n) ? `${(n * 100).toFixed(digits)}%` : '-';
 }
 ---
 
 <Base
-  title="Yield to Freedom — Income ETF Research"
-  description="Income-first ETF research mapped to Yield to Freedom pillars — Income, Stability, and Growth — plus starter guides for long-term builders."
+  title="Yield to Freedom - Income ETF Research"
+  description="Income-first ETF research mapped to Yield to Freedom pillars - Income, Stability, and Growth - plus starter guides for long-term builders."
   schema={homeSchema}
   fullWidth
 >
@@ -151,8 +151,8 @@ function fmtPct(s: string | null | undefined, digits = 2) {
           Build Income.<br class="hidden sm:block" /> Reach Freedom.
         </h1>
         <p class="mt-6 max-w-xl text-lg leading-relaxed text-slate-200/90">
-          Practical research for investors who want dividends and option income to do more of the heavy lifting —
-          not day-trading narratives.
+          Practical research for investors who want dividends and option income to do more of the heavy lifting, not
+          day-trading narratives.
         </p>
         <div class="mt-10 flex flex-wrap gap-4">
           <a
@@ -174,7 +174,7 @@ function fmtPct(s: string | null | undefined, digits = 2) {
             Blog
           </a>
         </div>
-        <p class="mt-6 text-xs text-slate-400">Educational content only — not financial advice.</p>
+        <p class="mt-6 text-xs text-slate-400">Educational content only - not financial advice.</p>
       </div>
     </div>
   </section>
@@ -266,7 +266,7 @@ function fmtPct(s: string | null | undefined, digits = 2) {
         <p class="text-sm font-semibold uppercase tracking-[0.15em] text-blue-700">Live data</p>
         <h2 class="font-heading mt-3 text-3xl font-bold text-slate-900 sm:text-4xl">Top-rated ETFs by pillar</h2>
         <p class="mx-auto mt-4 max-w-2xl text-slate-600">
-          Highest Yield to Freedom score in each pillar right now — scores refresh after each weekly data sync. Yield and
+          Highest Yield to Freedom score in each pillar right now - scores refresh after each weekly data sync. Yield and
           expense figures are{' '}
           <strong class="font-semibold text-slate-700">data as of each ETF’s last vendor sync</strong>
           {' '}(see the profile for the date).
@@ -397,7 +397,7 @@ function fmtPct(s: string | null | undefined, digits = 2) {
         Get the Income ETF Starter Guide
       </h2>
       <p class="mt-4 text-slate-300">
-        Double opt-in: we'll email a confirmation link. No spam — just the guide and occasional product updates.
+        Double opt-in: we'll email a confirmation link. No spam - just the guide and occasional product updates.
       </p>
       <form id="home-subscribe" class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-stretch">
         <label class="sr-only" for="home-email">Email</label>
@@ -460,7 +460,7 @@ function fmtPct(s: string | null | undefined, digits = 2) {
         msg.classList.remove('text-slate-300');
         msg.classList.add('text-emerald-400');
         if (data.alreadyConfirmed) {
-          msg.textContent = "You're already subscribed — thanks for sticking with us.";
+          msg.textContent = "You're already subscribed - thanks for sticking with us.";
         } else if (data.emailSent) {
           msg.textContent = 'Check your inbox for a confirmation link to finish subscribing.';
         } else {

@@ -16,7 +16,7 @@ export function trailingYieldDecimal(etf: EtfRow): number {
   return num(etf.trailing12mYield) ?? num(etf.lastYield) ?? 0;
 }
 
-/** SPEC §11 — yield component max 30, ≥20% yield capped at 20 pts */
+/** SPEC §11 - yield component max 30, ≥20% yield capped at 20 pts */
 export function yieldPoints(y: number): number {
   if (y <= 0) return 0;
   if (y >= 0.20) return 20;

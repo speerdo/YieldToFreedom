@@ -49,13 +49,13 @@ for (const etf of allEtfs) {
     } catch (inner) {
       const msg = inner instanceof Error ? inner.message : String(inner);
       if (msg.includes('429')) throw inner;
-      console.log(`  – ${etf.ticker.padEnd(6)} not in Tiingo`);
+      console.log(`  - ${etf.ticker.padEnd(6)} not in Tiingo`);
       skipped++;
       continue;
     }
 
     if (!rows.length) {
-      console.log(`  – ${etf.ticker.padEnd(6)} no data`);
+      console.log(`  - ${etf.ticker.padEnd(6)} no data`);
       skipped++;
       continue;
     }

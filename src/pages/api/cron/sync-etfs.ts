@@ -219,7 +219,7 @@ export const GET: APIRoute = async ({ request }) => {
           latestPrice = latestAdjClose;
         }
       } catch {
-        // price fetch failed — skip price update for this ticker
+        // price fetch failed - skip price update for this ticker
       }
 
       // ── 2. Fetch metadata (exchange, inception date) ──────────────────────
@@ -230,7 +230,7 @@ export const GET: APIRoute = async ({ request }) => {
         exchangeCode = meta.exchangeCode ?? null;
         inceptionDate = parseIsoDate(meta.startDate);
       } catch {
-        // meta fetch failed — use existing values
+        // meta fetch failed - use existing values
       }
 
       // ── 3. Try dedicated dividends endpoint, fallback to EOD divCash ──────

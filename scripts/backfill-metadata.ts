@@ -3,7 +3,7 @@
  *   - inception_date  (165 ETFs): from Tiingo /tiingo/daily/<ticker> startDate
  *   - return_1y/3y/5y (most ETFs): computed from adj_close in 5-year EOD history
  *
- * Only touches rows where the field is currently NULL — safe to re-run.
+ * Only touches rows where the field is currently NULL - safe to re-run.
  *
  * Usage:
  *   npm run backfill:metadata
@@ -99,7 +99,7 @@ for (const etf of targets) {
           if (/^\d{4}-\d{2}-\d{2}$/.test(d)) updates.inceptionDate = d;
         }
       } catch {
-        // metadata call failed — price history fallback will set inception date
+        // metadata call failed - price history fallback will set inception date
       }
       await sleep(120);
     }

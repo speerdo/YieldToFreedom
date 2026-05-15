@@ -14,12 +14,12 @@ const list = await db
 ---
 
 <Base
-  title="ETF directory — Yield to Freedom"
+  title="ETF directory - Yield to Freedom"
   description="Browse and filter Yield to Freedom's income ETF universe by pillar, grade, payout frequency, and more."
 >
   <h1 class="font-heading text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">ETF directory</h1>
   <p class="mt-2 max-w-2xl text-slate-600">
-    Filter our curated income ETF universe — open any profile for full metrics and payout history. Verify all data
+    Filter our curated income ETF universe - open any profile for full metrics and payout history. Verify all data
     externally before investing.
   </p>
 
@@ -164,7 +164,7 @@ const list = await db
             <!-- Divider -->
             <div class="my-4 border-t border-slate-100"></div>
 
-            <!-- Yield — hero stat -->
+            <!-- Yield - hero stat -->
             <div class="flex items-end justify-between">
               <div>
                 <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">T12M Yield</p>
@@ -188,7 +188,7 @@ const list = await db
               </div>
               <div>
                 <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Frequency</p>
-                <p class="truncate text-sm font-bold capitalize text-slate-800" x-text="row.dividendFrequency ?? '—'"></p>
+                <p class="truncate text-sm font-bold capitalize text-slate-800" x-text="row.dividendFrequency ?? '-'"></p>
               </div>
               <div>
                 <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">AUM</p>
@@ -196,7 +196,7 @@ const list = await db
               </div>
               <div>
                 <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">YTF Score</p>
-                <p class="text-sm font-bold tabular-nums text-slate-800" x-text="row.ytfScore ? Number(row.ytfScore).toFixed(1) : '—'"></p>
+                <p class="text-sm font-bold tabular-nums text-slate-800" x-text="row.ytfScore ? Number(row.ytfScore).toFixed(1) : '-'"></p>
               </div>
             </div>
 
@@ -301,17 +301,17 @@ const list = await db
               <td class="px-4 py-3 tabular-nums text-slate-700" x-text="fmtPrice(row.lastPrice)"></td>
               <td class="px-4 py-3 tabular-nums text-slate-700" x-text="fmtAum(row.aum)"></td>
               <td class="hidden px-4 py-3 text-xs capitalize text-slate-600 sm:table-cell">
-                <span x-text="row.dividendFrequency ?? '—'"></span>
+                <span x-text="row.dividendFrequency ?? '-'"></span>
               </td>
               <td class="hidden px-4 py-3 lg:table-cell">
                 <span
                   x-show="row.dripEligible"
                   class="inline-flex rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase ring-1 ring-inset ring-emerald-600/25 text-emerald-800"
                 >Yes</span>
-                <span x-show="!row.dripEligible" class="text-xs text-slate-400">—</span>
+                <span x-show="!row.dripEligible" class="text-xs text-slate-400">-</span>
               </td>
               <td class="hidden px-4 py-3 tabular-nums xl:table-cell" :class="returnColor(row.return1y)" x-text="fmtReturnPct(row.return1y)"></td>
-              <td class="hidden px-4 py-3 tabular-nums text-slate-700 xl:table-cell" x-text="row.ytfScore ? Number(row.ytfScore).toFixed(1) : '—'"></td>
+              <td class="hidden px-4 py-3 tabular-nums text-slate-700 xl:table-cell" x-text="row.ytfScore ? Number(row.ytfScore).toFixed(1) : '-'"></td>
             </tr>
           </template>
         </tbody>
@@ -325,7 +325,7 @@ const list = await db
   </div>
 
   <noscript class="mt-10 block rounded-xl border border-amber-400 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-    Enable JavaScript for filtering — JSON feed:<code class="ml-2 rounded bg-white px-1 text-xs ring-1 ring-amber-400/70">/api/etfs</code>
+    Enable JavaScript for filtering - JSON feed:<code class="ml-2 rounded bg-white px-1 text-xs ring-1 ring-amber-400/70">/api/etfs</code>
   </noscript>
 
   <Disclaimer />
@@ -373,7 +373,7 @@ const list = await db
 
   function gradeHTML(grade: unknown): string {
     const g = String(grade ?? '').trim().toUpperCase();
-    if (!g) return '<span class="text-xs font-medium text-slate-400">—</span>';
+    if (!g) return '<span class="text-xs font-medium text-slate-400">-</span>';
     const tiers: Record<string, string> = {
       A: 'bg-emerald-100 text-emerald-900 ring-emerald-600/30',
       B: 'bg-sky-100 text-sky-900 ring-sky-600/25',
@@ -381,7 +381,7 @@ const list = await db
       D: 'bg-rose-100 text-rose-900 ring-rose-600/30',
     };
     const cls = tiers[g] ?? 'bg-slate-100 text-slate-700 ring-slate-500/25';
-    return `<span class="inline-flex min-h-7 min-w-7 items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset tabular-nums ${cls}" title="YTF grade — research purposes only.">${g}</span>`;
+    return `<span class="inline-flex min-h-7 min-w-7 items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset tabular-nums ${cls}" title="YTF grade - research purposes only.">${g}</span>`;
   }
 
   function yieldColor(v: unknown): string {
@@ -466,30 +466,30 @@ const list = await db
 
       fmtYieldPct(v: unknown) {
         const p = pctFromDecimal(v);
-        return p == null ? '—' : `${p.toFixed(2)}%`;
+        return p == null ? '-' : `${p.toFixed(2)}%`;
       },
       fmtErPct(v: unknown) {
         const p = pctFromDecimal(v);
-        return p == null ? '—' : `${p.toFixed(3)}%`;
+        return p == null ? '-' : `${p.toFixed(3)}%`;
       },
       fmtPrice(v: unknown) {
-        if (v == null || v === '') return '—';
+        if (v == null || v === '') return '-';
         const n = Number(v);
-        return Number.isFinite(n) ? `$${n.toFixed(2)}` : '—';
+        return Number.isFinite(n) ? `$${n.toFixed(2)}` : '-';
       },
       fmtAum(v: unknown) {
-        if (v == null || v === '') return '—';
+        if (v == null || v === '') return '-';
         const n = Number(v);
-        if (!Number.isFinite(n) || n === 0) return '—';
+        if (!Number.isFinite(n) || n === 0) return '-';
         if (n >= 1e12) return `$${(n / 1e12).toFixed(2)}T`;
         if (n >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
         if (n >= 1e6) return `$${(n / 1e6).toFixed(1)}M`;
         return `$${n.toLocaleString()}`;
       },
       fmtReturnPct(v: unknown) {
-        if (v == null || v === '') return '—';
+        if (v == null || v === '') return '-';
         const n = Number(v);
-        if (!Number.isFinite(n)) return '—';
+        if (!Number.isFinite(n)) return '-';
         const p = n * 100;
         return (p >= 0 ? '+' : '') + p.toFixed(1) + '%';
       },

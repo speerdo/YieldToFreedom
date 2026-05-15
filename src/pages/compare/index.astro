@@ -21,8 +21,8 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
 ---
 
 <Base
-  title="Compare income ETFs — Yield to Freedom"
-  description="Pick up to three ETFs by ticker and contrast trailing dividend yield curves, Yield to Freedom grades, and payout metrics side by side — not advice."
+  title="Compare income ETFs - Yield to Freedom"
+  description="Pick up to three ETFs by ticker and contrast trailing dividend yield curves, Yield to Freedom grades, and payout metrics side by side - not advice."
 >
   <article>
     <h1 class="text-3xl font-bold tracking-tight text-slate-900">Compare ETFs</h1>
@@ -62,11 +62,11 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
                 x-model="tickers[col]"
                 @change="onTickerChange(col)"
               >
-                <option value="">— none —</option>
+                <option value="">(none)</option>
                 <template x-for="row in filteredCatalog()" :key="row.ticker">
                   <option
                     :value="row.ticker"
-                    x-text="`${row.ticker} — ${row.name.length > 38 ? row.name.slice(0, 38) + '…' : row.name}`"
+                    x-text="`${row.ticker} - ${row.name.length > 38 ? row.name.slice(0, 38) + '…' : row.name}`"
                   ></option>
                 </template>
               </select>
@@ -118,7 +118,7 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
         <!-- excluded notice -->
         <template x-if="noDataFor.length > 0">
           <p class="mt-3 text-xs text-amber-700 bg-amber-50 rounded px-3 py-1.5">
-            No price history for: <span class="font-mono font-semibold" x-text="noDataFor.join(', ')"></span> — run <code>npm run backfill:prices</code> to populate.
+            No price history for: <span class="font-mono font-semibold" x-text="noDataFor.join(', ')"></span> - run <code>npm run backfill:prices</code> to populate.
           </p>
         </template>
         <div class="relative mt-5 h-72 w-full sm:h-80">
@@ -154,7 +154,7 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
       </section>
 
       <p class="text-sm text-slate-500">
-        Columns update the address bar silently so you can bookmark or paste a preset — no account required.
+        Columns update the address bar silently so you can bookmark or paste a preset - no account required.
       </p>
 
       <Disclaimer />
@@ -201,9 +201,9 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
   }
 
   function pctFromDecimal(s: unknown, digits = 2): string {
-    if (s === null || s === undefined || s === '') return '—';
+    if (s === null || s === undefined || s === '') return '-';
     const n = Number(s);
-    if (!Number.isFinite(n)) return '—';
+    if (!Number.isFinite(n)) return '-';
     return `${(n * 100).toFixed(digits)}%`;
   }
 
@@ -213,16 +213,16 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
   }
 
   function fmtUsdAmount(s: unknown): string {
-    if (s === null || s === undefined || s === '') return '—';
+    if (s === null || s === undefined || s === '') return '-';
     const v = Number(s);
-    if (!Number.isFinite(v)) return '—';
+    if (!Number.isFinite(v)) return '-';
     return `$${v.toLocaleString(undefined, { maximumFractionDigits: 4 })}`;
   }
 
   function fmtBillions(s: unknown): string {
-    if (s === null || s === undefined || s === '') return '—';
+    if (s === null || s === undefined || s === '') return '-';
     const v = Number(s);
-    if (!Number.isFinite(v)) return '—';
+    if (!Number.isFinite(v)) return '-';
     if (v >= 1e9) return `$${(v / 1e9).toFixed(2)}B`;
     if (v >= 1e6) return `$${(v / 1e6).toFixed(2)}M`;
     return `$${v.toLocaleString()}`;
@@ -338,7 +338,7 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
 
       gradeHTML(g: unknown): string {
         const k = String(g ?? '').trim().toUpperCase();
-        if (!k) return `<span class="text-xs text-slate-400">—</span>`;
+        if (!k) return `<span class="text-xs text-slate-400">-</span>`;
         const tiers: Record<string, string> = {
           A: 'bg-emerald-100 text-emerald-900',
           B: 'bg-sky-100 text-sky-900',
@@ -355,7 +355,7 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
           { key: 'name', label: 'Name' },
           { key: 'pillar', label: 'Pillar' },
           { key: 'grade', label: 'YTF grade' },
-          { key: 't12', label: 'Trailing 12‑mo yield' },
+          { key: 't12', label: 'Trailing 12-mo yield' },
           { key: 'er', label: 'Expense ratio' },
           { key: 'price', label: 'Last price' },
           { key: 'aum', label: 'Approx size (market cap)**' },
@@ -374,7 +374,7 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
         const rowData = this.etfByTicker[t];
         const err = this.errors[t];
         if (err) return `<span class="text-rose-700">${err}</span>`;
-        if (!rowData) return `<span class="text-slate-400">—</span>`;
+        if (!rowData) return `<span class="text-slate-400">-</span>`;
         switch (row.key) {
           case 'name':
             return `<a class="font-medium text-blue-800 hover:text-blue-950" href="/etfs/${t}">${escapeHtml(rowData.name ?? '')}</a>`;
@@ -394,7 +394,7 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
           case 'aum':
             return escapeHtml(fmtBillions(rowData.aum));
           case 'fq':
-            return `<span class="capitalize">${escapeHtml(String(rowData.dividendFrequency ?? '—'))}</span>`;
+            return `<span class="capitalize">${escapeHtml(String(rowData.dividendFrequency ?? '-'))}</span>`;
           case 'drip':
             return rowData.dripEligible ? `<span class="text-teal-800">Yes*</span>` : `<span>No*</span>`;
           case 'synth':
@@ -406,13 +406,13 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
           case 'r5':
             return escapeHtml(pctFromDecimal(rowData.return5y, 2));
           case 'inception':
-            return escapeHtml(rowData.inceptionDate ? String(rowData.inceptionDate).slice(0, 10) : '—');
+            return escapeHtml(rowData.inceptionDate ? String(rowData.inceptionDate).slice(0, 10) : '-');
           case 'sync':
             return escapeHtml(
-              rowData.dataLastSynced != null ? String(rowData.dataLastSynced).slice(0, 10) : '—',
+              rowData.dataLastSynced != null ? String(rowData.dataLastSynced).slice(0, 10) : '-',
             );
           default:
-            return '—';
+            return '-';
         }
       },
 
@@ -509,7 +509,7 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
                 if (Array.isArray(body.totalReturnPoints)) nextHist[tk]!.totalReturnPoints = body.totalReturnPoints as PriceHist['totalReturnPoints'];
               }
             } catch {
-              /* price history stays empty — metrics table still renders */
+              /* price history stays empty - metrics table still renders */
             }
           }),
         );

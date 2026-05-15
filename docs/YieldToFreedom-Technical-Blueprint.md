@@ -1,4 +1,4 @@
-# Yield to Freedom — Technical Blueprint
+# Yield to Freedom - Technical Blueprint
 
 **Domain:** yieldtofreedom.com
 **Entity:** Creative Bandit LLC
@@ -11,14 +11,14 @@
 
 1. [Architecture Overview](#1-architecture-overview)
 2. [Monorepo Structure](#2-monorepo-structure)
-3. [Tech Stack — Full Decision Record](#3-tech-stack--full-decision-record)
+3. [Tech Stack - Full Decision Record](#3-tech-stack--full-decision-record)
 4. [Database Schema](#4-database-schema)
 5. [API Integrations](#5-api-integrations)
 6. [Data Pipeline](#6-data-pipeline)
 7. [ETF Grading Algorithm](#7-etf-grading-algorithm)
 8. [Authentication & Authorization](#8-authentication--authorization)
-9. [Phase 1 — Page Architecture](#9-phase-1--page-architecture)
-10. [Phase 2 — App Architecture](#10-phase-2--app-architecture)
+9. [Phase 1 - Page Architecture](#9-phase-1--page-architecture)
+10. [Phase 2 - App Architecture](#10-phase-2--app-architecture)
 11. [Payments & Subscriptions](#11-payments--subscriptions)
 12. [Email & Notifications](#12-email--notifications)
 13. [Deployment & CI/CD](#13-deployment--cicd)
@@ -141,7 +141,7 @@ yield-to-freedom/
 │   │   ├── about.astro
 │   │   ├── login.astro           # Clerk sign-in page
 │   │   │
-│   │   ├── app/                  # Phase 2 — all SSR, Clerk-protected
+│   │   ├── app/                  # Phase 2 - all SSR, Clerk-protected
 │   │   │   ├── index.astro       # Dashboard
 │   │   │   ├── portfolio.astro
 │   │   │   ├── drip.astro
@@ -158,11 +158,11 @@ yield-to-freedom/
 │   │       │   ├── sync.ts       # POST /api/portfolio/sync (SnapTrade)
 │   │       │   └── holdings.ts   # GET /api/portfolio/holdings
 │   │       ├── brokerage/
-│   │       │   ├── connect.ts    # POST — initiate SnapTrade OAuth
-│   │       │   └── callback.ts   # GET — SnapTrade OAuth callback
+│   │       │   ├── connect.ts    # POST - initiate SnapTrade OAuth
+│   │       │   └── callback.ts   # GET - SnapTrade OAuth callback
 │   │       ├── stripe/
-│   │       │   ├── checkout.ts   # POST — create Stripe session
-│   │       │   └── webhook.ts    # POST — Stripe event handler
+│   │       │   ├── checkout.ts   # POST - create Stripe session
+│   │       │   └── webhook.ts    # POST - Stripe event handler
 │   │       └── cron/
 │   │           ├── sync-etfs.ts  # Nightly FMP data refresh
 │   │           └── grade-etfs.ts # Weekly grade recalculation
@@ -203,25 +203,25 @@ yield-to-freedom/
 
 ---
 
-## 3. Tech Stack — Full Decision Record
+## 3. Tech Stack - Full Decision Record
 
 Every tool was chosen with solo-developer bandwidth and cost in mind. The guiding principle: use what you already know unless there is a clear, specific reason not to.
 
 ### Core Framework
 
 **Astro 5**
-- Output mode: `hybrid` — allows per-page prerender/SSR decisions
+- Output mode: `hybrid` - allows per-page prerender/SSR decisions
 - Static pages (ETF profiles, strategy content, homepage) use `export const prerender = true`
 - App pages (`/app/*`) use `export const prerender = false` (SSR on every request)
 - Server islands for any public page that needs a live data widget (screener, stack builder)
-- Why not SvelteKit: Astro is already proven in your directory stack. The interactivity needed in Phase 2 (charts, sliders, calculators) does not require a full SPA framework — Astro with client-side scripts or lightweight Alpine.js is sufficient.
+- Why not SvelteKit: Astro is already proven in your directory stack. The interactivity needed in Phase 2 (charts, sliders, calculators) does not require a full SPA framework - Astro with client-side scripts or lightweight Alpine.js is sufficient.
 
 ### Database
 
 **Neon DB (Postgres)**
 - Serverless Postgres, already familiar from eBikeLocal
-- Free tier: 0.5 GB storage, 190 compute hours/month — sufficient for development and early Phase 1
-- Launch tier ($19/mo): 10 GB storage, autoscaling compute — target for Phase 2 launch
+- Free tier: 0.5 GB storage, 190 compute hours/month - sufficient for development and early Phase 1
+- Launch tier ($19/mo): 10 GB storage, autoscaling compute - target for Phase 2 launch
 - Connection pooling via Neon's built-in PgBouncer (critical for Vercel serverless where connections are not persistent)
 - Connection string format: `postgresql://user:pass@host/dbname?sslmode=require`
 
@@ -246,21 +246,21 @@ export const db = drizzle(sql, { schema });
 **Vercel**
 - Hobby tier is sufficient for Phase 1
 - Pro tier ($20/mo) required for Phase 2: custom domains on all environments, team features, and no bandwidth restrictions
-- Cron jobs handled via Vercel Cron (configured in `vercel.json`) — fires the `/api/cron/*` endpoints on schedule
-- Edge middleware for Clerk auth — runs at the edge before any SSR
+- Cron jobs handled via Vercel Cron (configured in `vercel.json`) - fires the `/api/cron/*` endpoints on schedule
+- Edge middleware for Clerk auth - runs at the edge before any SSR
 
 ### Styling
 
 **Tailwind CSS v4**
-- Already in use on GoT Risk project — familiar
+- Already in use on GoT Risk project - familiar
 - v4 uses CSS-first config (`@import "tailwindcss"` in global CSS, no `tailwind.config.js` required)
-- Component classes extracted into `.astro` files — no separate CSS files needed
+- Component classes extracted into `.astro` files - no separate CSS files needed
 
 ### Authentication
 
 **Clerk**
 - Handles sign-up, sign-in, session management, and JWT validation
-- Free tier: 10,000 MAU — more than enough for Phase 2 launch
+- Free tier: 10,000 MAU - more than enough for Phase 2 launch
 - Astro integration: `@clerk/astro` package
 - Middleware protects all `/app/*` routes
 - User ID from Clerk (`clerkId`) stored in `users` table as foreign key
@@ -277,8 +277,8 @@ export const db = drizzle(sql, { schema });
 
 **Resend**
 - Transactional email (welcome, dividend alerts, grade change notifications)
-- Free tier: 3,000 emails/month — sufficient for Phase 1 email capture and early Phase 2
-- React Email templates (even in Astro project — template rendering is Node-side)
+- Free tier: 3,000 emails/month - sufficient for Phase 1 email capture and early Phase 2
+- React Email templates (even in Astro project - template rendering is Node-side)
 - Newsletter via **Loops.so** (integrates with Resend, handles unsubscribes automatically)
 
 ### Interactive Components
@@ -594,7 +594,7 @@ Phase 1 does NOT show live prices. All data is end-of-day, cached in Neon, and d
 **Purpose:** OAuth-based brokerage portfolio import. Phase 2 only.
 **SDK:** `snaptrade-typescript-sdk`
 **Supports:** Robinhood, Schwab, Fidelity, E*TRADE, IBKR, and 50+ others.
-**Auth model:** OAuth2 — user credentials never touch our servers.
+**Auth model:** OAuth2 - user credentials never touch our servers.
 **Pricing:** Free tier (limited connections), pay-as-you-go for production.
 
 ```typescript
@@ -613,7 +613,7 @@ export const snaptrade = new SnapTrade({
 
 // 2. Generate connection portal URL:
 //    snaptrade.authentication.loginSnapTradeUser({ userId, userSecret })
-//    → redirectURI to show user — they connect their brokerage
+//    → redirectURI to show user - they connect their brokerage
 
 // 3. After connection, fetch holdings:
 //    snaptrade.accountInformation.getUserHoldings({ userId, userSecret })
@@ -710,7 +710,7 @@ await resend.emails.send({
 
 ### 6.1 ETF Universe
 
-The initial ETF universe is a curated list of ~75 income-relevant ETFs. This is not auto-discovered — it is hand-curated and seeded once. New ETFs are added manually as the category evolves.
+The initial ETF universe is a curated list of ~75 income-relevant ETFs. This is not auto-discovered - it is hand-curated and seeded once. New ETFs are added manually as the category evolves.
 
 **Initial universe (examples):**
 
@@ -793,7 +793,7 @@ export async function GET({ request }) {
 
     } catch (err) {
       console.error(`Failed to sync ${etf.ticker}:`, err);
-      // Continue to next ETF — don't fail entire job
+      // Continue to next ETF - don't fail entire job
     }
   }
 
@@ -840,13 +840,13 @@ for (const etf of allEtfs) {
 
 ## 7. ETF Grading Algorithm
 
-The YTF Grade is a proprietary score from 0-100 mapped to A/B/C/D. It is designed specifically for the Yield to Freedom strategy — it does not attempt to be a general ETF quality score.
+The YTF Grade is a proprietary score from 0-100 mapped to A/B/C/D. It is designed specifically for the Yield to Freedom strategy - it does not attempt to be a general ETF quality score.
 
 **Scoring criteria (total: 100 points):**
 
 | Criterion | Weight | Notes |
 |---|---|---|
-| Trailing 12-month yield | 30 pts | Scaled: 0% = 0, 12%+ = 30 (diminishing returns above 15% — penalizes NAV-destruction ETFs) |
+| Trailing 12-month yield | 30 pts | Scaled: 0% = 0, 12%+ = 30 (diminishing returns above 15% - penalizes NAV-destruction ETFs) |
 | Dividend consistency | 20 pts | No missed/cut payments in last 12 months = 20, 1 cut = 10, 2+ cuts = 0 |
 | Expense ratio | 15 pts | 0.00% = 15, 0.35% = 10, 0.75% = 5, 1.00%+ = 0 |
 | Dividend frequency | 15 pts | Monthly = 15, Quarterly = 8, Annual/Irregular = 0 |
@@ -857,9 +857,9 @@ The YTF Grade is a proprietary score from 0-100 mapped to A/B/C/D. It is designe
 
 | Score | Grade | Meaning |
 |---|---|---|
-| 80-100 | A | Core holding — strong fit for YTF strategy |
-| 60-79 | B | Good holding — minor trade-offs |
-| 40-59 | C | Situational — use with awareness of trade-offs |
+| 80-100 | A | Core holding - strong fit for YTF strategy |
+| 60-79 | B | Good holding - minor trade-offs |
+| 40-59 | C | Situational - use with awareness of trade-offs |
 | 0-39 | D | Not recommended for YTF strategy |
 
 ```typescript
@@ -905,7 +905,7 @@ export function calculateYtfGrade(etf: typeof etfs.$inferSelect & {
   const aum = Number(etf.aum ?? 0);
   score += aum >= 10e9 ? 10 : aum >= 1e9 ? 7 : aum >= 100e6 ? 4 : 0;
 
-  // 6. Pillar fit (10 pts) — simplified
+  // 6. Pillar fit (10 pts) - simplified
   score += 10; // Default full fit; reduce manually for edge cases
 
   const grade = score >= 80 ? 'A' : score >= 60 ? 'B' : score >= 40 ? 'C' : 'D';
@@ -980,7 +980,7 @@ const [user] = await db.select()
 
 ---
 
-## 9. Phase 1 — Page Architecture
+## 9. Phase 1 - Page Architecture
 
 ### Static Generation Strategy
 
@@ -1014,7 +1014,7 @@ const dividendHistory = await db.select()
 
 ### Screener API Endpoint
 
-The screener is a server island — it fetches filtered results client-side so the main ETF page can be statically generated.
+The screener is a server island - it fetches filtered results client-side so the main ETF page can be statically generated.
 
 ```typescript
 // src/pages/api/etfs/index.ts
@@ -1045,7 +1045,7 @@ export async function GET({ url }) {
 
 ### Stack Builder Calculator (No Auth Required)
 
-The Stack Builder is a client-side only calculator — no API call needed. User picks ETFs, enters a dollar amount, and sees projected monthly income. All data needed is baked into the page at build time as a JSON island.
+The Stack Builder is a client-side only calculator - no API call needed. User picks ETFs, enters a dollar amount, and sees projected monthly income. All data needed is baked into the page at build time as a JSON island.
 
 ```typescript
 // src/pages/stack-builder.astro
@@ -1115,11 +1115,11 @@ Required on all ETF data pages and strategy pages. Renders as a dismissible bann
 
 ---
 
-## 10. Phase 2 — App Architecture
+## 10. Phase 2 - App Architecture
 
 ### Dashboard Data Model
 
-The dashboard assembles multiple queries into a single user-facing view. Keep queries lean — do not join across all tables on every page load.
+The dashboard assembles multiple queries into a single user-facing view. Keep queries lean - do not join across all tables on every page load.
 
 ```typescript
 // src/pages/app/index.astro (dashboard)
@@ -1270,7 +1270,7 @@ Grade alerts are generated by the weekly cron (Section 6.3) and delivered via a 
 
 ```typescript
 // src/pages/api/cron/send-alerts.ts
-// Runs daily at 08:00 UTC — sends any pending grade alert emails
+// Runs daily at 08:00 UTC - sends any pending grade alert emails
 // vercel.json: { "schedule": "0 8 * * *" }
 
 const pending = await db.select()
@@ -1353,10 +1353,10 @@ export async function POST({ request, locals }) {
 
 Four core emails needed at launch:
 
-1. **Welcome** — triggered on first sign-up (Clerk webhook `user.created`)
-2. **Grade Change Alert** — triggered by weekly cron when a held ETF changes grade
-3. **Subscription Confirmation** — triggered by Stripe `customer.subscription.created`
-4. **Subscription Lapse Warning** — triggered by Stripe `invoice.payment_failed`
+1. **Welcome** - triggered on first sign-up (Clerk webhook `user.created`)
+2. **Grade Change Alert** - triggered by weekly cron when a held ETF changes grade
+3. **Subscription Confirmation** - triggered by Stripe `customer.subscription.created`
+4. **Subscription Lapse Warning** - triggered by Stripe `invoice.payment_failed`
 
 All templates are plain HTML strings rendered server-side. No React Email dependency needed for v1.
 
@@ -1365,7 +1365,7 @@ All templates are plain HTML strings rendered server-side. No React Email depend
 - Loops.so connects to Resend as the sending infrastructure
 - Email capture form on homepage, blog, and stack builder submits to `/api/subscribe`
 - Double opt-in: confirmation email sent on subscribe, `confirmed = true` set on click
-- Weekly newsletter: "This Week in Income ETFs" — manually written or semi-automated from blog posts
+- Weekly newsletter: "This Week in Income ETFs" - manually written or semi-automated from blog posts
 
 ```typescript
 // src/pages/api/subscribe.ts
@@ -1448,8 +1448,8 @@ export default defineConfig({
 ### Git Workflow
 
 Simple two-branch workflow for solo development:
-- `main` — production only. PR required, no direct pushes.
-- `develop` — active development. Push freely, Vercel preview deploys on every push.
+- `main` - production only. PR required, no direct pushes.
+- `develop` - active development. Push freely, Vercel preview deploys on every push.
 - Feature branches optional but recommended for anything touching the DB schema.
 
 ### Database Migrations
@@ -1465,14 +1465,14 @@ DATABASE_URL=$DEV_DATABASE_URL npx drizzle-kit migrate
 DATABASE_URL=$PROD_DATABASE_URL npx drizzle-kit migrate
 ```
 
-Never run migrations directly against production without testing on the dev Neon branch first. Neon branching makes this easy — dev branch is a copy of production schema.
+Never run migrations directly against production without testing on the dev Neon branch first. Neon branching makes this easy - dev branch is a copy of production schema.
 
 ---
 
 ## 14. Environment Variables
 
 ```bash
-# .env.example — copy to .env and fill in
+# .env.example - copy to .env and fill in
 
 # Database
 DATABASE_URL=postgresql://user:pass@host/dbname?sslmode=require
@@ -1505,7 +1505,7 @@ CRON_SECRET=a_long_random_string_32_chars_min
 PUBLIC_SITE_URL=https://yieldtofreedom.com
 ```
 
-All `PUBLIC_` prefixed vars are exposed to the client. Everything else is server-only. Never commit `.env` — only `.env.example`.
+All `PUBLIC_` prefixed vars are exposed to the client. Everything else is server-only. Never commit `.env` - only `.env.example`.
 
 ---
 
@@ -1524,7 +1524,7 @@ All `PUBLIC_` prefixed vars are exposed to the client. Everything else is server
 
 - ETF issuer logos: SVG where possible, PNG with explicit width/height otherwise
 - OG images: pre-generated static PNGs per ETF page using `@vercel/og` or Satori
-- No hero images on content pages — use CSS gradients instead
+- No hero images on content pages - use CSS gradients instead
 
 ### Caching Strategy
 
@@ -1612,7 +1612,7 @@ const event = stripe.webhooks.constructEvent(
 
 ### SnapTrade Security
 
-- Store `snaptradeUserSecret` encrypted in the session (not in DB) or derive it per-request using a user-specific HMAC — SnapTrade's own recommendation
+- Store `snaptradeUserSecret` encrypted in the session (not in DB) or derive it per-request using a user-specific HMAC - SnapTrade's own recommendation
 - All SnapTrade connections are read-only by default
 - No brokerage credentials ever touch our servers
 
@@ -1639,7 +1639,7 @@ Required on every page that displays ETF data, grades, or financial projections:
 
 Estimated at 5-10 hours/week alongside Sallie Mae contract role.
 
-### Sprint 1 — Foundation (Weeks 1-2)
+### Sprint 1 - Foundation (Weeks 1-2)
 
 - [ ] Astro project init with `hybrid` output, Tailwind v4, TypeScript strict
 - [ ] Neon DB provisioned, dev branch created
@@ -1649,14 +1649,14 @@ Estimated at 5-10 hours/week alongside Sallie Mae contract role.
 - [ ] Nightly sync cron working locally (`tsx src/pages/api/cron/sync-etfs.ts`)
 - [ ] Vercel project created, domain pointed, env vars set
 - [ ] `develop` branch auto-deploys to preview URL
-- [ ] Commercial FMP agreement initiated (do not wait — this takes time)
+- [ ] Commercial FMP agreement initiated (do not wait - this takes time)
 
 **Blocker:** FMP commercial agreement. Start this conversation on day 1.
 
-### Sprint 2 — ETF Directory (Weeks 3-5)
+### Sprint 2 - ETF Directory (Weeks 3-5)
 
 - [ ] `/etfs` screener page with filter UI (pillar, grade, frequency, yield range)
-- [ ] `/etfs/[ticker]` profile pages — static generation
+- [ ] `/etfs/[ticker]` profile pages - static generation
 - [ ] Grade algorithm implemented and run against full universe
 - [ ] GradeChip, EtfCard, EtfTable components
 - [ ] DividendChart component (Chart.js, last 24 payments)
@@ -1664,25 +1664,25 @@ Estimated at 5-10 hours/week alongside Sallie Mae contract role.
 - [ ] Disclaimer component in place on all ETF pages
 - [ ] SEO: title templates, meta descriptions, canonical URLs
 
-### Sprint 3 — Strategy Content (Weeks 6-7)
+### Sprint 3 - Strategy Content (Weeks 6-7)
 
-- [ ] Homepage — hero, pillar explainer, grade highlights, email capture CTA
+- [ ] Homepage - hero, pillar explainer, grade highlights, email capture CTA
 - [ ] `/strategy` index page
-- [ ] `/strategy/drip` — DRIP mechanics explainer
-- [ ] `/strategy/margin` — margin arbitrage explainer
-- [ ] `/strategy/fi-timeline` — FI timeline explainer
-- [ ] `/about` — philosophy, disclaimer, creator background
+- [ ] `/strategy/drip` - DRIP mechanics explainer
+- [ ] `/strategy/margin` - margin arbitrage explainer
+- [ ] `/strategy/fi-timeline` - FI timeline explainer
+- [ ] `/about` - philosophy, disclaimer, creator background
 - [ ] Lead magnet PDF: "Yield to Freedom Starter Guide" (brief, 8-10 pages)
 - [ ] Email capture form → Resend + Loops.so pipeline
 
-### Sprint 4 — Tools (Weeks 8-9)
+### Sprint 4 - Tools (Weeks 8-9)
 
-- [ ] `/compare` — head-to-head ETF comparison (up to 3 ETFs)
-- [ ] `/stack-builder` — no-auth income projection calculator
+- [ ] `/compare` - head-to-head ETF comparison (up to 3 ETFs)
+- [ ] `/stack-builder` - no-auth income projection calculator
 - [ ] Pillar balance visualization (pie chart via Chart.js)
 - [ ] Monthly income breakdown by payment frequency
 
-### Sprint 5 — Blog & SEO (Weeks 10-11)
+### Sprint 5 - Blog & SEO (Weeks 10-11)
 
 - [ ] Blog setup with Astro content collections
 - [ ] First 6 posts: income ETF overviews, DRIP explainer, SCHD vs JEPI, JEPI vs JEPQ, building the 40/30/30 stack, what is covered call income
@@ -1692,7 +1692,7 @@ Estimated at 5-10 hours/week alongside Sallie Mae contract role.
 - [ ] Google Analytics 4 or Plausible
 - [ ] AdSense application submitted
 
-### Sprint 6 — Phase 1 Soft Launch (Week 12)
+### Sprint 6 - Phase 1 Soft Launch (Week 12)
 
 - [ ] Full Lighthouse audit (target 90+ on all metrics)
 - [ ] Mobile responsiveness pass
@@ -1702,31 +1702,31 @@ Estimated at 5-10 hours/week alongside Sallie Mae contract role.
 - [ ] Announcement posts: r/dividends, r/financialindependence, r/ETFs
 - [ ] LinkedIn/Twitter/X launch post
 
-### Sprint 7 — Phase 2 Foundation (Weeks 13-15)
+### Sprint 7 - Phase 2 Foundation (Weeks 13-15)
 
 - [ ] Clerk integration, auth middleware, `/login` page
 - [ ] `users` table, Clerk webhook sync
 - [ ] Stripe products created, checkout flow, webhook handler
-- [ ] `/app` dashboard — basic layout, subscription gate
+- [ ] `/app` dashboard - basic layout, subscription gate
 - [ ] Manual holding entry (free tier: 5 holdings max)
 - [ ] Pillar breakdown chart from holdings
 
-### Sprint 8 — Phase 2 Portfolio (Weeks 16-18)
+### Sprint 8 - Phase 2 Portfolio (Weeks 16-18)
 
-- [ ] SnapTrade integration — connect brokerage, OAuth flow, holdings sync
-- [ ] `/app/portfolio` — full holdings table, pillar balance, rebalancing gap
+- [ ] SnapTrade integration - connect brokerage, OAuth flow, holdings sync
+- [ ] `/app/portfolio` - full holdings table, pillar balance, rebalancing gap
 - [ ] FI Score calculation and display
-- [ ] `/app/drip` — DRIP modeler with Chart.js projection chart
+- [ ] `/app/drip` - DRIP modeler with Chart.js projection chart
 
-### Sprint 9 — Phase 2 Advanced Features (Weeks 19-21)
+### Sprint 9 - Phase 2 Advanced Features (Weeks 19-21)
 
-- [ ] `/app/margin` — margin paydown timeline
-- [ ] `/app/calendar` — dividend calendar from held ETFs
-- [ ] Grade change alert system — cron + email delivery
-- [ ] `/app/alerts` — alert history view
-- [ ] `/app/settings` — subscription management, brokerage connections, preferences
+- [ ] `/app/margin` - margin paydown timeline
+- [ ] `/app/calendar` - dividend calendar from held ETFs
+- [ ] Grade change alert system - cron + email delivery
+- [ ] `/app/alerts` - alert history view
+- [ ] `/app/settings` - subscription management, brokerage connections, preferences
 
-### Sprint 10 — Phase 2 Launch (Week 22)
+### Sprint 10 - Phase 2 Launch (Week 22)
 
 - [ ] Stripe customer portal integration
 - [ ] 14-day trial flow tested end-to-end
@@ -1742,27 +1742,27 @@ The following must be resolved before or during Sprint 1:
 
 ### Critical (Before Sprint 1)
 
-1. **FMP Commercial Agreement** — Contact FMP at `site.financialmodelingprep.com` to initiate a Data Display and Licensing Agreement. Get pricing for the commercial Build tier. This is the longest lead-time item in the entire project.
+1. **FMP Commercial Agreement** - Contact FMP at `site.financialmodelingprep.com` to initiate a Data Display and Licensing Agreement. Get pricing for the commercial Build tier. This is the longest lead-time item in the entire project.
 
-2. **Twelve Data as interim Phase 1 source** — Consider using Twelve Data ($29/mo, display-permissive) to power Phase 1 development while the FMP commercial deal is negotiated. Migrate to FMP once the agreement is in place. The FMP client wrapper in `src/lib/fmp/client.ts` can be swapped to Twelve Data with minimal changes.
+2. **Twelve Data as interim Phase 1 source** - Consider using Twelve Data ($29/mo, display-permissive) to power Phase 1 development while the FMP commercial deal is negotiated. Migrate to FMP once the agreement is in place. The FMP client wrapper in `src/lib/fmp/client.ts` can be swapped to Twelve Data with minimal changes.
 
-3. **Domain purchase** — Register `yieldtofreedom.com` now. Point nameservers to Vercel. Set up `hello@yieldtofreedom.com` and `alerts@yieldtofreedom.com` in Resend for email sending.
+3. **Domain purchase** - Register `yieldtofreedom.com` now. Point nameservers to Vercel. Set up `hello@yieldtofreedom.com` and `alerts@yieldtofreedom.com` in Resend for email sending.
 
 ### Before Sprint 2
 
-4. **Initial ETF universe** — Finalize the curated list of ~75 ETFs to include at launch. Prioritize: well-known income ETFs (JEPI, JEPQ, SCHD, DIVO, QYLD), your personal holdings (TOPW, GOOW, NVII, IBIT), and ETFs that rank for target keywords.
+4. **Initial ETF universe** - Finalize the curated list of ~75 ETFs to include at launch. Prioritize: well-known income ETFs (JEPI, JEPQ, SCHD, DIVO, QYLD), your personal holdings (TOPW, GOOW, NVII, IBIT), and ETFs that rank for target keywords.
 
-5. **Grade algorithm weighting** — The weights in Section 7 are a starting proposal. Review and adjust before the first public grade display. Consider asking the r/dividends community for feedback after soft launch.
+5. **Grade algorithm weighting** - The weights in Section 7 are a starting proposal. Review and adjust before the first public grade display. Consider asking the r/dividends community for feedback after soft launch.
 
 ### Before Sprint 7
 
-6. **Free tier limits** — Finalize what free users get in Phase 2. Current proposal: dashboard access with up to 5 manually-entered holdings, read-only DRIP modeler (no save), no brokerage import. Adjust based on Phase 1 user feedback.
+6. **Free tier limits** - Finalize what free users get in Phase 2. Current proposal: dashboard access with up to 5 manually-entered holdings, read-only DRIP modeler (no save), no brokerage import. Adjust based on Phase 1 user feedback.
 
-7. **SnapTrade pricing confirmation** — Contact SnapTrade to confirm current pay-as-you-go rates for production use. Their pricing page shows unlimited API requests but brokerage connection sync costs vary.
+7. **SnapTrade pricing confirmation** - Contact SnapTrade to confirm current pay-as-you-go rates for production use. Their pricing page shows unlimited API requests but brokerage connection sync costs vary.
 
-8. **Pricing validation** — $9/mo is below-market for a portfolio tool of this depth. Consider $12/mo monthly, $99/yr annual. Validate against competitor pricing (Passiv, Snowball Analytics, Dividend Tracker Pro) before launch.
+8. **Pricing validation** - $9/mo is below-market for a portfolio tool of this depth. Consider $12/mo monthly, $99/yr annual. Validate against competitor pricing (Passiv, Snowball Analytics, Dividend Tracker Pro) before launch.
 
 ---
 
-*Technical Blueprint v1.0 — Yield to Freedom / Creative Bandit LLC / May 2026*
+*Technical Blueprint v1.0 - Yield to Freedom / Creative Bandit LLC / May 2026*
 *Stack: Astro 5 + Neon DB + Vercel + Drizzle + Clerk + Stripe + FMP + SnapTrade + Resend*

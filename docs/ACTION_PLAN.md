@@ -1,14 +1,14 @@
-# Yield to Freedom — Action Plan
+# Yield to Freedom - Action Plan
 
 **Project:** yieldtofreedom.com  
 **Entity:** Creative Bandit LLC  
 **Updated:** May 2026  
 
-This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-time work (~5–10 hrs/week alongside contract work). Complete tasks in order — later sprints depend on earlier ones.
+This is the step-by-step build plan. Each sprint maps to 1-3 weeks of part-time work (~5-10 hrs/week alongside contract work). Complete tasks in order - later sprints depend on earlier ones.
 
 **How to track progress:** Mark checklist items with `[x]` when done; leave `[ ]` until finished. Update the *last progress update* line whenever you check something in.
 
-*Last progress update: 2026-05-13 — **ETF universe expanded to ~165 ETFs.** Added comprehensive coverage of Roundhill (RDTE, MAGY, YBTC + 12 WeeklyPay single-stock), YieldMax (MSTY, GOOY fix, 20+ single-stock, 5 short/inverse, 8 sector/portfolio, 5 0DTE/target), NEOS (QQQI, IWMI, BTCI, QQQH, SPYH, BNDI, HYBI, TLTI), and Defiance (WDTE, QQQY, SPYT). `seed-etf-statics.ts` updated to cover all ~165 ETFs. GOOGY ticker corrected to GOOY. **Next:** Set `TIINGO_API_KEY` in Vercel env vars, run `seed-etfs.ts` + `seed-etf-statics.ts` against prod DB, smoke-test cron, then Lighthouse + mobile/a11y pass.*
+*Last progress update: 2026-05-13 - **ETF universe expanded to ~165 ETFs.** Added comprehensive coverage of Roundhill (RDTE, MAGY, YBTC + 12 WeeklyPay single-stock), YieldMax (MSTY, GOOY fix, 20+ single-stock, 5 short/inverse, 8 sector/portfolio, 5 0DTE/target), NEOS (QQQI, IWMI, BTCI, QQQH, SPYH, BNDI, HYBI, TLTI), and Defiance (WDTE, QQQY, SPYT). `seed-etf-statics.ts` updated to cover all ~165 ETFs. GOOGY ticker corrected to GOOY. **Next:** Set `TIINGO_API_KEY` in Vercel env vars, run `seed-etfs.ts` + `seed-etf-statics.ts` against prod DB, smoke-test cron, then Lighthouse + mobile/a11y pass.*
 
 **Prior ships:** SPEC v1.1, six blog posts, `/blog`, `/sitemap.xml`, `robots.txt`, GA4 hook, Sprint 4 tools.*
 
@@ -16,7 +16,7 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 
 ## Sprint status tracker
 
-### Sprint 1 — Foundation
+### Sprint 1 - Foundation
 
 | Step | Done |
 |------|------|
@@ -26,10 +26,10 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 | 1.4 Neon + Drizzle | [x] |
 | 1.5 Tiingo client (`src/lib/tiingo/client.ts`) | [x] client built; key test pending Tiingo maintenance window |
 | 1.6 Seed ETFs (`npm run seed:etfs`) | [x] |
-| 1.7 Vercel dashboard + env vars + preview branch | [ ] (`vercel.json` [x]; deploy error fixed — removed invalid `functions` pattern, `maxDuration: 60` in adapter) |
+| 1.7 Vercel dashboard + env vars + preview branch | [ ] (`vercel.json` [x]; deploy error fixed - removed invalid `functions` pattern, `maxDuration: 60` in adapter) |
 | 1.8 `.gitignore` | [x] |
 
-### Sprint 2 — ETF directory
+### Sprint 2 - ETF directory
 
 | Step | Done |
 |------|------|
@@ -41,7 +41,7 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 | 2.6 Dividend chart (Chart.js) | [x] |
 | 2.7 Cron **`/api/cron/sync-etfs`** + **`/api/cron/grade-etfs`** | [x] code ([ ] nightly smoke 5 tickers) |
 
-### Sprint 3 — Strategy & capture
+### Sprint 3 - Strategy & capture
 
 | Step | Done |
 |------|------|
@@ -50,19 +50,19 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 | 3.3 Strategy `/strategy` + drip / margin / FI timeline (+ Article JSON-LD) | [x] |
 | 3.4 About `/about` | [x] |
 
-### Sprint 4 — Tools
+### Sprint 4 - Tools
 
 | Step | Done |
 |------|------|
 | 4.1 Compare `/compare` (+ **`/api/etfs/[ticker]/yield-trail`**) | [x] |
 | 4.2 Stack Builder `/stack-builder` | [x] |
 
-### Sprint 5 — Blog & SEO
+### Sprint 5 - Blog & SEO
 
 | Step | Done |
 |------|------|
 | 5.1 Astro Content Layer + `/blog` + `[slug]` | [x] |
-| 5.2 Six launch ACTION_PLAN articles | [x] (**6** in **`src/content/blog/`** — editorial pass still useful) |
+| 5.2 Six launch ACTION_PLAN articles | [x] (**6** in **`src/content/blog/`** - editorial pass still useful) |
 | 5.3 Dynamic **`/sitemap.xml`** + **`public/robots.txt`** | [x] |
 | 5.4 Google Analytics 4 snippet (optional **`PUBLIC_GA_MEASUREMENT_ID`**) | [x] |
 | 5.5 Search Console · AdSense submission | [ ] |
@@ -72,9 +72,9 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 
 > **Tailwind note:** Astro 6 / Vite 7: use **Tailwind v4 via PostCSS** (`@tailwindcss/postcss`, `postcss.config.mjs`), not `@tailwindcss/vite`, until that plugin supports the current Vite resolver.
 >
-> **Astro server routes:** Astro 6 removed **`output: 'hybrid'`** — **default static** still emits serverless bundles via **`@astrojs/vercel`** when routes declare **`export const prerender = false`**.
+> **Astro server routes:** Astro 6 removed **`output: 'hybrid'`** - **default static** still emits serverless bundles via **`@astrojs/vercel`** when routes declare **`export const prerender = false`**.
 >
-> **Vercel `functions` config:** Do **not** use the `functions` key in `vercel.json` with Astro. The adapter uses Vercel's Build Output API and emits functions to `.vercel/output/functions/` — the `src/pages/api/**/*.ts` source-path pattern will never match and causes a build error. Set `maxDuration` via the adapter option in `astro.config.mjs` instead.
+> **Vercel `functions` config:** Do **not** use the `functions` key in `vercel.json` with Astro. The adapter uses Vercel's Build Output API and emits functions to `.vercel/output/functions/` - the `src/pages/api/**/*.ts` source-path pattern will never match and causes a build error. Set `maxDuration` via the adapter option in `astro.config.mjs` instead.
 
 ---
 
@@ -82,14 +82,14 @@ This is the step-by-step build plan. Each sprint maps to 1–3 weeks of part-tim
 
 These are long-lead-time items. Start all of them before Sprint 1 coding.
 
-- [ ] **Register `yieldtofreedom.com`** — point nameservers to Vercel immediately
-- [x] **Data provider decision** — **Tiingo** selected as primary data provider (display-permissive free tier, no commercial agreement required for Phase 1). `src/lib/tiingo/client.ts` built and integrated. FMP dropped. Tiingo sign-up: [api.tiingo.com](https://api.tiingo.com) — set `TIINGO_API_KEY` in Vercel env vars once account is ready.
-- [ ] **Set up email addresses** — configure `hello@yieldtofreedom.com` and `alerts@yieldtofreedom.com` in Resend
+- [ ] **Register `yieldtofreedom.com`** - point nameservers to Vercel immediately
+- [x] **Data provider decision** - **Tiingo** selected as primary data provider (display-permissive free tier, no commercial agreement required for Phase 1). `src/lib/tiingo/client.ts` built and integrated. FMP dropped. Tiingo sign-up: [api.tiingo.com](https://api.tiingo.com) - set `TIINGO_API_KEY` in Vercel env vars once account is ready.
+- [ ] **Set up email addresses** - configure `hello@yieldtofreedom.com` and `alerts@yieldtofreedom.com` in Resend
 - [ ] **Create accounts** (if not already done): Neon, Vercel, Clerk, Stripe, Resend, Loops.so, SnapTrade
 
 ---
 
-## Sprint 1 — Foundation (Weeks 1–2)
+## Sprint 1 - Foundation (Weeks 1-2)
 
 **Goal:** Working project scaffold deployed to Vercel, DB running, Tiingo client tested.
 
@@ -116,7 +116,7 @@ npm install astro@6.2.1 @astrojs/vercel@10.0.6 typescript@6.0.3
 npm install drizzle-orm@0.45.2 @neondatabase/serverless@1.1.0
 npm install -D drizzle-kit@0.31.10
 
-# Styling (Tailwind v4 — PostCSS in this repo; see note under Sprint 1 table)
+# Styling (Tailwind v4 - PostCSS in this repo; see note under Sprint 1 table)
 npm install tailwindcss@4.2.4 @tailwindcss/postcss@4.2.4 postcss
 
 # Auth
@@ -178,7 +178,7 @@ export default defineConfig({
 3. Copy the connection strings (pooled) for both branches to `.env`
 
 ```typescript
-// drizzle.config.ts — repo also calls `import 'dotenv/config'` and accepts
+// drizzle.config.ts - repo also calls `import 'dotenv/config'` and accepts
 // DATABASE_URL or NEON_DATABASE_CONNECTION_STRING
 import 'dotenv/config';
 import { defineConfig } from 'drizzle-kit';
@@ -194,7 +194,7 @@ export default defineConfig({
 ```
 
 ```typescript
-// src/lib/db/index.ts — resolves URL from import.meta.env (Astro) or process.env (scripts)
+// src/lib/db/index.ts - resolves URL from import.meta.env (Astro) or process.env (scripts)
 import { drizzle } from 'drizzle-orm/neon-http';
 import { neon } from '@neondatabase/serverless';
 import * as schema from './schema';
@@ -202,7 +202,7 @@ import * as schema from './schema';
 // see repo for resolveDatabaseUrl() + export const db = drizzle(...)
 ```
 
-5. Write the full schema in `src/lib/db/schema.ts` (copy from SPEC.md Section 5 — **committed**)
+5. Write the full schema in `src/lib/db/schema.ts` (copy from SPEC.md Section 5 - **committed**)
 6. Generate and apply first migration:
 
 ```bash
@@ -212,7 +212,7 @@ npm run db:migrate
 
 ### 1.5 Build Tiingo Client
 
-`src/lib/tiingo/client.ts` — **complete.** Uses bearer token auth (`Authorization: Token <key>`).
+`src/lib/tiingo/client.ts` - **complete.** Uses bearer token auth (`Authorization: Token <key>`).
 
 Key exports:
 - `tiingoMeta(ticker)` → name, exchangeCode, description
@@ -294,7 +294,7 @@ npm run seed:etfs
 1. Create Vercel project, connect GitHub repo
 2. Set all env vars in Vercel dashboard (copy from `.env.example`)
 3. Set production branch to `main`, preview branch to `develop`
-4. **Repo:** `[x]` `vercel.json` with cron config (SPEC § Vercel) — wire dashboard when cron routes exist
+4. **Repo:** `[x]` `vercel.json` with cron config (SPEC § Vercel) - wire dashboard when cron routes exist
 
 ### 1.8 Configure .gitignore
 
@@ -313,15 +313,15 @@ dist/
 
 - [x] `npm run dev` runs without errors
 - [x] `npm run build` succeeds
-- [x] DB schema applied to dev Neon branch *(first migration pushed to linked DB — confirm branch in Neon UI)*
+- [x] DB schema applied to dev Neon branch *(first migration pushed to linked DB - confirm branch in Neon UI)*
 - [x] 5 ETFs seeded and queryable *(full universe seeded; re-run safe via `ON CONFLICT DO NOTHING`)*
-- [x] Tiingo client built (`src/lib/tiingo/client.ts`) — smoke test pending Tiingo maintenance window
+- [x] Tiingo client built (`src/lib/tiingo/client.ts`) - smoke test pending Tiingo maintenance window
 - [ ] Preview deployment live on Vercel
 - [ ] `TIINGO_API_KEY` added to Vercel env vars
 
 ---
 
-## Sprint 2 — ETF Directory (Weeks 3–5)
+## Sprint 2 - ETF Directory (Weeks 3-5)
 
 **Goal:** `/etfs` screener and `/etfs/[ticker]` profile pages live and SEO-ready.
 
@@ -356,10 +356,10 @@ const { title, description, schema } = Astro.props;
 ### 2.2 Shared UI Components
 
 Build these components (no logic, pure display):
-- `GradeChip.astro` — renders A/B/C/D with color (green/blue/yellow/red)
-- `Badge.astro` — pill badge for pillar labels
-- `Card.astro` — wrapper with border/shadow
-- `Disclaimer.astro` — financial disclaimer text block
+- `GradeChip.astro` - renders A/B/C/D with color (green/blue/yellow/red)
+- `Badge.astro` - pill badge for pillar labels
+- `Card.astro` - wrapper with border/shadow
+- `Disclaimer.astro` - financial disclaimer text block
 
 ### 2.3 ETF Profile Pages (Static)
 
@@ -394,14 +394,14 @@ const schema = {
   "@context": "https://schema.org",
   "@type": "FinancialProduct",
   "name": etf.name,
-  "description": `${etf.name} (${etf.ticker}) — income ETF research and analysis`,
+  "description": `${etf.name} (${etf.ticker}) - income ETF research and analysis`,
 };
 
 export const headers = {
   'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=3600'
 };
 ---
-<Base title={`${etf.ticker} ETF — ${etf.name}`} description={`...`} {schema}>
+<Base title={`${etf.ticker} ETF - ${etf.name}`} description={`...`} {schema}>
   <!-- ETF profile content -->
   <Disclaimer />
 </Base>
@@ -475,23 +475,23 @@ npx tsx -e "import('./src/pages/api/cron/sync-etfs.ts')"
 - [x] `/etfs/JEPI` renders *(dividend chart shows data after sync; otherwise empty-state copy)*
 - [x] ETF pages carry `FinancialProduct` JSON-LD
 - [x] Disclaimer block on profile pages
-- [x] Grade algorithm run on entire **seeded** universe (`npm run run-grader`; ~100 ETF universe — see `scripts/seed-etfs.ts`)
+- [x] Grade algorithm run on entire **seeded** universe (`npm run run-grader`; ~100 ETF universe - see `scripts/seed-etfs.ts`)
 - [ ] Nightly sync tested against **5 tickers** *(call `GET /api/cron/sync-etfs` with `Authorization: Bearer $CRON_SECRET` in preview)*
 
 ---
 
-## Sprint 3 — Strategy Content (Weeks 6–7)
+## Sprint 3 - Strategy Content (Weeks 6-7)
 
 **Goal:** Homepage, strategy pages, and email capture live.
 
 ### 3.1 Homepage
 
 Sections to build:
-1. **Hero** — headline ("Build Income. Reach Freedom."), subhead, CTA buttons
-2. **Pillar explainer** — three-column layout: Income / Stability / Growth with brief description and 2–3 example ETFs each
-3. **Top-rated ETFs** — one A-grade ETF from each pillar with grade chip and key metric
-4. **Email capture** — "Get the free Income ETF Starter Guide" → double opt-in flow
-5. **Footer** — links, disclaimer
+1. **Hero** - headline ("Build Income. Reach Freedom."), subhead, CTA buttons
+2. **Pillar explainer** - three-column layout: Income / Stability / Growth with brief description and 2-3 example ETFs each
+3. **Top-rated ETFs** - one A-grade ETF from each pillar with grade chip and key metric
+4. **Email capture** - "Get the free Income ETF Starter Guide" → double opt-in flow
+5. **Footer** - links, disclaimer
 
 JSON-LD: `WebSite` + `Organization`
 
@@ -517,12 +517,12 @@ export const POST: APIRoute = async ({ request }) => {
 ### 3.3 Strategy Pages
 
 Build four pages with Article JSON-LD:
-- `/strategy/index.astro` — overview + links
-- `/strategy/drip.astro` — DRIP mechanics, compounding examples
-- `/strategy/margin.astro` — margin arbitrage, risk disclosure
-- `/strategy/fi-timeline.astro` — FI Score concept
+- `/strategy/index.astro` - overview + links
+- `/strategy/drip.astro` - DRIP mechanics, compounding examples
+- `/strategy/margin.astro` - margin arbitrage, risk disclosure
+- `/strategy/fi-timeline.astro` - FI Score concept
 
-Each page links to 3–5 relevant ETF profiles.
+Each page links to 3-5 relevant ETF profiles.
 
 ### 3.4 About Page
 
@@ -534,14 +534,14 @@ Each page links to 3–5 relevant ETF profiles.
 ### Sprint 3 Completion Criteria
 
 - [x] Homepage renders with hero, pillar explainer, email capture
-- [x] Email capture POSTs to `/api/subscribe` (**Resend sends when `RESEND_API_KEY`** is set — otherwise `{ emailSent:false }`)
+- [x] Email capture POSTs to `/api/subscribe` (**Resend sends when `RESEND_API_KEY`** is set - otherwise `{ emailSent:false }`)
 - [x] All four strategy pages live with Article schema
 - [x] About page live
 - [x] All public routes above ship unique `<title>` + `<meta description>` *(spot-check periodically for drift)*
 
 ---
 
-## Sprint 4 — Tools (Weeks 8–9)
+## Sprint 4 - Tools (Weeks 8-9)
 
 **Goal:** Compare tool and Stack Builder live (no auth required).
 
@@ -576,14 +576,14 @@ const etfData = await db.select({
 
 ### Sprint 4 Completion Criteria
 
-- [x] Compare tool works with 2–3 ETFs via URL params
+- [x] Compare tool works with 2-3 ETFs via URL params
 - [x] Stack Builder calculates monthly income projection
 - [x] Pillar balance pie chart renders in Stack Builder
 - [x] Both tools mobile-responsive
 
 ---
 
-## Sprint 5 — Blog & SEO (Weeks 10–11)
+## Sprint 5 - Blog & SEO (Weeks 10-11)
 
 **Goal:** Blog running, SEO infrastructure complete, ready for AdSense application.
 
@@ -631,13 +631,13 @@ Production implementation: **`src/pages/sitemap.xml.ts`** declares **`export con
 ### 5.4 Analytics & Monetization Setup
 
 - [ ] Connect Google Search Console
-- [x] GA4 — when `PUBLIC_GA_MEASUREMENT_ID` is set, `src/layouts/Base.astro` injects `gtag.js` + config
+- [x] GA4 - when `PUBLIC_GA_MEASUREMENT_ID` is set, `src/layouts/Base.astro` injects `gtag.js` + config
 - [ ] Submit AdSense application (requires site to have substantial content)
 
 ### Sprint 5 Completion Criteria
 
 - [x] Blog listing and post pages render (`/blog`, `/blog/[slug]`)
-- [x] 6 launch posts drafted in-repo (see §5.2 titles — revise before treating as final editorial)
+- [x] 6 launch posts drafted in-repo (see §5.2 titles - revise before treating as final editorial)
 - [x] **`/sitemap.xml`** emits ETF URLs + static routes + blog posts (needs live DB hit for ETFs)
 - [x] `public/robots.txt` deployed with sitemap hint + crawler blocks on `/api/`, `/app/`
 - [x] Analytics hook (conditional GA4 via **`PUBLIC_GA_MEASUREMENT_ID`**) in **Base layout**
@@ -645,24 +645,24 @@ Production implementation: **`src/pages/sitemap.xml.ts`** declares **`export con
 
 ---
 
-## Sprint 6 — Phase 1 Soft Launch (Week 12)
+## Sprint 6 - Phase 1 Soft Launch (Week 12)
 
 **Goal:** Publicly launch Phase 1 to early adopters and communities.
 
 ### 6.1 Launch Checklist
 
 **Technical:**
-- [ ] Lighthouse audit on homepage, ETF page, screener — target 90+ all metrics
+- [ ] Lighthouse audit on homepage, ETF page, screener - target 90+ all metrics
 - [ ] Mobile responsiveness pass on all pages (test at 375px, 768px, 1280px)
-- [ ] Accessibility audit — keyboard navigation, color contrast, alt text
-- [x] `npm run build` runs clean with zero TypeScript errors *(confirmed — `astro check` 0 errors, build completes in ~8s)*
+- [ ] Accessibility audit - keyboard navigation, color contrast, alt text
+- [x] `npm run build` runs clean with zero TypeScript errors *(confirmed - `astro check` 0 errors, build completes in ~8s)*
 - [ ] Nightly cron tested end-to-end in production (verify Vercel cron fires, check logs)
 - [ ] Load test `/api/etfs` with 50 concurrent requests
 
 **Content:**
 - [x] Disclaimer visible on all ETF and strategy pages *(ETF directory + all four strategy pages; consistent `<Disclaimer />` component throughout)*
 - [x] "Data as of [date]" label on all ETF metric displays *(profiles + compare grid row + contextual notes on directory / home spotlight / stack builder)*
-- [x] Data provider: **Tiingo** (display-permissive free tier — no licensing agreement needed for Phase 1)
+- [x] Data provider: **Tiingo** (display-permissive free tier - no licensing agreement needed for Phase 1)
 - [x] Privacy policy page live (`/privacy`)
 - [x] Terms of service page live (`/terms`)
 
@@ -675,7 +675,7 @@ Production implementation: **`src/pages/sitemap.xml.ts`** declares **`export con
 
 ---
 
-## Sprint 7 — Phase 2 Foundation (Weeks 13–15)
+## Sprint 7 - Phase 2 Foundation (Weeks 13-15)
 
 **Goal:** Auth, payments, and basic app dashboard working end-to-end.
 
@@ -741,7 +741,7 @@ All `src/pages/app/*.astro` files declare `export const prerender = false` at th
 
 ---
 
-## Sprint 8 — Phase 2 Portfolio (Weeks 16–18)
+## Sprint 8 - Phase 2 Portfolio (Weeks 16-18)
 
 **Goal:** Brokerage import, full portfolio view, DRIP modeler.
 
@@ -758,11 +758,11 @@ export const snaptrade = new SnapTrade({
 ```
 
 Implement the OAuth flow (see SPEC.md Section 5.2):
-- `POST /api/brokerage/connect` — register SnapTrade user, generate portal URL
-- `GET /api/brokerage/callback` — receive redirect, trigger portfolio sync
-- `POST /api/portfolio/sync` — fetch holdings, match to `etfs` table, upsert `user_holdings`
+- `POST /api/brokerage/connect` - register SnapTrade user, generate portal URL
+- `GET /api/brokerage/callback` - receive redirect, trigger portfolio sync
+- `POST /api/portfolio/sync` - fetch holdings, match to `etfs` table, upsert `user_holdings`
 
-> Store `snaptradeUserSecret` in encrypted session or derive per-request via HMAC — never in DB plaintext.
+> Store `snaptradeUserSecret` in encrypted session or derive per-request via HMAC - never in DB plaintext.
 
 ### 8.2 Portfolio Page (`/app/portfolio`)
 
@@ -785,7 +785,7 @@ Display as a progress bar on the dashboard.
 
 ### 8.4 DRIP Modeler (`/app/drip`)
 
-Implement `computeDripProjection` in `src/lib/utils/finance.ts` (see SPEC.md Section 10). Output: Chart.js line chart with two series — portfolio value and monthly income — over projection period.
+Implement `computeDripProjection` in `src/lib/utils/finance.ts` (see SPEC.md Section 10). Output: Chart.js line chart with two series - portfolio value and monthly income - over projection period.
 
 Add `user_scenarios` table to schema (run new migration):
 ```typescript
@@ -810,7 +810,7 @@ export const userScenarios = pgTable('user_scenarios', {
 
 ---
 
-## Sprint 9 — Phase 2 Advanced Features (Weeks 19–21)
+## Sprint 9 - Phase 2 Advanced Features (Weeks 19-21)
 
 **Goal:** Margin timeline, dividend calendar, grade alerts, settings page.
 
@@ -869,7 +869,7 @@ for (const alert of pending) {
 
 ---
 
-## Sprint 10 — Phase 2 Launch (Week 22)
+## Sprint 10 - Phase 2 Launch (Week 22)
 
 **Goal:** Production-ready Phase 2, 14-day trial tested, launch campaign.
 
@@ -948,4 +948,4 @@ stripe listen --forward-to localhost:4321/api/stripe/webhook
 
 ---
 
-*ACTION_PLAN v1.0 — Yield to Freedom / Creative Bandit LLC / May 2026*
+*ACTION_PLAN v1.0 - Yield to Freedom / Creative Bandit LLC / May 2026*

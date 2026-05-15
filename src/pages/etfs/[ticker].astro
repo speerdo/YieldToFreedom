@@ -78,23 +78,23 @@ const chartAmounts = chartOrdered.map((d) => Number(d.amount));
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function fmtPct(decStr: string | null | undefined, digits = 2): string {
-  if (decStr == null || decStr === '') return '—';
+  if (decStr == null || decStr === '') return '-';
   const v = Number(decStr);
-  if (!Number.isFinite(v)) return '—';
+  if (!Number.isFinite(v)) return '-';
   return `${(v * 100).toFixed(digits)}%`;
 }
 
 function fmtBillionsUsd(decStr: string | null | undefined): string {
-  if (decStr == null || decStr === '') return '—';
+  if (decStr == null || decStr === '') return '-';
   const v = Number(decStr);
-  if (!Number.isFinite(v)) return '—';
+  if (!Number.isFinite(v)) return '-';
   if (v >= 1e9) return `$${(v / 1e9).toFixed(2)}B`;
   if (v >= 1e6) return `$${(v / 1e6).toFixed(2)}M`;
   return `$${v.toLocaleString()}`;
 }
 
 function fmtUsd(n: number, digits = 4): string {
-  if (!Number.isFinite(n) || n === 0) return '—';
+  if (!Number.isFinite(n) || n === 0) return '-';
   return `$${n.toFixed(digits)}`;
 }
 
@@ -106,13 +106,13 @@ const related = await db
   .orderBy(asc(etfs.ticker))
   .limit(8);
 
-const descText = `${etf.name} (${etf.ticker}) — pillar ${etf.pillar}; Yield to Freedom ETF profile & payouts snapshot.`;
+const descText = `${etf.name} (${etf.ticker}) - pillar ${etf.pillar}; Yield to Freedom ETF profile & payouts snapshot.`;
 
 const schema = {
   '@context': 'https://schema.org',
   '@type': 'FinancialProduct',
   name: etf.name,
-  description: `${etf.name} (${etf.ticker}) — income ETF snapshot for research.`,
+  description: `${etf.name} (${etf.ticker}) - income ETF snapshot for research.`,
 };
 
 const chartId = `dividend-chart-${etf.ticker}`;
@@ -124,7 +124,7 @@ const calcFreq   = etf.dividendFrequency ?? 'monthly';
 const divPerYear = PPY[calcFreq] ?? 12;
 ---
 
-<Base title={`${etf.ticker} ETF — ${etf.name}`} description={descText.slice(0, 160)} schema={schema}>
+<Base title={`${etf.ticker} ETF - ${etf.name}`} description={descText.slice(0, 160)} schema={schema}>
   <article>
 
     <!-- ── Hero ────────────────────────────────────────────────────────────── -->
@@ -147,14 +147,14 @@ const divPerYear = PPY[calcFreq] ?? 12;
       </div>
 
       <div class="rounded-xl border border-slate-100 bg-slate-50 px-6 py-4 text-xs text-slate-500">
-        <p>YTF grades are research-only — not financial advice.</p>
+        <p>YTF grades are research-only - not financial advice.</p>
         {
           etf.dataLastSynced ? (
             <p class="mt-3 font-medium text-slate-700">
               Data as of {(etf.dataLastSynced instanceof Date ? etf.dataLastSynced : new Date(String(etf.dataLastSynced))).toISOString().slice(0, 10)} (Tiingo).
             </p>
           ) : (
-            <p class="mt-3 font-medium text-amber-800">Pricing has not synced yet — run nightly sync.</p>
+            <p class="mt-3 font-medium text-amber-800">Pricing has not synced yet - run nightly sync.</p>
           )
         }
       </div>
@@ -165,7 +165,7 @@ const divPerYear = PPY[calcFreq] ?? 12;
       <Card>
         <p class="text-xs font-semibold uppercase text-slate-500">Last price</p>
         <p class="mt-2 text-2xl font-semibold tabular-nums">
-          {calcPrice > 0 ? `$${calcPrice.toFixed(2)}` : '—'}
+          {calcPrice > 0 ? `$${calcPrice.toFixed(2)}` : '-'}
         </p>
       </Card>
       <Card>
@@ -182,12 +182,12 @@ const divPerYear = PPY[calcFreq] ?? 12;
       </Card>
       <Card>
         <p class="text-xs font-semibold uppercase text-slate-500">Distribution frequency</p>
-        <p class="mt-2 text-2xl font-semibold capitalize">{etf.dividendFrequency ?? '—'}</p>
+        <p class="mt-2 text-2xl font-semibold capitalize">{etf.dividendFrequency ?? '-'}</p>
       </Card>
       <Card>
         <p class="text-xs font-semibold uppercase text-slate-500">YTF grade</p>
         <div class="mt-2"><GradeChip grade={etf.ytfGrade} /></div>
-        <p class="mt-2 text-xs tabular-nums text-slate-600">Score {etf.ytfScore ?? '—'} / 100</p>
+        <p class="mt-2 text-xs tabular-nums text-slate-600">Score {etf.ytfScore ?? '-'} / 100</p>
       </Card>
     </div>
 
@@ -278,21 +278,21 @@ const divPerYear = PPY[calcFreq] ?? 12;
                   <p class="text-xs" style="color: var(--section-ink-muted)">
                     {calcFreq === 'weekly' ? 'per week' : calcFreq === 'quarterly' ? 'per quarter' : calcFreq === 'semi-annual' ? 'per 6 months' : 'per month'}
                   </p>
-                  <p class="mt-1.5 text-2xl font-bold tabular-nums" id="calc-period">—</p>
+                  <p class="mt-1.5 text-2xl font-bold tabular-nums" id="calc-period">-</p>
                 </div>
 
-                <!-- Monthly avg — skip for monthly payers (same as per payment) -->
+                <!-- Monthly avg - skip for monthly payers (same as per payment) -->
                 {calcFreq !== 'monthly' && (
                   <div class="rounded-xl bg-white/10 px-4 py-3">
                     <p class="text-xs" style="color: var(--section-ink-muted)">monthly avg</p>
-                    <p class="mt-1.5 text-2xl font-bold tabular-nums" id="calc-monthly">—</p>
+                    <p class="mt-1.5 text-2xl font-bold tabular-nums" id="calc-monthly">-</p>
                   </div>
                 )}
 
-                <!-- Annual — spans full width on mobile when 3-chip layout -->
+                <!-- Annual - spans full width on mobile when 3-chip layout -->
                 <div class={`rounded-xl bg-white/10 px-4 py-3 ${calcFreq !== 'monthly' ? 'col-span-2 sm:col-span-1' : ''}`}>
                   <p class="text-xs" style="color: var(--section-ink-muted)">per year</p>
-                  <p class="mt-1.5 text-2xl font-bold tabular-nums" id="calc-annual">—</p>
+                  <p class="mt-1.5 text-2xl font-bold tabular-nums" id="calc-annual">-</p>
                 </div>
               </div>
             </div>
@@ -322,11 +322,11 @@ const divPerYear = PPY[calcFreq] ?? 12;
                   const prev = next ? Number(next.amount) : null;
                   const chg = prev && prev > 0 ? (curr - prev) / prev : null;
                   const chgCls = chg === null ? '' : chg > 0.005 ? 'text-emerald-700' : chg < -0.005 ? 'text-rose-700' : 'text-slate-400';
-                  const chgStr = chg === null ? '—' : chg >= 0 ? `+${(chg * 100).toFixed(1)}%` : `${(chg * 100).toFixed(1)}%`;
+                  const chgStr = chg === null ? '-' : chg >= 0 ? `+${(chg * 100).toFixed(1)}%` : `${(chg * 100).toFixed(1)}%`;
                   return (
                     <tr class="hover:bg-slate-50/60">
                       <td class="px-4 py-2.5 tabular-nums text-slate-800">{String(d.exDate)}</td>
-                      <td class="px-4 py-2.5 tabular-nums text-slate-500">{d.paymentDate ? String(d.paymentDate) : '—'}</td>
+                      <td class="px-4 py-2.5 tabular-nums text-slate-500">{d.paymentDate ? String(d.paymentDate) : '-'}</td>
                       <td class="px-4 py-2.5 text-right tabular-nums font-medium text-slate-900">${curr.toFixed(4)}</td>
                       <td class={`px-4 py-2.5 text-right tabular-nums text-xs font-medium ${chgCls}`}>{chgStr}</td>
                     </tr>
@@ -357,7 +357,7 @@ const divPerYear = PPY[calcFreq] ?? 12;
     </section>
 
     <p class="mt-10 text-xs text-slate-500">
-      Expense ratio / issuer / frequency sourced from fund disclosures. AUM is approximate market capitalisation — confirm via fund factsheets. Yield and price data via Tiingo.
+      Expense ratio / issuer / frequency sourced from fund disclosures. AUM is approximate market capitalisation - confirm via fund factsheets. Yield and price data via Tiingo.
     </p>
 
     <Disclaimer />
@@ -383,9 +383,9 @@ const divPerYear = PPY[calcFreq] ?? 12;
     const update = () => {
       const inv = parseFloat(input?.value ?? '0');
       if (!Number.isFinite(inv) || inv <= 0 || annualYield <= 0) {
-        if (periodEl)  periodEl.textContent  = '—';
-        if (monthlyEl) monthlyEl.textContent = '—';
-        if (annualEl)  annualEl.textContent  = '—';
+        if (periodEl)  periodEl.textContent  = '-';
+        if (monthlyEl) monthlyEl.textContent = '-';
+        if (annualEl)  annualEl.textContent  = '-';
         return;
       }
       const annual = inv * annualYield;

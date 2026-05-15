@@ -1,6 +1,6 @@
 ---
 title: 'High-Yield ETFs Ranked: Our A-to-D Grading System Explained'
-description: 'How Yield to Freedom scores income ETFs from 0–100 and maps them to letter grades—plus what the score does not capture.'
+description: 'How Yield to Freedom scores income ETFs from 0-100 and maps them to letter grades, plus what the score does not capture.'
 pubDate: 2026-05-10
 image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80'
 imageAlt: 'Data analysis and research documents spread across a desk for ETF grading methodology'
@@ -16,7 +16,7 @@ Grades summarize how well an ETF aligns with **income-forward, sleeve-based plan
 ## The mechanics (high level)
 
 - Raw inputs come from Neon after FMP nightly sync succeeds (otherwise metrics may be sparse).
-- A deterministic function (`src/lib/grader/grade.ts`) produces a **0–100 score** mapped to **A / B / C / D**.
+- A deterministic function (`src/lib/grader/grade.ts`) produces a **0-100 score** mapped to **A / B / C / D**.
 - History is logged to `etf_grade_history` when the cron grader runs.
 
 ## What grades deliberately ignore
@@ -29,4 +29,4 @@ Whenever you see a chip on the site, the fine print applies: **YTF grades are fo
 
 **Browse the universe:** [ETF directory](/etfs) · **Compare funds:** [/compare](/compare)
 
-*Educational only — not investment advice.*
+*Educational only - not investment advice.*

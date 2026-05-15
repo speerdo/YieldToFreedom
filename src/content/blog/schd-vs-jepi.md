@@ -12,9 +12,9 @@ relatedEtfs: ['SCHD', 'JEPI']
 
 Neither label tells you taxes, sequencing risk, or whether you need NAV stability vs. paycheck replacement. Ask:
 
-1. **Do you reinvest distributions or spend them?** SCHD holders often accumulate share count through DRIP-like behavior; JEPI investors frequently spend coupons—make sure NAV path matches expectations.
+1. **Do you reinvest distributions or spend them?** SCHD holders often accumulate share count through DRIP-like behavior; JEPI investors frequently spend coupons. Make sure NAV path matches expectations.
 2. **How sensitive are you to distribution volatility?** Option funds can reshuffle payouts as implied volatility regimes change; SCHD dividends can rise slowly but seldom feel “high coupon.”
-3. **What pillar are you defending?** In the Yield to Freedom taxonomy SCHD skews toward **stability/consistency**, while JEPI lives in **income/max cash today** buckets—overlap is intentional, not contradictory.
+3. **What pillar are you defending?** In the Yield to Freedom taxonomy SCHD skews toward **stability/consistency**, while JEPI lives in **income/max cash today** buckets; overlap is intentional, not contradictory.
 
 Compare live snapshots (always verify elsewhere):
 
@@ -22,4 +22,4 @@ Compare live snapshots (always verify elsewhere):
 - [JEPI profile](/etfs/JEPI)
 - [/compare preset](/compare?a=SCHD&b=JEPI)
 
-*Educational only — verify prospectuses before investing.*
+*Educational only - verify prospectuses before investing.*
