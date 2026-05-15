@@ -11,6 +11,7 @@ const catalog = await db
     ticker: etfs.ticker,
     name: etfs.name,
     pillar: etfs.pillar,
+    category: etfs.category,
   })
   .from(etfs)
   .where(eq(etfs.isActive, true))
@@ -63,10 +64,10 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
                 @change="onTickerChange(col)"
               >
                 <option value="">(none)</option>
-                <template x-for="row in filteredCatalog()" :key="row.ticker">
+                <template x-for="row in filteredCatalogForCol(col)" :key="row.ticker">
                   <option
                     :value="row.ticker"
-                    x-text="`${row.ticker} - ${row.name.length > 38 ? row.name.slice(0, 38) + '…' : row.name}`"
+                    x-text="optionLabel(row)"
                   ></option>
                 </template>
               </select>
@@ -173,6 +174,7 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
     ticker: string;
     name: string;
     pillar: string;
+    category: string | null;
   }
 
   interface EtfApiRow {
@@ -248,12 +250,26 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
       loading: false,
       CANVAS_ID: 'ytf-compare-yield-chart',
 
-      filteredCatalog(): CatalogRow[] {
-        if (this.filterPillar === 'all') return this.catalog;
-        const selected = new Set(this.tickers.filter(Boolean));
-        return this.catalog.filter(
-          (r: CatalogRow) => r.pillar === this.filterPillar || selected.has(r.ticker),
-        );
+      /** Pillar tabs filter the pick list; each slot only adds its own value if missing (not all three slots). */
+      filteredCatalogForCol(col: number): CatalogRow[] {
+        const base =
+          this.filterPillar === 'all'
+            ? this.catalog
+            : this.catalog.filter((r: CatalogRow) => r.pillar === this.filterPillar);
+        const pick = String(this.tickers[col] ?? '')
+          .trim()
+          .toUpperCase();
+        if (!pick) return base;
+        if (base.some((r: CatalogRow) => r.ticker.toUpperCase() === pick)) return base;
+        const row = this.catalog.find((r: CatalogRow) => r.ticker.toUpperCase() === pick);
+        return row ? [...base, row] : base;
+      },
+
+      optionLabel(row: CatalogRow): string {
+        const title = row.name.length > 32 ? `${row.name.slice(0, 32)}…` : row.name;
+        const cat = row.category ? String(row.category).replace(/-/g, ' ') : '';
+        const tail = cat ? ` · ${row.pillar} · ${cat}` : ` · ${row.pillar}`;
+        return `${row.ticker} — ${title}${tail}`;
       },
 
       tickerSet(): Set<string> {

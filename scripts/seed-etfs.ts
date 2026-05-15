@@ -16,7 +16,8 @@ import { etfs } from '../src/lib/db/schema';
 // incomeSynthetic: true for ETFs that generate distributions via options
 // strategies rather than from underlying dividends (covered-call, YieldMax, etc.)
 //
-// Add new ETFs here; re-running the script is safe (ON CONFLICT DO NOTHING).
+// Add new ETFs here; re-running upserts name / pillar / category / incomeSynthetic
+// from this file so taxonomy stays canonical (ON CONFLICT DO UPDATE).
 // After seeding, run: npx tsx scripts/seed-etf-statics.ts  to fill ER / AUM.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -309,9 +310,24 @@ const ETF_UNIVERSE = [
 for (const etf of ETF_UNIVERSE) {
   await db
     .insert(etfs)
-    .values(etf)
-    .onConflictDoNothing({ target: etfs.ticker });
-  console.log(`  seeded ${etf.ticker}`);
+    .values({
+      ticker: etf.ticker,
+      name: etf.name,
+      pillar: etf.pillar,
+      category: etf.category,
+      incomeSynthetic: etf.incomeSynthetic,
+    })
+    .onConflictDoUpdate({
+      target: etfs.ticker,
+      set: {
+        name: etf.name,
+        pillar: etf.pillar,
+        category: etf.category,
+        incomeSynthetic: etf.incomeSynthetic,
+        updatedAt: new Date(),
+      },
+    });
+  console.log(`  upserted ${etf.ticker}`);
 }
 
-console.log(`\nDone - ${ETF_UNIVERSE.length} ETFs in universe.`);
+console.log(`\nDone - ${ETF_UNIVERSE.length} ETFs in universe (taxonomy reconciled on conflict).`);
