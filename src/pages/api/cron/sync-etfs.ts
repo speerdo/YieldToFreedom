@@ -96,6 +96,7 @@ function inferDividendFrequency(historyRows: TiingoEodRow[]): string | null {
 
   const count = historyRows.filter(r => r.date.slice(0, 10) >= cutoff && r.divCash > 0).length;
 
+  if (count >= 40) return 'weekly';
   if (count >= 10) return 'monthly';
   if (count >= 3) return 'quarterly';
   if (count >= 1) return 'annual';
@@ -135,11 +136,9 @@ function buildDividendRows(
       yieldAtPayment: null,
       adjAmount: adjAmount != null ? adjAmount.toFixed(6) : null,
     });
-
-    if (out.length >= 48) break;
   }
 
-  return out.sort((a, b) => b.exDate.localeCompare(a.exDate)).slice(0, 24);
+  return out.sort((a, b) => b.exDate.localeCompare(a.exDate));
 }
 
 /**
@@ -176,11 +175,9 @@ function buildDividendRowsFromEod(
       yieldAtPayment: null,
       adjAmount: null,
     });
-
-    if (out.length >= 48) break;
   }
 
-  return out.sort((a, b) => b.exDate.localeCompare(a.exDate)).slice(0, 24);
+  return out.sort((a, b) => b.exDate.localeCompare(a.exDate));
 }
 
 export const GET: APIRoute = async ({ request }) => {
