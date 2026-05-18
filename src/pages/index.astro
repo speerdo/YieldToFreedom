@@ -58,7 +58,7 @@ const pillarCopy = [
     key: 'income' as PillarKey,
     title: 'Income',
     blurb:
-      'Prioritize distributable cash flow - covered-call premiums, BDC-style payouts, and other sleeves engineered to pay you while you stay invested.',
+      'High-yield ETFs designed to pay you consistently — through covered-call strategies, real-asset income, and other structures engineered to generate cash while you stay invested. The engine behind your monthly paycheck.',
     examples: [
       { ticker: 'JEPI', href: '/etfs/JEPI' },
       { ticker: 'JEPQ', href: '/etfs/JEPQ' },
@@ -67,13 +67,12 @@ const pillarCopy = [
     image: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&w=800&q=80',
     imageAlt: 'Stacked coins representing passive dividend income',
     color: 'blue' as const,
-    allocation: '40%',
   },
   {
     key: 'stability' as PillarKey,
     title: 'Stability',
     blurb:
-      'Dividend growers and quality screens that aim to compound through cycles with less drama than pure high-yield chasing.',
+      'ETFs that raise their dividends year after year through recessions and rallies alike. Quality-screened funds that protect your income stream and cushion downturns — the backbone that keeps your portfolio durable.',
     examples: [
       { ticker: 'SCHD', href: '/etfs/SCHD' },
       { ticker: 'VIG', href: '/etfs/VIG' },
@@ -82,13 +81,12 @@ const pillarCopy = [
     image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80',
     imageAlt: 'Serene mountain lake reflecting stability and permanence',
     color: 'violet' as const,
-    allocation: '30%',
   },
   {
     key: 'growth' as PillarKey,
     title: 'Growth',
     blurb:
-      'Core beta and thematic exposure that can still throw off some yield while keeping equity growth in the portfolio.',
+      'Broad-market and thematic ETFs that capture equity upside while still generating some yield. This pillar ensures your portfolio keeps growing in value over time — not just paying income today.',
     examples: [
       { ticker: 'VOO', href: '/etfs/VOO' },
       { ticker: 'QQQ', href: '/etfs/QQQ' },
@@ -97,7 +95,6 @@ const pillarCopy = [
     image: 'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&w=800&q=80',
     imageAlt: 'Lush green terraced landscape representing compound growth',
     color: 'emerald' as const,
-    allocation: '30%',
   },
 ];
 
@@ -127,8 +124,8 @@ function fmtPct(s: string | null | undefined, digits = 2) {
 ---
 
 <Base
-  title="Yield to Freedom - Income ETF Research"
-  description="Income-first ETF research mapped to Yield to Freedom pillars - Income, Stability, and Growth - plus starter guides for long-term builders."
+  title="Yield to Freedom - Income ETF Research & Dividend Strategy"
+  description="Research dividend ETFs across three complementary pillars — high-yield income, dividend-growth stability, and equity growth — so your portfolio pays you today and tomorrow."
   schema={homeSchema}
   fullWidth
 >
@@ -205,11 +202,14 @@ function fmtPct(s: string | null | undefined, digits = 2) {
   <section class="mx-auto max-w-6xl px-6 py-20 sm:py-24">
     <div class="text-center">
       <p class="text-sm font-semibold uppercase tracking-[0.15em] text-blue-700">The framework</p>
-      <h2 class="font-heading mt-3 text-3xl font-bold text-slate-900 sm:text-4xl">Three pillars (40 / 30 / 30)</h2>
+      <h2 class="font-heading mt-3 text-3xl font-bold text-slate-900 sm:text-4xl">Three pillars, one balanced income strategy</h2>
       <p class="mx-auto mt-4 max-w-2xl text-slate-600">
-        Every ETF profile is tagged to a pillar so you can balance <strong>cash flow</strong>,{' '}
-        <strong>compounding quality</strong>, and <strong>growth</strong> without guessing which bucket a fund
-        belongs in.
+        Chasing the highest yield alone is a trap — funds with 15%+ yields often erode their own price over time,
+        leaving you with less capital and shrinking payouts. A balanced income portfolio combines three roles:
+        <strong>high-yield income</strong> funds that maximize your immediate cash flow,{' '}
+        <strong>dividend-growth</strong> funds that raise their payouts reliably through every market cycle, and{' '}
+        <strong>equity growth</strong> funds that keep your principal expanding. Together they give you income today,
+        income tomorrow, and a portfolio that compounds.
       </p>
     </div>
 
@@ -229,11 +229,6 @@ function fmtPct(s: string | null | undefined, digits = 2) {
                   loading="lazy"
                 />
                 <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                <div class="absolute bottom-3 left-3">
-                  <span class={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${c.badge}`}>
-                    {col.allocation} of portfolio
-                  </span>
-                </div>
               </div>
               <div class="p-6">
                 <h3 class="font-heading text-lg font-bold text-slate-900">{col.title}</h3>
@@ -319,17 +314,12 @@ function fmtPct(s: string | null | undefined, digits = 2) {
 
   <!-- ── LATEST FROM THE BLOG ─────────────────────────────────────────── -->
   <section class="mx-auto max-w-6xl px-6 py-20 sm:py-24">
-    <div class="flex items-end justify-between gap-4">
-      <div>
-        <p class="text-sm font-semibold uppercase tracking-[0.15em] text-blue-700">Research</p>
-        <h2 class="font-heading mt-3 text-3xl font-bold text-slate-900 sm:text-4xl">Latest from the blog</h2>
-      </div>
-      <a
-        href="/blog"
-        class="shrink-0 text-sm font-semibold text-blue-700 hover:text-blue-900"
-      >
-        All posts →
-      </a>
+    <div class="text-center">
+      <p class="text-sm font-semibold uppercase tracking-[0.15em] text-blue-700">Research</p>
+      <h2 class="font-heading mt-3 text-3xl font-bold text-slate-900 sm:text-4xl">Latest from the blog</h2>
+      <p class="mx-auto mt-4 max-w-2xl text-slate-600">
+        In-depth comparisons, strategy guides, and plain-English explainers for income-focused investors.
+      </p>
     </div>
 
     <ul class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -377,6 +367,11 @@ function fmtPct(s: string | null | undefined, digits = 2) {
         ))
       }
     </ul>
+    <div class="mt-10 text-center">
+      <a href="/blog" class="text-sm font-semibold text-blue-700 hover:text-blue-900">
+        View all posts →
+      </a>
+    </div>
   </section>
 
   <!-- ── NEWSLETTER CTA ────────────────────────────────────────────────── -->
