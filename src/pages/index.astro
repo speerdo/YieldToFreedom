@@ -64,8 +64,8 @@ const pillarCopy = [
       { ticker: 'JEPQ', href: '/etfs/JEPQ' },
       { ticker: 'QYLD', href: '/etfs/QYLD' },
     ],
-    image: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&w=800&q=80',
-    imageAlt: 'Stacked coins representing passive dividend income',
+    image: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=800&q=80',
+    imageAlt: 'Fanned-out US dollar bills representing cash income and cashflow',
     color: 'blue' as const,
   },
   {
@@ -120,6 +120,17 @@ function fmtPct(s: string | null | undefined, digits = 2) {
   if (s === null || s === undefined || s === '') return '-';
   const n = Number(s);
   return Number.isFinite(n) ? `${(n * 100).toFixed(digits)}%` : '-';
+}
+
+function fmtScore(s: string | null | undefined) {
+  if (s === null || s === undefined || s === '') return '-';
+  const n = Number(s);
+  return Number.isFinite(n) ? n.toFixed(1) : '-';
+}
+
+function fmtFreq(s: string | null | undefined) {
+  if (!s) return '-';
+  return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 }
 ---
 
@@ -275,14 +286,20 @@ function fmtPct(s: string | null | undefined, digits = 2) {
               <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">{pillar}</p>
               {row ? (
                 <>
-                  <div class="mt-2 flex items-center gap-3">
-                    <a
-                      class="font-heading text-2xl font-bold text-blue-900 hover:underline"
-                      href={`/etfs/${row.ticker}`}
-                    >
-                      {row.ticker}
-                    </a>
-                    <GradeChip grade={row.ytfGrade} />
+                  <div class="mt-2 flex items-start justify-between gap-2">
+                    <div class="flex items-center gap-3">
+                      <a
+                        class="font-heading text-2xl font-bold text-blue-900 hover:underline"
+                        href={`/etfs/${row.ticker}`}
+                      >
+                        {row.ticker}
+                      </a>
+                      <GradeChip grade={row.ytfGrade} />
+                    </div>
+                    <div class="text-right">
+                      <span class="font-heading text-2xl font-bold text-slate-900">{fmtScore(row.ytfScore)}</span>
+                      <span class="text-xs text-slate-400">/100</span>
+                    </div>
                   </div>
                   <p class="mt-2 line-clamp-2 text-sm text-slate-600">{row.name}</p>
                   <dl class="mt-4 space-y-1.5 text-sm">
@@ -290,8 +307,16 @@ function fmtPct(s: string | null | undefined, digits = 2) {
                       <dt class="text-slate-500">T12M yield</dt>
                       <dd class="font-semibold tabular-nums text-slate-900">{fmtPct(row.trailing12mYield)}</dd>
                     </div>
+                    <div class="flex justify-between gap-4 border-b border-slate-100 pb-1.5">
+                      <dt class="text-slate-500">1Y return</dt>
+                      <dd class="font-semibold tabular-nums text-slate-900">{fmtPct(row.return1y)}</dd>
+                    </div>
+                    <div class="flex justify-between gap-4 border-b border-slate-100 pb-1.5">
+                      <dt class="text-slate-500">Pay frequency</dt>
+                      <dd class="font-semibold text-slate-900">{fmtFreq(row.dividendFrequency)}</dd>
+                    </div>
                     <div class="flex justify-between gap-4">
-                      <dt class="text-slate-500">Expense ratio*</dt>
+                      <dt class="text-slate-500">Expense ratio</dt>
                       <dd class="font-semibold tabular-nums text-slate-900">{fmtPct(row.expenseRatio, 3)}</dd>
                     </div>
                   </dl>
