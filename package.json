@@ -20,7 +20,8 @@
     "backfill:prices": "tsx scripts/backfill-prices.ts",
     "backfill:dividends": "tsx scripts/backfill-dividends.ts",
     "backfill:metadata": "tsx scripts/backfill-metadata.ts",
-    "run-grader": "tsx scripts/run-grader.ts"
+    "run-grader": "tsx scripts/run-grader.ts",
+    "sync:etfs": "tsx scripts/sync-etfs.ts"
   },
   "dependencies": {
     "@astrojs/vercel": "10.0.6",
