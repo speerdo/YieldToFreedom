@@ -3,7 +3,8 @@
  *
  * Uses the same source as the nightly sync: EOD price history from Tiingo,
  * extracting rows where divCash > 0. The dedicated /tiingo/dividends/ endpoint
- * requires a higher plan tier; the EOD approach works on all plans.
+ * returns 404 for some tickers (new funds, recently renamed) so this script
+ * uses the EOD fallback the same way sync-etfs.ts does.
  *
  * Usage:
  *   npm run backfill:dividends
