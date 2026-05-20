@@ -8,14 +8,14 @@ const themes = [
 ---
 
 <div class="relative" id="theme-switcher">
-  <!-- Trigger: 4-quadrant circle icon -->
+  <!-- Trigger: 4-quadrant circle -->
   <button
     id="theme-toggle-btn"
     title="Change theme"
     aria-label="Open theme switcher"
     aria-expanded="false"
     aria-haspopup="true"
-    class="flex items-center text-[var(--fg-muted)] hover:text-[var(--fg)] focus-visible:outline-none"
+    class="flex h-10 w-10 items-center justify-center text-[var(--fg-muted)] hover:text-[var(--fg)] focus-visible:outline-none"
   >
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 16 16" aria-hidden="true">
       <path d="M8,8 L1,8 A7,7,0,0,1,8,1 Z"  fill="#e2e8f0"/>
@@ -26,23 +26,22 @@ const themes = [
     </svg>
   </button>
 
-  <!-- Popover swatch box -->
+  <!-- Popover swatch grid -->
   <div
     id="theme-toggle-box"
     role="group"
     aria-label="Choose theme"
-    class="absolute right-0 top-full z-10 mt-2 hidden rounded-lg border border-[var(--border)] bg-[var(--bg-card)] shadow-lg"
-    style="padding: 10px;"
+    class="absolute right-0 top-full z-50 mt-2 hidden rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 shadow-xl"
   >
-    <div style="display: grid; grid-template-columns: 20px 20px; gap: 8px;">
+    <div class="theme-grid">
       {themes.map(t => (
         <button
           data-theme-id={t.id}
-          title={`${t.label} theme`}
+          title={t.label}
           aria-label={`Switch to ${t.label} theme`}
           aria-pressed="false"
-          class="theme-swatch focus-visible:outline-none"
-          style={`background:${t.bg}; width: 20px; height: 20px; border-radius: 50%; display: block; flex-shrink: 0;`}
+          class="theme-swatch"
+          style={`background:${t.bg};`}
         />
       ))}
     </div>
@@ -50,22 +49,34 @@ const themes = [
 </div>
 
 <style>
+  .theme-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
   .theme-swatch {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     border: 1px solid color-mix(in srgb, var(--fg) 20%, transparent);
     transition: transform 0.1s;
+    cursor: pointer;
   }
+
   .theme-swatch:hover {
-    transform: scale(1.15);
+    transform: scale(1.1);
   }
+
   .theme-swatch[aria-pressed="true"] {
-    box-shadow: 0 0 0 1.5px var(--bg-card), 0 0 0 3px var(--fg);
+    box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px var(--fg);
   }
 </style>
 
 <script is:inline>
   (function () {
-    var btn = document.getElementById('theme-toggle-btn');
-    var box = document.getElementById('theme-toggle-box');
+    var btn   = document.getElementById('theme-toggle-btn');
+    var box   = document.getElementById('theme-toggle-box');
     var saved = localStorage.getItem('ytf-theme') || 'light';
 
     function mark(id) {
@@ -74,7 +85,7 @@ const themes = [
       });
     }
 
-    function close() {
+    function closeBox() {
       box.classList.add('hidden');
       btn.setAttribute('aria-expanded', 'false');
     }
@@ -85,14 +96,14 @@ const themes = [
       e.stopPropagation();
       var isOpen = !box.classList.contains('hidden');
       if (isOpen) {
-        close();
+        closeBox();
       } else {
         box.classList.remove('hidden');
         btn.setAttribute('aria-expanded', 'true');
       }
     });
 
-    document.addEventListener('click', close);
+    document.addEventListener('click', closeBox);
     box.addEventListener('click', function (e) { e.stopPropagation(); });
 
     document.querySelectorAll('.theme-swatch').forEach(function (swatch) {
@@ -101,7 +112,7 @@ const themes = [
         document.documentElement.setAttribute('data-theme', id);
         localStorage.setItem('ytf-theme', id);
         mark(id);
-        close();
+        closeBox();
       });
     });
   })();

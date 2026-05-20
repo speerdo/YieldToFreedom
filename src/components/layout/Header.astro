@@ -2,22 +2,90 @@
 import ThemeToggle from './ThemeToggle.astro';
 ---
 <header class="border-b border-[var(--border)] bg-[var(--bg)]">
-  <div class="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-4">
+  <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4">
+
+    <!-- Logo -->
     <a href="/" class="font-heading flex items-center gap-2 font-bold tracking-tight text-[var(--fg)]">
       <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
         <rect width="28" height="28" rx="7" fill="#2563eb"/>
-        <!-- jagged upward-trending line -->
         <polyline points="3,23 7,16 10,19 14,11 18,14 24,4" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       Yield to Freedom
     </a>
-    <nav class="flex flex-wrap items-center gap-6 text-sm font-medium text-[var(--fg-muted)]">
-      <a href="/etfs"         class="hover:text-[var(--fg)]">ETFs</a>
-      <a href="/compare"      class="hover:text-[var(--fg)]">Compare</a>
-      <a href="/blog"         class="hover:text-[var(--fg)]">Blog</a>
-      <a href="/strategy"     class="hover:text-[var(--fg)]">Strategy</a>
-      <a href="/about"        class="hover:text-[var(--fg)]">About</a>
+
+    <!-- Desktop nav -->
+    <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-[var(--fg-muted)]">
+      <a href="/etfs"      class="hover:text-[var(--fg)]">ETFs</a>
+      <a href="/compare"   class="hover:text-[var(--fg)]">Compare</a>
+      <a href="/blog"      class="hover:text-[var(--fg)]">Blog</a>
+      <a href="/strategy"  class="hover:text-[var(--fg)]">Strategy</a>
+      <a href="/about"     class="hover:text-[var(--fg)]">About</a>
       <ThemeToggle />
+    </nav>
+
+    <!-- Mobile controls: theme toggle + hamburger -->
+    <div class="flex items-center gap-2 md:hidden">
+      <ThemeToggle />
+      <button
+        id="mobile-menu-btn"
+        aria-label="Open navigation menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        class="flex h-10 w-10 items-center justify-center rounded-md text-[var(--fg-muted)] hover:text-[var(--fg)]"
+      >
+        <svg id="icon-hamburger" width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+          <line x1="3" y1="6"  x2="19" y2="6"  stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="3" y1="11" x2="19" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="3" y1="16" x2="19" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <svg id="icon-close" width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true" class="hidden">
+          <line x1="5" y1="5"  x2="17" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="17" y1="5" x2="5"  y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile drawer -->
+  <div id="mobile-menu" class="hidden border-t border-[var(--border)] bg-[var(--bg)] md:hidden">
+    <nav class="mx-auto max-w-6xl flex flex-col px-4 text-base font-medium text-[var(--fg-muted)]">
+      <a href="/etfs"      class="border-b border-[var(--border)] py-3 hover:text-[var(--fg)]">ETFs</a>
+      <a href="/compare"   class="border-b border-[var(--border)] py-3 hover:text-[var(--fg)]">Compare</a>
+      <a href="/blog"      class="border-b border-[var(--border)] py-3 hover:text-[var(--fg)]">Blog</a>
+      <a href="/strategy"  class="border-b border-[var(--border)] py-3 hover:text-[var(--fg)]">Strategy</a>
+      <a href="/about"     class="py-3 hover:text-[var(--fg)]">About</a>
     </nav>
   </div>
 </header>
+
+<script is:inline>
+  (function () {
+    var btn  = document.getElementById('mobile-menu-btn');
+    var menu = document.getElementById('mobile-menu');
+    var iconH = document.getElementById('icon-hamburger');
+    var iconX = document.getElementById('icon-close');
+
+    function openMenu() {
+      menu.classList.remove('hidden');
+      iconH.classList.add('hidden');
+      iconX.classList.remove('hidden');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeMenu() {
+      menu.classList.add('hidden');
+      iconH.classList.remove('hidden');
+      iconX.classList.add('hidden');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+
+    btn.addEventListener('click', function () {
+      menu.classList.contains('hidden') ? openMenu() : closeMenu();
+    });
+
+    // Close after navigating
+    menu.querySelectorAll('a').forEach(function (link) {
+      link.addEventListener('click', closeMenu);
+    });
+  })();
+</script>
