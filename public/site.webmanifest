@@ -1,0 +1,21 @@
+{
+  "name": "Yield to Freedom",
+  "short_name": "YTF",
+  "description": "Income ETF research, strategy, and tools",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#0f172a",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    }
+  ]
+}

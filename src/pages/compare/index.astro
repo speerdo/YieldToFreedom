@@ -115,7 +115,11 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
             </template>
           </div>
         </div>
-        <p class="mt-1.5 text-xs text-slate-400" x-text="chartMode === 'total-return' ? 'Price + reinvested dividends · % return from start date' : 'Closing price · % return from start date · dividends not included'"></p>
+        <p class="mt-1.5 text-xs text-slate-400" x-text="chartMode === 'total-return' ? 'Price + reinvested dividends · % return from each ETF\'s first available data point' : 'Closing price · % return from each ETF\'s first available data point · dividends excluded'"></p>
+        <!-- data range notice -->
+        <template x-if="chartDataRanges().length > 0">
+          <p class="mt-2 text-xs text-slate-500" x-html="'Data from: ' + chartDataRanges().join(' &nbsp;·&nbsp; ')"></p>
+        </template>
         <!-- excluded notice -->
         <template x-if="noDataFor.length > 0">
           <p class="mt-3 text-xs text-amber-700 bg-amber-50 rounded px-3 py-1.5">
@@ -458,6 +462,15 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
           await this.pullData();
           (this as { _loadTimer?: number })._loadTimer = undefined;
         }, 120);
+      },
+
+      chartDataRanges(): string[] {
+        return this.usableTickers().map((tk: string) => {
+          const pts = this.priceHistByTicker[tk]?.pricePoints ?? [];
+          if (!pts.length) return '';
+          const first = new Date((pts[0] as { x: number }).x).toISOString().slice(0, 7);
+          return `<span class="font-mono">${tk}</span> ${first}`;
+        }).filter(Boolean);
       },
 
       renderChartOverlay() {

@@ -1,10 +1,11 @@
 /**
- * One-time backfill: populate etf_prices with ~14 months of daily EOD history
- * for every active ETF that has a lastPrice (i.e., Tiingo knows about it).
+ * One-time backfill: populate etf_prices with up to 5 years of daily EOD history
+ * for every active ETF, floored at each ETF's inception date so new funds don't
+ * request data before they existed.
  *
  * The nightly sync-etfs cron adds one row per day going forward; this script
  * fills the historical window so the /compare price and total-return charts
- * have data to display immediately.
+ * have rich data to display.
  *
  * Usage:
  *   npm run backfill:prices
@@ -13,7 +14,7 @@
  */
 import 'dotenv/config';
 
-import { eq, isNotNull } from 'drizzle-orm';
+import { isNotNull } from 'drizzle-orm';
 
 import { db } from '../src/lib/db';
 import { etfPrices, etfs } from '../src/lib/db/schema';
@@ -23,25 +24,34 @@ function sleep(ms: number) {
   return new Promise<void>((r) => setTimeout(r, ms));
 }
 
-function dateMonthsAgo(months: number): string {
+function dateYearsAgo(years: number): string {
   const d = new Date();
-  d.setMonth(d.getMonth() - months);
+  d.setFullYear(d.getFullYear() - years);
   return d.toISOString().slice(0, 10);
 }
 
+/** Use ETF inception date as floor, 5 years ago as ceiling. */
+function etfStartDate(inceptionDate: string | null): string {
+  const fiveYearsAgo = dateYearsAgo(5);
+  if (!inceptionDate) return fiveYearsAgo;
+  const inc = String(inceptionDate).slice(0, 10);
+  return inc > fiveYearsAgo ? inc : fiveYearsAgo;
+}
+
 const allEtfs = await db
-  .select({ id: etfs.id, ticker: etfs.ticker })
+  .select({ id: etfs.id, ticker: etfs.ticker, inceptionDate: etfs.inceptionDate })
   .from(etfs)
   .where(isNotNull(etfs.lastPrice))
   .orderBy(etfs.ticker);
 
-const startDate = dateMonthsAgo(14);
-console.log(`Backfilling prices from ${startDate} for ${allEtfs.length} ETFs…\n`);
+console.log(`Backfilling prices (up to 5y, floored at inception) for ${allEtfs.length} ETFs…\n`);
 
 let done = 0;
 let skipped = 0;
 
 for (const etf of allEtfs) {
+  const startDate = etfStartDate(etf.inceptionDate ? String(etf.inceptionDate) : null);
+
   try {
     let rows;
     try {
@@ -73,12 +83,11 @@ for (const etf of allEtfs) {
       }))
       .filter((r) => /^\d{4}-\d{2}-\d{2}$/.test(r.date));
 
-    // Insert in batches of 100 to avoid oversized queries
     for (let i = 0; i < priceRows.length; i += 100) {
       await db.insert(etfPrices).values(priceRows.slice(i, i + 100)).onConflictDoNothing();
     }
 
-    console.log(`  ✓ ${etf.ticker.padEnd(6)} ${rows.length} rows`);
+    console.log(`  ✓ ${etf.ticker.padEnd(6)} ${rows.length} rows  (from ${startDate})`);
     done++;
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);

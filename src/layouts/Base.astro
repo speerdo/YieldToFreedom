@@ -9,8 +9,10 @@ interface Props {
   description: string;
   schema?: object;
   fullWidth?: boolean;
+  ogImage?: string;
+  ogType?: 'website' | 'article';
 }
-const { title, description, schema, fullWidth = false } = Astro.props;
+const { title, description, schema, fullWidth = false, ogImage, ogType } = Astro.props;
 const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID?.trim();
 
 function gaSrc(measurementId: string): string {
@@ -34,7 +36,10 @@ function gaSrc(measurementId: string): string {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
-    <Seo title={title} description={description} schema={schema} />
+    <Seo title={title} description={description} schema={schema} ogImage={ogImage} ogType={ogType} />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#2563eb" />
     {
       gaId ? (
         <>

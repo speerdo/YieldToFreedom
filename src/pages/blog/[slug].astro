@@ -34,7 +34,13 @@ const schema = {
 };
 ---
 
-<Base title={`${post.data.title} - Yield to Freedom`} description={post.data.description} schema={schema}>
+<Base
+  title={`${post.data.title} - Yield to Freedom`}
+  description={post.data.description}
+  schema={schema}
+  ogType="article"
+  ogImage={post.data.image}
+>
   <article
     class="max-w-3xl space-y-4 leading-relaxed text-slate-700 [&_a]:font-semibold [&_a]:text-blue-700 hover:[&_a]:text-blue-900 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-6 [&_h2]:mt-10 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-slate-900 [&_strong]:font-semibold"
   >
