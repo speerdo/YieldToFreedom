@@ -106,13 +106,50 @@ const related = await db
   .orderBy(asc(etfs.ticker))
   .limit(8);
 
-const descText = `${etf.name} (${etf.ticker}) - pillar ${etf.pillar}; Yield to Freedom ETF profile & payouts snapshot.`;
+const site = 'https://yieldtofreedom.com';
+const pageUrl = `${site}/etfs/${etf.ticker}`;
+
+// Build a human-readable description that's useful as a meta description
+const yieldStr = etf.trailing12mYield ? `${(Number(etf.trailing12mYield) * 100).toFixed(2)}% TTM yield` : null;
+const expStr = etf.expenseRatio ? `${(Number(etf.expenseRatio) * 100).toFixed(2)}% expense ratio` : null;
+const freqStr = etf.dividendFrequency ? `${etf.dividendFrequency} distributions` : null;
+const metaParts = [yieldStr, expStr, freqStr].filter(Boolean);
+const descText = metaParts.length
+  ? `${etf.name} (${etf.ticker}): ${metaParts.join(', ')}. Income ETF research, payout history & tools on Yield to Freedom.`
+  : `${etf.name} (${etf.ticker}) - income ETF research, payout history, and analysis on Yield to Freedom.`;
 
 const schema = {
   '@context': 'https://schema.org',
-  '@type': 'FinancialProduct',
-  name: etf.name,
-  description: `${etf.name} (${etf.ticker}) - income ETF snapshot for research.`,
+  '@graph': [
+    {
+      '@type': 'FinancialProduct',
+      '@id': `${pageUrl}#etf`,
+      name: etf.name,
+      tickerSymbol: etf.ticker,
+      description: descText.slice(0, 200),
+      url: pageUrl,
+      ...(etf.issuer ? { provider: { '@type': 'Organization', name: etf.issuer } } : {}),
+      ...(etf.exchange ? { exchangeCode: etf.exchange } : {}),
+      ...(etf.inceptionDate ? { foundingDate: String(etf.inceptionDate) } : {}),
+      ...(etf.trailing12mYield
+        ? {
+            annualPercentageRate: {
+              '@type': 'QuantitativeValue',
+              value: (Number(etf.trailing12mYield) * 100).toFixed(4),
+              unitCode: 'P1',
+            },
+          }
+        : {}),
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: site },
+        { '@type': 'ListItem', position: 2, name: 'ETFs', item: `${site}/etfs` },
+        { '@type': 'ListItem', position: 3, name: etf.ticker, item: pageUrl },
+      ],
+    },
+  ],
 };
 
 const chartId = `dividend-chart-${etf.ticker}`;
@@ -124,7 +161,11 @@ const calcFreq   = etf.dividendFrequency ?? 'monthly';
 const divPerYear = PPY[calcFreq] ?? 12;
 ---
 
-<Base title={`${etf.ticker} ETF - ${etf.name}`} description={descText.slice(0, 160)} schema={schema}>
+<Base
+  title={`${etf.ticker} ETF - ${etf.name} | Yield to Freedom`}
+  description={descText.slice(0, 160)}
+  schema={schema}
+>
   <article>
 
     <!-- ── Hero ────────────────────────────────────────────────────────────── -->
@@ -132,10 +173,11 @@ const divPerYear = PPY[calcFreq] ?? 12;
       <div>
         <p class="text-sm font-semibold uppercase tracking-wide text-slate-500">ETF profile</p>
         <div class="mt-2 flex flex-wrap items-center gap-3">
-          <h1 class="text-4xl font-bold tracking-tight text-slate-900">{etf.ticker}</h1>
+          <h1 class="text-4xl font-bold tracking-tight text-slate-900">
+            {etf.ticker} <span class="text-2xl font-semibold text-slate-600">— {etf.name}</span>
+          </h1>
           <GradeChip grade={etf.ytfGrade} />
         </div>
-        <p class="mt-2 max-w-2xl text-lg text-slate-700">{etf.name}</p>
         <div class="mt-4 flex flex-wrap items-center gap-3">
           <a
             href={`/compare?a=${etf.ticker}`}

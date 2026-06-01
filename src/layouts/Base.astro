@@ -10,9 +10,24 @@ interface Props {
   schema?: object;
   fullWidth?: boolean;
   ogImage?: string;
+  ogImageAlt?: string;
   ogType?: 'website' | 'article';
+  articlePublishedTime?: string;
+  articleModifiedTime?: string;
+  noindex?: boolean;
 }
-const { title, description, schema, fullWidth = false, ogImage, ogType } = Astro.props;
+const {
+  title,
+  description,
+  schema,
+  fullWidth = false,
+  ogImage,
+  ogImageAlt,
+  ogType,
+  articlePublishedTime,
+  articleModifiedTime,
+  noindex,
+} = Astro.props;
 const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID?.trim();
 
 function gaSrc(measurementId: string): string {
@@ -35,10 +50,33 @@ function gaSrc(measurementId: string): string {
     <meta name="generator" content={Astro.generator} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
-    <Seo title={title} description={description} schema={schema} ogImage={ogImage} ogType={ogType} />
+    <!-- Non-blocking font load: load as print stylesheet, swap to all once loaded -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Serif+Display:ital@0;1&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Serif+Display:ital@0;1&display=swap"
+      />
+    </noscript>
+    <Seo
+      title={title}
+      description={description}
+      schema={schema}
+      ogImage={ogImage}
+      ogImageAlt={ogImageAlt}
+      ogType={ogType}
+      articlePublishedTime={articlePublishedTime}
+      articleModifiedTime={articleModifiedTime}
+      noindex={noindex}
+    />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
+    <link rel="alternate" type="application/rss+xml" title="Yield to Freedom Blog" href="/rss.xml" />
     <meta name="theme-color" content="#2563eb" />
     {
       gaId ? (

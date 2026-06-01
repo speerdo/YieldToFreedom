@@ -21,16 +21,40 @@ const { post } = Astro.props;
 const { Content } = await render(post);
 const site = publicSiteOrigin();
 const published = post.data.pubDate.toISOString().slice(0, 10);
+const publishedFull = post.data.pubDate.toISOString();
+const pageUrl = `${site}/blog/${post.id}`;
 
 const schema = {
   '@context': 'https://schema.org',
-  '@type': 'Article',
-  headline: post.data.title,
-  datePublished: published,
-  dateModified: published,
-  author: { '@type': 'Organization', name: 'Yield to Freedom', url: site },
-  publisher: { '@type': 'Organization', name: 'Creative Bandit LLC', url: site },
-  description: post.data.description,
+  '@graph': [
+    {
+      '@type': 'Article',
+      '@id': `${pageUrl}#article`,
+      headline: post.data.title,
+      datePublished: publishedFull,
+      dateModified: publishedFull,
+      author: { '@type': 'Organization', name: 'Yield to Freedom', url: site },
+      publisher: {
+        '@type': 'Organization',
+        name: 'Creative Bandit LLC',
+        url: site,
+        logo: { '@type': 'ImageObject', url: `${site}/favicon.svg` },
+      },
+      description: post.data.description,
+      mainEntityOfPage: { '@type': 'WebPage', '@id': pageUrl },
+      ...(post.data.image
+        ? { image: { '@type': 'ImageObject', url: post.data.image, width: 1200, height: 630 } }
+        : {}),
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: site },
+        { '@type': 'ListItem', position: 2, name: 'Blog', item: `${site}/blog` },
+        { '@type': 'ListItem', position: 3, name: post.data.title, item: pageUrl },
+      ],
+    },
+  ],
 };
 ---
 
@@ -40,6 +64,9 @@ const schema = {
   schema={schema}
   ogType="article"
   ogImage={post.data.image}
+  ogImageAlt={post.data.imageAlt ?? post.data.title}
+  articlePublishedTime={publishedFull}
+  articleModifiedTime={publishedFull}
 >
   <article
     class="max-w-3xl space-y-4 leading-relaxed text-slate-700 [&_a]:font-semibold [&_a]:text-blue-700 hover:[&_a]:text-blue-900 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-6 [&_h2]:mt-10 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-slate-900 [&_strong]:font-semibold"
@@ -70,6 +97,9 @@ const schema = {
               class="w-full object-cover"
               style="aspect-ratio: 16/6; object-position: center;"
               loading="eager"
+              fetchpriority="high"
+              width="1200"
+              height="450"
             />
           </div>
         ) : null
