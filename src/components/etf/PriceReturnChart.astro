@@ -15,6 +15,7 @@ const canvasId = `prc-${ticker}`;
     <div>
       <h2 class="text-sm font-semibold uppercase tracking-wide text-[var(--fg-muted)]">Performance history</h2>
       <p data-chart-desc class="mt-0.5 text-xs text-[var(--fg-muted)]">Adjusted closing price; splits and distributions are normalized</p>
+      <p data-history-note hidden class="mt-1 text-xs text-[var(--fg-muted)]"></p>
     </div>
     <div class="flex flex-wrap items-center gap-2">
       <div class="flex rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] p-0.5 text-sm font-medium">
@@ -30,13 +31,13 @@ const canvasId = `prc-${ticker}`;
       <div class="flex rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] p-0.5 text-xs font-medium">
         <button data-range="1y" class="cursor-pointer rounded-md px-2.5 py-1.5 text-[var(--fg-muted)] transition-colors hover:text-[var(--fg)]">1Y</button>
         <button data-range="3y" class="cursor-pointer rounded-md px-2.5 py-1.5 text-[var(--fg-muted)] transition-colors hover:text-[var(--fg)]">3Y</button>
-        <button data-range="5y" class="cursor-pointer rounded-md bg-[var(--bg-card)] px-2.5 py-1.5 text-[var(--fg)] shadow-sm transition-colors hover:text-[var(--fg)]">5Y</button>
+        <button data-range="5y" class="cursor-pointer rounded-md px-2.5 py-1.5 text-[var(--fg-muted)] transition-colors hover:text-[var(--fg)]">5Y</button>
         <button data-range="10y" class="cursor-pointer rounded-md px-2.5 py-1.5 text-[var(--fg-muted)] transition-colors hover:text-[var(--fg)]">10Y</button>
         <button data-range="max" class="cursor-pointer rounded-md px-2.5 py-1.5 text-[var(--fg-muted)] transition-colors hover:text-[var(--fg)]">Max</button>
       </div>
     </div>
   </div>
-  <div class="relative mt-5 h-64 w-full sm:h-72">
+  <div class="relative mt-5 h-72 w-full sm:h-80">
     <canvas id={canvasId} class="absolute inset-0 max-h-full w-full"></canvas>
     <p data-loading class="absolute inset-0 flex items-center justify-center text-sm text-[var(--fg-muted)]">Loading…</p>
     <p data-empty hidden class="absolute inset-0 flex items-center justify-center text-sm text-[var(--fg-muted)]">No price history available yet.</p>

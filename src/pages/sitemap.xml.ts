@@ -25,6 +25,7 @@ const STATIC_PATHS: SitemapEntry[] = [
   { loc: '/compare',                changefreq: 'weekly',  priority: 0.7 },
   { loc: '/stack-builder',          changefreq: 'weekly',  priority: 0.7 },
   { loc: '/about',                  changefreq: 'yearly',  priority: 0.4 },
+  { loc: '/contact',               changefreq: 'yearly',  priority: 0.3 },
   { loc: '/privacy',                changefreq: 'yearly',  priority: 0.2 },
   { loc: '/terms',                  changefreq: 'yearly',  priority: 0.2 },
 ];

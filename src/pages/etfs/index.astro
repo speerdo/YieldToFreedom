@@ -30,44 +30,86 @@ const list = await db
       <div class="grid flex-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <label class="text-xs font-semibold uppercase tracking-wide text-slate-500">
           Pillar
-          <select
-            class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-900 shadow-sm"
-            x-model="pillar"
-          >
-            <option value="all">All</option>
-            <option value="income">Income</option>
-            <option value="stability">Stability</option>
-            <option value="growth">Growth</option>
-            <option value="mixed">Mixed</option>
-          </select>
+          <span class="relative mt-1 block">
+            <select
+              class="w-full cursor-pointer appearance-none rounded-lg border border-slate-300 bg-white px-3 py-2 pr-10 text-sm font-medium text-slate-900 shadow-sm"
+              x-model="pillar"
+            >
+              <option value="all">All</option>
+              <option value="income">Income</option>
+              <option value="stability">Stability</option>
+              <option value="growth">Growth</option>
+              <option value="mixed">Mixed</option>
+            </select>
+            <svg
+              class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--fg-muted)]"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </span>
         </label>
         <label class="text-xs font-semibold uppercase tracking-wide text-slate-500">
           Grade
-          <select
-            class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-900 shadow-sm"
-            x-model="grade"
-          >
-            <option value="all">All</option>
-            <option value="A">A</option>
-            <option value="B">B</option>
-            <option value="C">C</option>
-            <option value="D">D</option>
-            <option value="__none">No grade yet</option>
-          </select>
+          <span class="relative mt-1 block">
+            <select
+              class="w-full cursor-pointer appearance-none rounded-lg border border-slate-300 bg-white px-3 py-2 pr-10 text-sm font-medium text-slate-900 shadow-sm"
+              x-model="grade"
+            >
+              <option value="all">All</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+              <option value="D">D</option>
+              <option value="__none">No grade yet</option>
+            </select>
+            <svg
+              class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--fg-muted)]"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </span>
         </label>
         <label class="text-xs font-semibold uppercase tracking-wide text-slate-500">
           Frequency
-          <select
-            class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-900 shadow-sm"
-            x-model="frequency"
-          >
-            <option value="all">All</option>
-            <option value="monthly">Monthly</option>
-            <option value="quarterly">Quarterly</option>
-            <option value="annual">Annual</option>
-            <option value="irregular">Irregular</option>
-            <option value="__none">Unknown</option>
-          </select>
+          <span class="relative mt-1 block">
+            <select
+              class="w-full cursor-pointer appearance-none rounded-lg border border-slate-300 bg-white px-3 py-2 pr-10 text-sm font-medium text-slate-900 shadow-sm"
+              x-model="frequency"
+            >
+              <option value="all">All</option>
+              <option value="monthly">Monthly</option>
+              <option value="quarterly">Quarterly</option>
+              <option value="annual">Annual</option>
+              <option value="irregular">Irregular</option>
+              <option value="__none">Unknown</option>
+            </select>
+            <svg
+              class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--fg-muted)]"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.17l3.71-3.94a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </span>
         </label>
         <label class="text-xs font-semibold uppercase tracking-wide text-slate-500">
           Search

@@ -32,6 +32,7 @@ export interface CompareYieldMountPayload {
   datasets: CompareYieldDatasetPayload[];
   /** 'indexed' = price/TR chart (100 = start); 'yield' = trailing yield % */
   yMode?: ChartYMode;
+  displayDensity?: 'default' | 'comfortable';
 }
 
 export interface MountResult {
@@ -45,6 +46,11 @@ export function mountCompareYieldChartFromPayload(payload: CompareYieldMountPayl
   ensureRegistry();
 
   const yMode = payload.yMode ?? 'indexed';
+  const comfortable = payload.displayDensity === 'comfortable';
+  const tickFontSize = comfortable ? 13 : 11;
+  const tooltipTitleSize = comfortable ? 13 : 12;
+  const tooltipBodySize = comfortable ? 14 : 12;
+  const tickPadding = comfortable ? 8 : 4;
 
   const canvas = document.getElementById(payload.canvasId);
   if (!(canvas instanceof HTMLCanvasElement)) return { chart: undefined, excluded: [] };
@@ -92,7 +98,10 @@ export function mountCompareYieldChartFromPayload(payload: CompareYieldMountPayl
           bodyColor: '#f1f5f9',
           borderColor: 'rgba(148, 163, 184, 0.2)',
           borderWidth: 1,
-          padding: 12,
+          padding: comfortable ? 14 : 12,
+          titleFont: { size: tooltipTitleSize, weight: 'bold' },
+          bodyFont: { size: tooltipBodySize, weight: 'bold' },
+          bodySpacing: comfortable ? 6 : 4,
           callbacks: {
             title(items) {
               const x = items[0]?.parsed.x;
@@ -137,7 +146,8 @@ export function mountCompareYieldChartFromPayload(payload: CompareYieldMountPayl
           ticks: {
             maxTicksLimit: 8,
             color: '#94a3b8',
-            font: { size: 11 },
+            font: { size: tickFontSize, weight: 'normal' },
+            padding: tickPadding,
             callback(v) {
               const n = Number(v);
               if (!Number.isFinite(n)) return '';
@@ -155,7 +165,8 @@ export function mountCompareYieldChartFromPayload(payload: CompareYieldMountPayl
           border: { display: false },
           ticks: {
             color: '#94a3b8',
-            font: { size: 11 },
+            font: { size: tickFontSize, weight: 'bold' },
+            padding: tickPadding,
             callback(v) {
               const n = Number(v);
               if (yMode === 'indexed') return `${n.toFixed(0)}`;

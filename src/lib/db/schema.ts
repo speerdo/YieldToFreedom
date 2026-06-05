@@ -8,6 +8,7 @@ import {
   boolean,
   timestamp,
   date,
+  jsonb,
   index,
   uniqueIndex,
 } from 'drizzle-orm/pg-core';
@@ -41,6 +42,9 @@ export const etfs = pgTable(
     exchange: varchar('exchange', { length: 10 }),
     dataLastSynced: timestamp('fmp_last_synced'),
     isActive: boolean('is_active').default(true),
+    description: text('description'),
+    holdingsJson: jsonb('holdings_json').$type<Array<{ ticker: string; name: string; weightPercentage: number }>>(),
+    sectorWeightsJson: jsonb('sector_weights_json').$type<Array<{ sector: string; weightPercentage: number }>>(),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
   },

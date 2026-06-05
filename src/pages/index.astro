@@ -6,7 +6,7 @@ import GradeChip from '../components/ui/GradeChip.astro';
 import { db } from '../lib/db';
 import { etfs } from '../lib/db/schema';
 import { publicSiteOrigin } from '../lib/site/url';
-import { and, desc, eq } from 'drizzle-orm';
+import { and, count, desc, eq } from 'drizzle-orm';
 
 const site = publicSiteOrigin();
 
@@ -132,6 +132,16 @@ function fmtFreq(s: string | null | undefined) {
   if (!s) return '-';
   return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 }
+
+function fmtCountFloor(n: number) {
+  return n >= 100 ? `${Math.floor(n / 100) * 100}+` : String(n);
+}
+
+const [{ activeEtfCount }] = await db
+  .select({ activeEtfCount: count() })
+  .from(etfs)
+  .where(eq(etfs.isActive, true));
+const activeEtfStat = fmtCountFloor(activeEtfCount);
 ---
 
 <Base
@@ -191,7 +201,7 @@ function fmtFreq(s: string | null | undefined) {
   <div class="bg-blue-950 text-white">
     <div class="mx-auto grid max-w-6xl grid-cols-2 gap-px sm:grid-cols-4 bg-white/10">
       <div class="flex flex-col items-center bg-blue-950 px-6 py-4 text-center">
-        <span class="font-heading text-2xl font-bold">100+</span>
+        <span class="font-heading text-2xl font-bold">{activeEtfStat}</span>
         <span class="mt-0.5 text-xs font-medium uppercase tracking-wide text-blue-300">ETFs graded</span>
       </div>
       <div class="flex flex-col items-center bg-blue-950 px-6 py-4 text-center">
