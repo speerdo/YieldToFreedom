@@ -6,22 +6,67 @@ interface Props {
 
 const { label, pillar = '' } = Astro.props;
 
-const tone: Record<string, string> = {
-  income: 'bg-orange-50 text-orange-900 ring-orange-700/25',
-  stability: 'bg-indigo-50 text-indigo-900 ring-indigo-700/25',
-  growth: 'bg-teal-50 text-teal-900 ring-teal-700/25',
-  mixed: 'bg-slate-50 text-slate-800 ring-slate-700/25',
-};
-
-const pillarKey = pillar.toLowerCase() as keyof typeof tone;
-const classes = pillarKey in tone ? tone[pillarKey] : tone.mixed;
+const tones = ['income', 'stability', 'growth', 'mixed'];
+const pillarKey = pillar.toLowerCase();
+const tone = tones.includes(pillarKey) ? pillarKey : 'mixed';
 ---
 
 <span
-  class:list={[
-    'inline-flex rounded-full px-3 py-0.5 text-xs font-semibold capitalize ring-1 ring-inset',
-    classes,
-  ]}
+  data-badge-tone={tone}
+  class="ytf-badge inline-flex rounded-full px-3 py-0.5 text-xs font-semibold capitalize ring-1 ring-inset"
 >
   {label}
 </span>
+
+<style>
+  .ytf-badge {
+    background-color: var(--badge-bg);
+    color: var(--badge-fg);
+    --tw-ring-color: var(--badge-ring);
+  }
+
+  [data-badge-tone="income"] {
+    --badge-bg: #fff7ed;
+    --badge-fg: #7c2d12;
+    --badge-ring: rgba(194, 65, 12, 0.25);
+  }
+
+  [data-badge-tone="stability"] {
+    --badge-bg: #eef2ff;
+    --badge-fg: #312e81;
+    --badge-ring: rgba(67, 56, 202, 0.25);
+  }
+
+  [data-badge-tone="growth"] {
+    --badge-bg: #f0fdfa;
+    --badge-fg: #134e4a;
+    --badge-ring: rgba(15, 118, 110, 0.25);
+  }
+
+  [data-badge-tone="mixed"] {
+    --badge-bg: var(--bg-subtle);
+    --badge-fg: var(--fg);
+    --badge-ring: color-mix(in srgb, var(--border) 80%, transparent);
+  }
+
+  :global([data-theme="dark"]) [data-badge-tone="income"],
+  :global([data-theme="purple"]) [data-badge-tone="income"] {
+    --badge-bg: rgba(249, 115, 22, 0.16);
+    --badge-fg: #fdba74;
+    --badge-ring: rgba(249, 115, 22, 0.35);
+  }
+
+  :global([data-theme="dark"]) [data-badge-tone="stability"],
+  :global([data-theme="purple"]) [data-badge-tone="stability"] {
+    --badge-bg: rgba(129, 140, 248, 0.16);
+    --badge-fg: #c7d2fe;
+    --badge-ring: rgba(129, 140, 248, 0.35);
+  }
+
+  :global([data-theme="dark"]) [data-badge-tone="growth"],
+  :global([data-theme="purple"]) [data-badge-tone="growth"] {
+    --badge-bg: rgba(45, 212, 191, 0.14);
+    --badge-fg: #5eead4;
+    --badge-ring: rgba(45, 212, 191, 0.35);
+  }
+</style>

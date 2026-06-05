@@ -17,7 +17,7 @@ const payload = JSON.stringify({ labels, amounts, canvasId });
       <canvas id={canvasId} />
     </div>
   ) : (
-    <p class="mt-6 text-sm text-slate-600">No dividend history in the database yet.</p>
+    <p class="mt-6 text-sm text-[var(--fg-muted)]">No dividend history in the database yet.</p>
   )
 }
 

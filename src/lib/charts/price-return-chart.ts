@@ -1,6 +1,9 @@
 import { mountCompareYieldChartFromPayload } from './compare-yield-line';
 
 const PRICE_COLOR = 'rgb(37, 99, 235)';
+const ACTIVE_BG_CLASS = 'bg-[var(--bg-card)]';
+const ACTIVE_TEXT_CLASS = 'text-[var(--fg)]';
+const IDLE_TEXT_CLASS = 'text-[var(--fg-muted)]';
 
 interface PricePoint { x: number; value: number; }
 interface PriceHistBody { pricePoints?: PricePoint[]; totalReturnPoints?: PricePoint[]; }
@@ -77,17 +80,17 @@ async function initPriceReturnChart(container: HTMLElement, ticker: string): Pro
     for (const btn of [priceBtn, trBtn]) {
       if (!btn) continue;
       const active = btn.dataset.mode === mode;
-      btn.classList.toggle('bg-white', active);
-      btn.classList.toggle('text-slate-900', active);
+      btn.classList.toggle(ACTIVE_BG_CLASS, active);
+      btn.classList.toggle(ACTIVE_TEXT_CLASS, active);
       btn.classList.toggle('shadow-sm', active);
-      btn.classList.toggle('text-slate-500', !active);
+      btn.classList.toggle(IDLE_TEXT_CLASS, !active);
     }
     for (const btn of rangeBtns) {
       const active = btn.dataset.range === range;
-      btn.classList.toggle('bg-white', active);
-      btn.classList.toggle('text-slate-900', active);
+      btn.classList.toggle(ACTIVE_BG_CLASS, active);
+      btn.classList.toggle(ACTIVE_TEXT_CLASS, active);
       btn.classList.toggle('shadow-sm', active);
-      btn.classList.toggle('text-slate-500', !active);
+      btn.classList.toggle(IDLE_TEXT_CLASS, !active);
     }
   };
 

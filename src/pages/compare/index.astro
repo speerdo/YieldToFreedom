@@ -38,7 +38,7 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
       <div x-show="catalog.length > 0" class="flex flex-wrap gap-2">
         <template x-for="p in pillars" :key="p.value">
           <button
-            class="rounded-full px-3.5 py-1 text-xs font-semibold capitalize transition-colors"
+            class="cursor-pointer rounded-full px-3.5 py-1 text-xs font-semibold capitalize transition-colors"
             :class="filterPillar === p.value ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
             @click="filterPillar = p.value"
             x-text="p.label"
@@ -94,12 +94,12 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
           <div class="flex flex-wrap gap-2">
             <div class="flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 text-sm font-medium">
               <button
-                class="rounded-md px-4 py-1.5 transition-colors"
+                class="cursor-pointer rounded-md px-4 py-1.5 transition-colors"
                 :class="chartMode === 'price' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
                 @click="chartMode = 'price'; renderChartOverlay()"
               >Price</button>
               <button
-                class="rounded-md px-4 py-1.5 transition-colors"
+                class="cursor-pointer rounded-md px-4 py-1.5 transition-colors"
                 :class="chartMode === 'total-return' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
                 @click="chartMode = 'total-return'; renderChartOverlay()"
               >Total Return</button>
@@ -107,7 +107,7 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
             <div class="flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 text-xs font-medium">
               <template x-for="range in ['1y', '3y', '5y', '10y', 'max']" :key="range">
                 <button
-                  class="rounded-md px-2.5 py-1.5 uppercase transition-colors"
+                  class="cursor-pointer rounded-md px-2.5 py-1.5 uppercase transition-colors"
                   :class="chartRange === range ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
                   @click="chartRange = range; void pullData()"
                   x-text="range === 'max' ? 'Max' : range"

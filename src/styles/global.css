@@ -26,6 +26,10 @@
   --section-ink-bg:    #172554;  /* blue-950 */
   --section-ink-fg:    #ffffff;
   --section-ink-muted: #93c5fd;  /* blue-300 */
+  --disclaimer-bg:     #fffbeb;  /* amber-50 */
+  --disclaimer-border: #fde68a;  /* amber-200 */
+  --disclaimer-fg:     #451a03;  /* amber-950 */
+  --disclaimer-heading:#78350f;  /* amber-900 - 8.75:1 on amber-50 */
 }
 
 [data-theme="dark"] {
@@ -42,6 +46,10 @@
   --section-ink-bg:    #1e293b;  /* slate-800 - distinct from main bg */
   --section-ink-fg:    #f1f5f9;
   --section-ink-muted: #94a3b8;  /* slate-400 */
+  --disclaimer-bg:     #1e293b;  /* slate-800 */
+  --disclaimer-border: #475569;  /* slate-600 */
+  --disclaimer-fg:     #fef3c7;  /* amber-100 */
+  --disclaimer-heading:#fbbf24;  /* amber-400 - 8.76:1 on slate-800 */
 }
 
 [data-theme="tan"] {
@@ -58,6 +66,10 @@
   --section-ink-bg:    #3b2410;  /* deep tan-brown (matches --fg) */
   --section-ink-fg:    #f9edd8;
   --section-ink-muted: #c4976a;  /* border color as muted label */
+  --disclaimer-bg:     #f9edd8;  /* warm card surface */
+  --disclaimer-border: #c4976a;
+  --disclaimer-fg:     #3b2410;
+  --disclaimer-heading:#3b2410;  /* 12.54:1 on warm card surface */
 }
 
 [data-theme="purple"] {
@@ -74,6 +86,10 @@
   --section-ink-bg:    #130626;  /* --bg-subtle - very dark purple */
   --section-ink-fg:    #f7e9b0;
   --section-ink-muted: #d4a843;
+  --disclaimer-bg:     #2d1155;  /* purple card surface */
+  --disclaimer-border: #7c3aed;  /* violet-700 */
+  --disclaimer-fg:     #f7e9b0;
+  --disclaimer-heading:#facc15;  /* yellow-400 - 10.37:1 on purple card */
 }
 
 /* ── Remap hard-coded Tailwind color utilities to theme vars ─────────── */

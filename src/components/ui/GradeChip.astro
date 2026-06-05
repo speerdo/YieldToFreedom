@@ -5,31 +5,85 @@ interface Props {
 const { grade } = Astro.props;
 
 const trimmed = grade?.trim().toUpperCase() ?? '';
-
-const tier: Record<string, string> = {
-  A: 'bg-emerald-100 text-emerald-900 ring-emerald-600/30',
-  B: 'bg-sky-100 text-sky-900 ring-sky-600/25',
-  C: 'bg-amber-100 text-amber-900 ring-amber-600/25',
-  D: 'bg-rose-100 text-rose-900 ring-rose-600/30',
-};
-
-const chipClass =
-  trimmed && trimmed in tier
-    ? tier[trimmed]!
-    : 'bg-slate-100 text-slate-700 ring-slate-500/25';
-
-const shell = [
-  'inline-flex min-h-7 min-w-7 items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset tabular-nums',
-  chipClass,
-];
+const gradeTone = ['A', 'B', 'C', 'D'].includes(trimmed) ? trimmed : 'unknown';
 ---
 
 {
   trimmed ? (
-    <span class:list={shell} title="Yield to Freedom grade - research purposes only.">
+    <span
+      data-grade-tone={gradeTone}
+      class="ytf-grade-chip inline-flex min-h-7 min-w-7 items-center justify-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset tabular-nums"
+      title="Yield to Freedom grade - research purposes only."
+    >
       {trimmed}
     </span>
   ) : (
-    <span class="text-xs font-medium text-slate-400">-</span>
+    <span class="text-xs font-medium text-[var(--fg-muted)]">-</span>
   )
 }
+
+<style>
+  .ytf-grade-chip {
+    background-color: var(--grade-bg);
+    color: var(--grade-fg);
+    --tw-ring-color: var(--grade-ring);
+  }
+
+  [data-grade-tone="A"] {
+    --grade-bg: #d1fae5;
+    --grade-fg: #064e3b;
+    --grade-ring: rgba(5, 150, 105, 0.3);
+  }
+
+  [data-grade-tone="B"] {
+    --grade-bg: #e0f2fe;
+    --grade-fg: #075985;
+    --grade-ring: rgba(2, 132, 199, 0.25);
+  }
+
+  [data-grade-tone="C"] {
+    --grade-bg: #fef3c7;
+    --grade-fg: #78350f;
+    --grade-ring: rgba(217, 119, 6, 0.25);
+  }
+
+  [data-grade-tone="D"] {
+    --grade-bg: #ffe4e6;
+    --grade-fg: #881337;
+    --grade-ring: rgba(225, 29, 72, 0.3);
+  }
+
+  [data-grade-tone="unknown"] {
+    --grade-bg: var(--bg-subtle);
+    --grade-fg: var(--fg);
+    --grade-ring: color-mix(in srgb, var(--border) 80%, transparent);
+  }
+
+  :global([data-theme="dark"]) [data-grade-tone="A"],
+  :global([data-theme="purple"]) [data-grade-tone="A"] {
+    --grade-bg: rgba(16, 185, 129, 0.15);
+    --grade-fg: #6ee7b7;
+    --grade-ring: rgba(16, 185, 129, 0.35);
+  }
+
+  :global([data-theme="dark"]) [data-grade-tone="B"],
+  :global([data-theme="purple"]) [data-grade-tone="B"] {
+    --grade-bg: rgba(14, 165, 233, 0.15);
+    --grade-fg: #7dd3fc;
+    --grade-ring: rgba(14, 165, 233, 0.35);
+  }
+
+  :global([data-theme="dark"]) [data-grade-tone="C"],
+  :global([data-theme="purple"]) [data-grade-tone="C"] {
+    --grade-bg: rgba(245, 158, 11, 0.15);
+    --grade-fg: #fbbf24;
+    --grade-ring: rgba(245, 158, 11, 0.35);
+  }
+
+  :global([data-theme="dark"]) [data-grade-tone="D"],
+  :global([data-theme="purple"]) [data-grade-tone="D"] {
+    --grade-bg: rgba(244, 63, 94, 0.15);
+    --grade-fg: #fda4af;
+    --grade-ring: rgba(244, 63, 94, 0.35);
+  }
+</style>
