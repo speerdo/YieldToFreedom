@@ -304,7 +304,6 @@ console.log(`Found ${missing.length} ETFs missing price data.\n`);
 
 // 2-year window: enough for T12M yield, frequency inference, and 1-year return.
 const twoYearsAgo = dateYearsAgo(2);
-const todayUtc    = new Date().toISOString().slice(0, 10);
 
 let marketUpdated = 0, marketFailed = 0;
 
@@ -329,6 +328,7 @@ for (const row of missing) {
     const newest    = sortedAsc[sortedAsc.length - 1]!;
     const latestAdjClose = asNumber(newest.adjClose ?? newest.close);
     const latestPrice    = latestAdjClose;
+    const latestPriceDate = parseIsoDate(newest.date);
 
     // Trailing 12m yield from EOD divCash
     const cutoff12m = dateYearsAgo(1);
@@ -362,12 +362,12 @@ for (const row of missing) {
       dataLastSynced: new Date(),
     }).where(eq(etfs.id, row.id));
 
-    // Today's price row
-    if (latestPrice && latestPrice > 0) {
-      const todayRow = historyRows.find((r) => parseIsoDate(r.date) === todayUtc);
+    // Latest trading-day price row. Do not synthesize weekend/holiday rows.
+    if (latestPriceDate && latestPrice && latestPrice > 0) {
+      const todayRow = historyRows.find((r) => parseIsoDate(r.date) === latestPriceDate);
       await db.insert(etfPrices).values({
         etfId:    row.id,
-        date:     todayUtc,
+        date:     latestPriceDate,
         open:     todayRow?.open     != null ? String(todayRow.open)     : null,
         high:     todayRow?.high     != null ? String(todayRow.high)     : null,
         low:      todayRow?.low      != null ? String(todayRow.low)      : null,
@@ -379,6 +379,10 @@ for (const row of missing) {
         set: {
           close:    latestPrice.toFixed(4),
           adjClose: todayRow?.adjClose != null ? String(todayRow.adjClose) : latestPrice.toFixed(4),
+          open:     todayRow?.open     != null ? String(todayRow.open)     : null,
+          high:     todayRow?.high     != null ? String(todayRow.high)     : null,
+          low:      todayRow?.low      != null ? String(todayRow.low)      : null,
+          volume:   todayRow?.volume   ?? null,
         },
       });
     }

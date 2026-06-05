@@ -20,7 +20,7 @@
  */
 import 'dotenv/config';
 
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 import { db } from '../src/lib/db';
 import { etfDividends, etfPrices, etfs } from '../src/lib/db/schema';
@@ -88,17 +88,20 @@ for (const row of topwPrices) {
 
 const allPriceRows = [...priceByDate.entries()]
   .sort(([a], [b]) => a.localeCompare(b))
-  .map(([date, r]) => ({
-    etfId: topw.id,
-    date,
-    open:     r.open     != null ? String(r.open)     : null,
-    high:     r.high     != null ? String(r.high)     : null,
-    low:      r.low      != null ? String(r.low)      : null,
-    close:    r.close    != null ? String(r.close)    : null,
-    adjClose: r.adjClose != null ? String(r.adjClose) : (r.close != null ? String(r.close) : null),
-    volume:   r.volume   ?? null,
-  }))
-  .filter(r => r.close != null);
+  .flatMap(([date, r]) => {
+    if (r.close == null) return [];
+    const close = String(r.close);
+    return [{
+      etfId: topw.id,
+      date,
+      open:     r.open     != null ? String(r.open)     : null,
+      high:     r.high     != null ? String(r.high)     : null,
+      low:      r.low      != null ? String(r.low)      : null,
+      close,
+      adjClose: r.adjClose != null ? String(r.adjClose) : close,
+      volume:   r.volume   ?? null,
+    }];
+  });
 
 console.log(`\n  Merged price rows: ${allPriceRows.length} unique dates`);
 
@@ -108,12 +111,12 @@ for (let i = 0; i < allPriceRows.length; i += 100) {
   await db.insert(etfPrices).values(allPriceRows.slice(i, i + 100)).onConflictDoUpdate({
     target: [etfPrices.etfId, etfPrices.date],
     set: {
-      open:     allPriceRows[i]!.open,
-      high:     allPriceRows[i]!.high,
-      low:      allPriceRows[i]!.low,
-      close:    allPriceRows[i]!.close!,
-      adjClose: allPriceRows[i]!.adjClose,
-      volume:   allPriceRows[i]!.volume,
+      open:     sql`excluded.open`,
+      high:     sql`excluded.high`,
+      low:      sql`excluded.low`,
+      close:    sql`excluded.close`,
+      adjClose: sql`excluded.adj_close`,
+      volume:   sql`excluded.volume`,
     },
   });
   priceUpserted += Math.min(100, allPriceRows.length - i);

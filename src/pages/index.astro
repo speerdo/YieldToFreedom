@@ -209,6 +209,106 @@ function fmtFreq(s: string | null | undefined) {
     </div>
   </div>
 
+  <!-- ── INCOME PREVIEW ────────────────────────────────────────────────── -->
+  <section class="bg-slate-950 py-16 text-white sm:py-20">
+    <div class="mx-auto grid max-w-6xl gap-8 px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-[0.18em] text-blue-300">Try the idea</p>
+        <h2 class="font-heading mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+          Turn a lump sum into a visible income stream.
+        </h2>
+        <p class="mt-4 max-w-xl leading-relaxed text-slate-300">
+          Yield to Freedom is built around a simple question: if you put real dollars into an ETF, what cashflow might
+          it add to your life? Start with a $10k block, then stack blocks deliberately across income, stability, and
+          growth.
+        </p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a
+            href="/etfs"
+            class="inline-flex items-center rounded-xl bg-blue-500 px-5 py-3 text-sm font-semibold text-white shadow-lg transition-colors hover:bg-blue-400"
+          >
+            Browse ETF snapshots →
+          </a>
+          <a
+            href="/strategy/drip"
+            class="inline-flex items-center rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/15"
+          >
+            Learn DRIP mechanics
+          </a>
+        </div>
+      </div>
+
+      <div class="rounded-3xl border border-white/10 bg-white/[0.06] p-5 shadow-2xl backdrop-blur">
+        <div class="grid gap-3 sm:grid-cols-3">
+          <label class="block rounded-2xl bg-white/10 p-4">
+            <span class="text-xs font-medium text-slate-300">Investment</span>
+            <span class="mt-2 flex items-center gap-1">
+              <span class="text-slate-400">$</span>
+              <input
+                id="home-income-investment"
+                type="number"
+                min="0"
+                step="500"
+                value="10000"
+                class="w-full border-0 bg-transparent text-2xl font-bold tabular-nums text-white focus:outline-none"
+              />
+            </span>
+          </label>
+          <label class="block rounded-2xl bg-white/10 p-4">
+            <span class="text-xs font-medium text-slate-300">TTM yield</span>
+            <span class="mt-2 flex items-center gap-1">
+              <input
+                id="home-income-yield"
+                type="number"
+                min="0"
+                step="0.25"
+                value="8"
+                class="w-full border-0 bg-transparent text-2xl font-bold tabular-nums text-white focus:outline-none"
+              />
+              <span class="text-slate-400">%</span>
+            </span>
+          </label>
+          <label class="block rounded-2xl bg-white/10 p-4">
+            <span class="text-xs font-medium text-slate-300">Monthly target</span>
+            <span class="mt-2 flex items-center gap-1">
+              <span class="text-slate-400">$</span>
+              <input
+                id="home-income-target"
+                type="number"
+                min="0"
+                step="100"
+                value="3000"
+                class="w-full border-0 bg-transparent text-2xl font-bold tabular-nums text-white focus:outline-none"
+              />
+            </span>
+          </label>
+        </div>
+
+        <div class="mt-4 grid gap-3 sm:grid-cols-3">
+          <div class="rounded-2xl bg-blue-500/15 p-4 ring-1 ring-blue-300/20">
+            <p class="text-xs text-blue-200">Estimated annual income</p>
+            <p id="home-income-annual" class="mt-1 text-3xl font-bold tabular-nums">-</p>
+          </div>
+          <div class="rounded-2xl bg-emerald-500/15 p-4 ring-1 ring-emerald-300/20">
+            <p class="text-xs text-emerald-100">Monthly average</p>
+            <p id="home-income-monthly" class="mt-1 text-3xl font-bold tabular-nums">-</p>
+          </div>
+          <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10">
+            <p class="text-xs text-slate-300">Target covered</p>
+            <p id="home-income-coverage" class="mt-1 text-3xl font-bold tabular-nums">-</p>
+          </div>
+        </div>
+
+        <p id="home-income-blocks" class="mt-4 rounded-2xl bg-white/10 p-4 text-sm leading-relaxed text-slate-200">
+          -
+        </p>
+        <p class="mt-3 text-xs leading-relaxed text-slate-400">
+          Educational math only. Actual distributions, taxes, share prices, and future yields can change.
+        </p>
+      </div>
+    </div>
+  </section>
+
   <!-- ── THREE PILLARS ─────────────────────────────────────────────────── -->
   <section class="mx-auto max-w-6xl px-6 py-20 sm:py-24">
     <div class="text-center">
@@ -446,6 +546,51 @@ function fmtFreq(s: string | null | undefined) {
 </Base>
 
 <script>
+  const incomeInvestment = document.getElementById('home-income-investment') as HTMLInputElement | null;
+  const incomeYield = document.getElementById('home-income-yield') as HTMLInputElement | null;
+  const incomeTarget = document.getElementById('home-income-target') as HTMLInputElement | null;
+  const incomeAnnual = document.getElementById('home-income-annual');
+  const incomeMonthly = document.getElementById('home-income-monthly');
+  const incomeCoverage = document.getElementById('home-income-coverage');
+  const incomeBlocks = document.getElementById('home-income-blocks');
+
+  const fmtIncome = (value: number) =>
+    `$${Math.round(value).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+
+  function updateHomeIncomePreview() {
+    const investment = parseFloat(incomeInvestment?.value ?? '0');
+    const yieldPct = parseFloat(incomeYield?.value ?? '0');
+    const target = parseFloat(incomeTarget?.value ?? '0');
+
+    if (!Number.isFinite(investment) || investment <= 0 || !Number.isFinite(yieldPct) || yieldPct <= 0) {
+      if (incomeAnnual) incomeAnnual.textContent = '-';
+      if (incomeMonthly) incomeMonthly.textContent = '-';
+      if (incomeCoverage) incomeCoverage.textContent = '-';
+      if (incomeBlocks) incomeBlocks.textContent = 'Enter an amount and yield to see the cashflow block.';
+      return;
+    }
+
+    const annual = investment * (yieldPct / 100);
+    const monthly = annual / 12;
+    const coverage = target > 0 ? (monthly / target) * 100 : 0;
+    const blocks = investment / 10000;
+    const blockIncome = 10000 * (yieldPct / 100);
+
+    if (incomeAnnual) incomeAnnual.textContent = fmtIncome(annual);
+    if (incomeMonthly) incomeMonthly.textContent = fmtIncome(monthly);
+    if (incomeCoverage) incomeCoverage.textContent = target > 0 ? `${coverage.toFixed(1)}%` : '-';
+    if (incomeBlocks) {
+      incomeBlocks.textContent =
+        `${blocks.toFixed(1)} cashflow block${Math.abs(blocks - 1) < 0.05 ? '' : 's'} at this yield ` +
+        `would estimate about ${fmtIncome(blockIncome)} per year for every $10k invested.`;
+    }
+  }
+
+  for (const el of [incomeInvestment, incomeYield, incomeTarget]) {
+    el?.addEventListener('input', updateHomeIncomePreview);
+  }
+  updateHomeIncomePreview();
+
   const form = document.getElementById('home-subscribe');
   const msg = document.getElementById('home-subscribe-msg');
   if (form instanceof HTMLFormElement && msg) {

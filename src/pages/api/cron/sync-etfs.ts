@@ -197,13 +197,12 @@ export const GET: APIRoute = async ({ request }) => {
   twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
   const divStartDate = twoYearsAgo.toISOString().slice(0, 10);
 
-  const todayUtc = new Date().toISOString().slice(0, 10);
-
   for (const row of active) {
     try {
       // ── 1. Fetch 5-year EOD price history ─────────────────────────────────
       let latestPrice: number | null = null;
       let latestAdjClose: number | null = null;
+      let latestPriceDate: string | null = null;
       let historyRows: TiingoEodRow[] = [];
       let sortedAsc: TiingoEodRow[] = [];
 
@@ -214,6 +213,7 @@ export const GET: APIRoute = async ({ request }) => {
           const newest = sortedAsc[sortedAsc.length - 1]!;
           latestAdjClose = asNumber(newest.adjClose ?? newest.close);
           latestPrice = latestAdjClose;
+          latestPriceDate = parseIsoDate(newest.date);
         }
       } catch {
         // price fetch failed - skip price update for this ticker
@@ -295,14 +295,14 @@ export const GET: APIRoute = async ({ request }) => {
         })
         .where(eq(etfs.id, row.id));
 
-      // ── 8. Upsert today's EOD price row ──────────────────────────────────
-      if (latestPrice != null && latestPrice > 0) {
-        const todayRow = historyRows.find((r) => parseIsoDate(r.date) === todayUtc);
+      // ── 8. Upsert latest trading-day price row ────────────────────────────
+      if (latestPriceDate && latestPrice != null && latestPrice > 0) {
+        const todayRow = historyRows.find((r) => parseIsoDate(r.date) === latestPriceDate);
         await db
           .insert(etfPrices)
           .values({
             etfId: row.id,
-            date: todayUtc,
+            date: latestPriceDate,
             open: todayRow?.open != null ? String(todayRow.open) : null,
             high: todayRow?.high != null ? String(todayRow.high) : null,
             low: todayRow?.low != null ? String(todayRow.low) : null,
@@ -319,6 +319,10 @@ export const GET: APIRoute = async ({ request }) => {
                 todayRow?.adjClose != null
                   ? String(todayRow.adjClose)
                   : latestPrice.toFixed(4),
+              open: todayRow?.open != null ? String(todayRow.open) : null,
+              high: todayRow?.high != null ? String(todayRow.high) : null,
+              low: todayRow?.low != null ? String(todayRow.low) : null,
+              volume: todayRow?.volume ?? null,
             },
           });
       }

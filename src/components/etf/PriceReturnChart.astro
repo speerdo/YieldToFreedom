@@ -13,18 +13,27 @@ const canvasId = `prc-${ticker}`;
 >
   <div class="flex flex-wrap items-center justify-between gap-4">
     <div>
-      <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Performance - last 14 months</h2>
-      <p data-chart-desc class="mt-0.5 text-xs text-slate-400">Closing price indexed to 100 at start · dividends excluded</p>
+      <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Performance history</h2>
+      <p data-chart-desc class="mt-0.5 text-xs text-slate-400">Adjusted closing price; splits and distributions are normalized</p>
     </div>
-    <div class="flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 text-sm font-medium">
-      <button
-        data-mode="price"
-        class="rounded-md bg-white px-4 py-1.5 text-slate-900 shadow-sm transition-colors"
-      >Price</button>
-      <button
-        data-mode="total-return"
-        class="rounded-md px-4 py-1.5 text-slate-500 transition-colors hover:text-slate-700"
-      >Total Return</button>
+    <div class="flex flex-wrap items-center gap-2">
+      <div class="flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 text-sm font-medium">
+        <button
+          data-mode="price"
+          class="rounded-md bg-white px-4 py-1.5 text-slate-900 shadow-sm transition-colors"
+        >Price</button>
+        <button
+          data-mode="total-return"
+          class="rounded-md px-4 py-1.5 text-slate-500 transition-colors hover:text-slate-700"
+        >Total Return</button>
+      </div>
+      <div class="flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 text-xs font-medium">
+        <button data-range="1y" class="rounded-md px-2.5 py-1.5 text-slate-500 transition-colors hover:text-slate-700">1Y</button>
+        <button data-range="3y" class="rounded-md px-2.5 py-1.5 text-slate-500 transition-colors hover:text-slate-700">3Y</button>
+        <button data-range="5y" class="rounded-md bg-white px-2.5 py-1.5 text-slate-900 shadow-sm transition-colors">5Y</button>
+        <button data-range="10y" class="rounded-md px-2.5 py-1.5 text-slate-500 transition-colors hover:text-slate-700">10Y</button>
+        <button data-range="max" class="rounded-md px-2.5 py-1.5 text-slate-500 transition-colors hover:text-slate-700">Max</button>
+      </div>
     </div>
   </div>
   <div class="relative mt-5 h-64 w-full sm:h-72">

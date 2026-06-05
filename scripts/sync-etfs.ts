@@ -125,7 +125,6 @@ function buildDividendRowsFromEod(rows: TiingoEodRow[], etfId: number) {
 const active = await db.select().from(etfs).where(eq(etfs.isActive, true));
 const fiveYearsAgo = dateYearsAgo(5);
 const twoYearsAgo = dateYearsAgo(2);
-const todayUtc = new Date().toISOString().slice(0, 10);
 
 console.log(`Syncing ${active.length} active ETFs from ${fiveYearsAgo}…\n`);
 
@@ -138,6 +137,7 @@ for (const row of active) {
     // 1. Prices (5y)
     let latestPrice: number | null = null;
     let latestAdjClose: number | null = null;
+    let latestPriceDate: string | null = null;
     let historyRows: TiingoEodRow[] = [];
     let sortedAsc: TiingoEodRow[] = [];
     try {
@@ -147,6 +147,7 @@ for (const row of active) {
         const newest = sortedAsc[sortedAsc.length - 1]!;
         latestAdjClose = asNumber(newest.adjClose ?? newest.close);
         latestPrice = latestAdjClose;
+        latestPriceDate = parseIsoDate(newest.date);
       }
     } catch { /* price fetch failed */ }
 
@@ -209,11 +210,11 @@ for (const row of active) {
       dataLastSynced: new Date(),
     }).where(eq(etfs.id, row.id));
 
-    // 8. Today's price row
-    if (latestPrice != null && latestPrice > 0) {
-      const todayRow = historyRows.find((r) => parseIsoDate(r.date) === todayUtc);
+    // 8. Latest trading-day price row. Do not synthesize weekend/holiday rows.
+    if (latestPriceDate && latestPrice != null && latestPrice > 0) {
+      const todayRow = historyRows.find((r) => parseIsoDate(r.date) === latestPriceDate);
       await db.insert(etfPrices).values({
-        etfId: row.id, date: todayUtc,
+        etfId: row.id, date: latestPriceDate,
         open: todayRow?.open != null ? String(todayRow.open) : null,
         high: todayRow?.high != null ? String(todayRow.high) : null,
         low: todayRow?.low != null ? String(todayRow.low) : null,
@@ -225,6 +226,10 @@ for (const row of active) {
         set: {
           close: latestPrice.toFixed(4),
           adjClose: todayRow?.adjClose != null ? String(todayRow.adjClose) : latestPrice.toFixed(4),
+          open: todayRow?.open != null ? String(todayRow.open) : null,
+          high: todayRow?.high != null ? String(todayRow.high) : null,
+          low: todayRow?.low != null ? String(todayRow.low) : null,
+          volume: todayRow?.volume ?? null,
         },
       });
     }

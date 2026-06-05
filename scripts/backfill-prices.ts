@@ -1,5 +1,5 @@
 /**
- * One-time backfill: populate etf_prices with up to 5 years of daily EOD history
+ * One-time/re-runnable backfill: populate etf_prices with daily EOD history
  * for every active ETF, floored at each ETF's inception date so new funds don't
  * request data before they existed.
  *
@@ -9,12 +9,14 @@
  *
  * Usage:
  *   npm run backfill:prices
+ *   npm run backfill:prices -- --years=10
+ *   npm run backfill:prices -- --start=2010-01-01
  *
- * Safe to re-run: INSERT ... ON CONFLICT DO NOTHING skips already-present rows.
+ * Safe to re-run: INSERT ... ON CONFLICT DO UPDATE refreshes existing rows.
  */
 import 'dotenv/config';
 
-import { isNotNull } from 'drizzle-orm';
+import { isNotNull, sql } from 'drizzle-orm';
 
 import { db } from '../src/lib/db';
 import { etfPrices, etfs } from '../src/lib/db/schema';
@@ -24,18 +26,31 @@ function sleep(ms: number) {
   return new Promise<void>((r) => setTimeout(r, ms));
 }
 
+function argValue(name: string): string | undefined {
+  const prefix = `--${name}=`;
+  return process.argv.find((arg) => arg.startsWith(prefix))?.slice(prefix.length);
+}
+
 function dateYearsAgo(years: number): string {
   const d = new Date();
   d.setFullYear(d.getFullYear() - years);
   return d.toISOString().slice(0, 10);
 }
 
-/** Use ETF inception date as floor, 5 years ago as ceiling. */
+function requestedStartDate(): string {
+  const explicitStart = argValue('start');
+  if (explicitStart && /^\d{4}-\d{2}-\d{2}$/.test(explicitStart)) return explicitStart;
+  const years = Number(argValue('years') ?? process.env.ETF_BACKFILL_YEARS ?? '10');
+  return dateYearsAgo(Number.isFinite(years) && years > 0 ? years : 10);
+}
+
+const requestedStart = requestedStartDate();
+
+/** Use ETF inception date as floor and the requested backfill date as ceiling. */
 function etfStartDate(inceptionDate: string | null): string {
-  const fiveYearsAgo = dateYearsAgo(5);
-  if (!inceptionDate) return fiveYearsAgo;
+  if (!inceptionDate) return requestedStart;
   const inc = String(inceptionDate).slice(0, 10);
-  return inc > fiveYearsAgo ? inc : fiveYearsAgo;
+  return inc > requestedStart ? inc : requestedStart;
 }
 
 const allEtfs = await db
@@ -44,7 +59,7 @@ const allEtfs = await db
   .where(isNotNull(etfs.lastPrice))
   .orderBy(etfs.ticker);
 
-console.log(`Backfilling prices (up to 5y, floored at inception) for ${allEtfs.length} ETFs…\n`);
+console.log(`Backfilling prices from ${requestedStart} (floored at inception) for ${allEtfs.length} ETFs…\n`);
 
 let done = 0;
 let skipped = 0;
@@ -84,7 +99,18 @@ for (const etf of allEtfs) {
       .filter((r) => /^\d{4}-\d{2}-\d{2}$/.test(r.date));
 
     for (let i = 0; i < priceRows.length; i += 100) {
-      await db.insert(etfPrices).values(priceRows.slice(i, i + 100)).onConflictDoNothing();
+      const batch = priceRows.slice(i, i + 100);
+      await db.insert(etfPrices).values(batch).onConflictDoUpdate({
+        target: [etfPrices.etfId, etfPrices.date],
+        set: {
+          open: sql`excluded.open`,
+          high: sql`excluded.high`,
+          low: sql`excluded.low`,
+          close: sql`excluded.close`,
+          adjClose: sql`excluded.adj_close`,
+          volume: sql`excluded.volume`,
+        },
+      });
     }
 
     console.log(`  ✓ ${etf.ticker.padEnd(6)} ${rows.length} rows  (from ${startDate})`);

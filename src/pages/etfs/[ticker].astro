@@ -37,17 +37,18 @@ const dividends = await db
 const now = new Date();
 const oneYearAgo  = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()).toISOString().slice(0, 10);
 const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate()).toISOString().slice(0, 10);
+const dividendAmount = (d: typeof dividends[number]) => Number(d.adjAmount ?? d.amount);
 
 const ttmDivs  = dividends.filter((d) => String(d.exDate) >= oneYearAgo);
-const ttmSum   = ttmDivs.reduce((s, d) => s + Number(d.amount), 0);
+const ttmSum   = ttmDivs.reduce((s, d) => s + dividendAmount(d), 0);
 const recentSix = dividends.slice(0, 6);
 const avgPayment = recentSix.length
-  ? recentSix.reduce((s, d) => s + Number(d.amount), 0) / recentSix.length
+  ? recentSix.reduce((s, d) => s + dividendAmount(d), 0) / recentSix.length
   : 0;
 
 // Distribution trend: compare last 6 months vs prior 6 months
-const last6mSum  = dividends.filter((d) => String(d.exDate) >= sixMonthsAgo).reduce((s, d) => s + Number(d.amount), 0);
-const prior6mSum = dividends.filter((d) => { const dt = String(d.exDate); return dt >= oneYearAgo && dt < sixMonthsAgo; }).reduce((s, d) => s + Number(d.amount), 0);
+const last6mSum  = dividends.filter((d) => String(d.exDate) >= sixMonthsAgo).reduce((s, d) => s + dividendAmount(d), 0);
+const prior6mSum = dividends.filter((d) => { const dt = String(d.exDate); return dt >= oneYearAgo && dt < sixMonthsAgo; }).reduce((s, d) => s + dividendAmount(d), 0);
 let distTrend = 'Stable';
 let trendCls  = 'bg-slate-100 text-slate-600';
 if (prior6mSum > 0) {
@@ -60,8 +61,8 @@ if (prior6mSum > 0) {
 const divChron = [...dividends].sort((a, b) => String(a.exDate).localeCompare(String(b.exDate)));
 let paymentStreak = 0;
 for (let i = divChron.length - 1; i >= 1; i--) {
-  const curr = Number(divChron[i]!.amount);
-  const prev = Number(divChron[i - 1]!.amount);
+  const curr = dividendAmount(divChron[i]!);
+  const prev = dividendAmount(divChron[i - 1]!);
   if (prev > 0 && curr >= prev * 0.98) paymentStreak++;
   else break;
 }
@@ -74,7 +75,7 @@ const projectedAnnual = avgPayment * ppy;
 // Bar chart data (ascending for display)
 const chartOrdered = [...dividends].sort((a, b) => String(a.exDate).localeCompare(String(b.exDate)));
 const chartLabels  = chartOrdered.map((d) => String(d.exDate));
-const chartAmounts = chartOrdered.map((d) => Number(d.amount));
+const chartAmounts = chartOrdered.map((d) => dividendAmount(d));
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function fmtPct(decStr: string | null | undefined, digits = 2): string {
@@ -96,6 +97,11 @@ function fmtBillionsUsd(decStr: string | null | undefined): string {
 function fmtUsd(n: number, digits = 4): string {
   if (!Number.isFinite(n) || n === 0) return '-';
   return `$${n.toFixed(digits)}`;
+}
+
+function fmtUsdWhole(n: number): string {
+  if (!Number.isFinite(n)) return '-';
+  return `$${Math.round(n).toLocaleString()}`;
 }
 
 // ── Related ETFs ──────────────────────────────────────────────────────────────
@@ -158,7 +164,21 @@ const chartId = `dividend-chart-${etf.ticker}`;
 const calcYield  = Number(etf.trailing12mYield) || 0;   // decimal e.g. 0.085
 const calcPrice  = Number(etf.lastPrice) || 0;
 const calcFreq   = etf.dividendFrequency ?? 'monthly';
-const divPerYear = PPY[calcFreq] ?? 12;
+const periodLabel = calcFreq === 'weekly'
+  ? 'week'
+  : calcFreq === 'quarterly'
+    ? 'quarter'
+    : calcFreq === 'semi-annual'
+      ? '6 months'
+      : calcFreq === 'annual'
+        ? 'year'
+        : 'month';
+const snapshotInvestment = 10_000;
+const snapshotAnnual = snapshotInvestment * calcYield;
+const snapshotMonthly = snapshotAnnual / 12;
+const snapshotPeriod = ppy > 0 ? snapshotAnnual / ppy : 0;
+const snapshotShares = calcPrice > 0 ? snapshotInvestment / calcPrice : 0;
+const snapshotDripShares = calcPrice > 0 ? snapshotAnnual / calcPrice : 0;
 ---
 
 <Base
@@ -201,6 +221,50 @@ const divPerYear = PPY[calcFreq] ?? 12;
         }
       </div>
     </div>
+
+    {calcYield > 0 && calcPrice > 0 && (
+      <section class="mt-10 overflow-hidden rounded-3xl border border-blue-100 bg-gradient-to-br from-blue-950 via-blue-900 to-slate-950 text-white shadow-lg">
+        <div class="grid gap-0 lg:grid-cols-[1.05fr_0.95fr]">
+          <div class="p-6 sm:p-8">
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-300">$10k income snapshot</p>
+            <h2 class="font-heading mt-3 text-3xl font-bold tracking-tight">
+              What could $10,000 in {etf.ticker} do?
+            </h2>
+            <p class="mt-3 max-w-2xl text-sm leading-relaxed text-blue-100/90">
+              Using the current trailing 12-month yield, this is the simple cashflow picture: one position, one
+              estimated income stream, and one more step toward your freedom number.
+            </p>
+            <div class="mt-6 grid gap-3 sm:grid-cols-3">
+              <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10">
+                <p class="text-xs text-blue-200">Estimated annual income</p>
+                <p class="mt-1 text-3xl font-bold tabular-nums">{fmtUsdWhole(snapshotAnnual)}</p>
+              </div>
+              <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10">
+                <p class="text-xs text-blue-200">Monthly average</p>
+                <p class="mt-1 text-3xl font-bold tabular-nums">{fmtUsdWhole(snapshotMonthly)}</p>
+              </div>
+              <div class="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10">
+                <p class="text-xs text-blue-200">About per {periodLabel}</p>
+                <p class="mt-1 text-3xl font-bold tabular-nums">{fmtUsdWhole(snapshotPeriod)}</p>
+              </div>
+            </div>
+          </div>
+          <div class="border-t border-white/10 bg-white/[0.06] p-6 sm:p-8 lg:border-l lg:border-t-0">
+            <p class="text-sm font-semibold text-blue-100">DRIP framing</p>
+            <p class="mt-2 text-sm leading-relaxed text-blue-100/85">
+              At today&apos;s price, $10,000 buys about{' '}
+              <strong class="text-white">{snapshotShares.toFixed(1)} shares</strong>. If the estimated distributions
+              were reinvested for a year at the same price, DRIP could add roughly{' '}
+              <strong class="text-white">{snapshotDripShares.toFixed(1)} shares</strong> before any market movement.
+            </p>
+            <p class="mt-4 rounded-2xl bg-emerald-400/10 p-4 text-sm leading-relaxed text-emerald-50 ring-1 ring-emerald-300/20">
+              Think of each $10k as a cashflow block. Stack enough blocks, diversify the roles, and the portfolio
+              starts taking over small monthly bills before it ever replaces a full paycheck.
+            </p>
+          </div>
+        </div>
+      </section>
+    )}
 
     <!-- ── Key metrics ─────────────────────────────────────────────────────── -->
     <div class="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
@@ -280,14 +344,15 @@ const divPerYear = PPY[calcFreq] ?? 12;
               class="mt-6 rounded-2xl bg-blue-950 p-6"
               id="dist-calc"
               data-yield={calcYield}
+              data-price={calcPrice}
               data-freq={calcFreq}
             >
               <!-- Header -->
               <div class="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <h3 class="font-heading text-lg">Income calculator</h3>
+                  <h3 class="font-heading text-lg">Income and DRIP calculator</h3>
                   <p class="mt-0.5 text-xs" style="color: var(--section-ink-muted)">
-                    Trailing 12-month yield · not a guarantee of future distributions
+                    Model a starting position, automatic buys, and reinvested distributions
                   </p>
                 </div>
                 <span class="shrink-0 rounded-full bg-white/15 px-3 py-1 text-sm font-semibold tabular-nums">
@@ -296,25 +361,63 @@ const divPerYear = PPY[calcFreq] ?? 12;
               </div>
 
               <!-- Input -->
-              <div class="mt-5">
-                <label for="calc-amount" class="block text-xs font-medium" style="color: var(--section-ink-muted)">
-                  If I invest
-                </label>
-                <div class="mt-2 flex items-center gap-1 rounded-xl border border-white/20 bg-white/10 px-4 py-3 transition-colors focus-within:border-white/50 focus-within:bg-white/15">
-                  <span class="text-xl font-medium" style="color: var(--section-ink-muted)">$</span>
-                  <input
-                    id="calc-amount"
-                    type="number"
-                    min="0"
-                    step="100"
-                    value="10000"
-                    class="min-w-0 flex-1 border-0 bg-transparent text-2xl font-bold tabular-nums focus:outline-none"
-                  />
+              <div class="mt-5 grid gap-3 lg:grid-cols-3">
+                <div>
+                  <label for="calc-amount" class="block text-xs font-medium" style="color: var(--section-ink-muted)">
+                    Starting investment
+                  </label>
+                  <div class="mt-2 flex items-center gap-1 rounded-xl border border-white/20 bg-white/10 px-4 py-3 transition-colors focus-within:border-white/50 focus-within:bg-white/15">
+                    <span class="text-xl font-medium" style="color: var(--section-ink-muted)">$</span>
+                    <input
+                      id="calc-amount"
+                      type="number"
+                      min="0"
+                      step="100"
+                      value="10000"
+                      class="min-w-0 flex-1 border-0 bg-transparent text-2xl font-bold tabular-nums focus:outline-none"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label for="calc-monthly-buy" class="block text-xs font-medium" style="color: var(--section-ink-muted)">
+                    Automatic buy / month
+                  </label>
+                  <div class="mt-2 flex items-center gap-1 rounded-xl border border-white/20 bg-white/10 px-4 py-3 transition-colors focus-within:border-white/50 focus-within:bg-white/15">
+                    <span class="text-xl font-medium" style="color: var(--section-ink-muted)">$</span>
+                    <input
+                      id="calc-monthly-buy"
+                      type="number"
+                      min="0"
+                      step="25"
+                      value="250"
+                      class="min-w-0 flex-1 border-0 bg-transparent text-2xl font-bold tabular-nums focus:outline-none"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label for="calc-freedom-target" class="block text-xs font-medium" style="color: var(--section-ink-muted)">
+                    Monthly freedom target
+                  </label>
+                  <div class="mt-2 flex items-center gap-1 rounded-xl border border-white/20 bg-white/10 px-4 py-3 transition-colors focus-within:border-white/50 focus-within:bg-white/15">
+                    <span class="text-xl font-medium" style="color: var(--section-ink-muted)">$</span>
+                    <input
+                      id="calc-freedom-target"
+                      type="number"
+                      min="0"
+                      step="100"
+                      value="3000"
+                      class="min-w-0 flex-1 border-0 bg-transparent text-2xl font-bold tabular-nums focus:outline-none"
+                    />
+                  </div>
                 </div>
               </div>
+              <label class="mt-4 flex items-center gap-3 rounded-xl bg-white/10 px-4 py-3 text-sm font-medium">
+                <input id="calc-drip" type="checkbox" checked class="h-4 w-4 rounded border-white/30 bg-transparent accent-blue-400" />
+                Reinvest distributions with DRIP
+              </label>
 
               <!-- Output chips -->
-              <div class={`mt-4 grid gap-3 ${calcFreq === 'monthly' ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3'}`}>
+              <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 <!-- Per payment -->
                 <div class="rounded-xl bg-white/10 px-4 py-3">
                   <p class="text-xs" style="color: var(--section-ink-muted)">
@@ -332,11 +435,29 @@ const divPerYear = PPY[calcFreq] ?? 12;
                 )}
 
                 <!-- Annual - spans full width on mobile when 3-chip layout -->
-                <div class={`rounded-xl bg-white/10 px-4 py-3 ${calcFreq !== 'monthly' ? 'col-span-2 sm:col-span-1' : ''}`}>
+                <div class={`rounded-xl bg-white/10 px-4 py-3 ${calcFreq !== 'monthly' ? 'col-span-2 sm:col-span-1 lg:col-span-1' : ''}`}>
                   <p class="text-xs" style="color: var(--section-ink-muted)">per year</p>
                   <p class="mt-1.5 text-2xl font-bold tabular-nums" id="calc-annual">-</p>
                 </div>
+                <div class="rounded-xl bg-white/10 px-4 py-3">
+                  <p class="text-xs" style="color: var(--section-ink-muted)">target covered</p>
+                  <p class="mt-1.5 text-2xl font-bold tabular-nums" id="calc-coverage">-</p>
+                </div>
               </div>
+              <div class="mt-4 grid gap-3 lg:grid-cols-2">
+                <div class="rounded-xl bg-white/10 px-4 py-3">
+                  <p class="text-xs" style="color: var(--section-ink-muted)">cashflow blocks</p>
+                  <p class="mt-1.5 text-lg font-semibold" id="calc-blocks">-</p>
+                </div>
+                <div class="rounded-xl bg-white/10 px-4 py-3">
+                  <p class="text-xs" style="color: var(--section-ink-muted)">one-year DRIP estimate</p>
+                  <p class="mt-1.5 text-lg font-semibold" id="calc-drip-summary">-</p>
+                </div>
+              </div>
+              <p class="mt-4 text-xs leading-relaxed" style="color: var(--section-ink-muted)">
+                This is a simple educational model based on current TTM yield and price. It does not forecast price
+                changes, taxes, distribution cuts, or timing of each reinvestment.
+              </p>
             </div>
           )}
 
@@ -359,9 +480,9 @@ const divPerYear = PPY[calcFreq] ?? 12;
               </thead>
               <tbody class="divide-y divide-slate-100 bg-white">
                 {dividends.map((d, i) => {
-                  const curr = Number(d.amount);
+                  const curr = dividendAmount(d);
                   const next = dividends[i + 1];
-                  const prev = next ? Number(next.amount) : null;
+                  const prev = next ? dividendAmount(next) : null;
                   const chg = prev && prev > 0 ? (curr - prev) / prev : null;
                   const chgCls = chg === null ? '' : chg > 0.005 ? 'text-emerald-700' : chg < -0.005 ? 'text-rose-700' : 'text-slate-400';
                   const chgStr = chg === null ? '-' : chg >= 0 ? `+${(chg * 100).toFixed(1)}%` : `${(chg * 100).toFixed(1)}%`;
@@ -411,32 +532,65 @@ const divPerYear = PPY[calcFreq] ?? 12;
   const calc = document.getElementById('dist-calc');
   if (calc) {
     const annualYield = parseFloat(calc.dataset.yield ?? '0');
+    const price       = parseFloat(calc.dataset.price ?? '0');
     const freq        = calc.dataset.freq ?? 'monthly';
     const periodsPerYear: Record<string, number> = { weekly: 52, monthly: 12, quarterly: 4, 'semi-annual': 2, annual: 1 };
     const ppy         = periodsPerYear[freq] ?? 12;
 
-    const input      = document.getElementById('calc-amount') as HTMLInputElement | null;
-    const periodEl   = document.getElementById('calc-period');
-    const monthlyEl  = document.getElementById('calc-monthly');
-    const annualEl   = document.getElementById('calc-annual');
+    const input       = document.getElementById('calc-amount') as HTMLInputElement | null;
+    const monthlyBuy  = document.getElementById('calc-monthly-buy') as HTMLInputElement | null;
+    const targetInput = document.getElementById('calc-freedom-target') as HTMLInputElement | null;
+    const dripInput   = document.getElementById('calc-drip') as HTMLInputElement | null;
+    const periodEl    = document.getElementById('calc-period');
+    const monthlyEl   = document.getElementById('calc-monthly');
+    const annualEl    = document.getElementById('calc-annual');
+    const coverageEl  = document.getElementById('calc-coverage');
+    const blocksEl    = document.getElementById('calc-blocks');
+    const dripEl      = document.getElementById('calc-drip-summary');
 
     const fmt = (n: number) => `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
     const update = () => {
       const inv = parseFloat(input?.value ?? '0');
+      const monthly = parseFloat(monthlyBuy?.value ?? '0');
+      const target = parseFloat(targetInput?.value ?? '0');
       if (!Number.isFinite(inv) || inv <= 0 || annualYield <= 0) {
         if (periodEl)  periodEl.textContent  = '-';
         if (monthlyEl) monthlyEl.textContent = '-';
         if (annualEl)  annualEl.textContent  = '-';
+        if (coverageEl) coverageEl.textContent = '-';
+        if (blocksEl) blocksEl.textContent = '-';
+        if (dripEl) dripEl.textContent = '-';
         return;
       }
       const annual = inv * annualYield;
+      const monthlyContribution = Number.isFinite(monthly) && monthly > 0 ? monthly : 0;
+      const estimatedFirstYearIncome = (inv + monthlyContribution * 6) * annualYield;
+      const reinvestedShares = price > 0 && dripInput?.checked ? estimatedFirstYearIncome / price : 0;
+      const autoBuyShares = price > 0 ? (monthlyContribution * 12) / price : 0;
+      const monthlyIncome = annual / 12;
+      const coverage = target > 0 ? (monthlyIncome / target) * 100 : 0;
       if (periodEl)  periodEl.textContent  = fmt(annual / ppy);
       if (monthlyEl) monthlyEl.textContent = fmt(annual / 12);
       if (annualEl)  annualEl.textContent  = fmt(annual);
+      if (coverageEl) coverageEl.textContent = target > 0 ? `${coverage.toFixed(1)}%` : '-';
+      if (blocksEl) {
+        const blockIncome = 10000 * annualYield;
+        const blocks = inv / 10000;
+        blocksEl.textContent = `${blocks.toFixed(1)} blocks at about ${fmt(blockIncome)}/yr each`;
+      }
+      if (dripEl) {
+        const totalShares = reinvestedShares + autoBuyShares;
+        dripEl.textContent = dripInput?.checked
+          ? `DRIP + buys could add about ${totalShares.toFixed(2)} shares in year one`
+          : `Taking cash; monthly buys add about ${autoBuyShares.toFixed(2)} shares in year one`;
+      }
     };
 
     input?.addEventListener('input', update);
+    monthlyBuy?.addEventListener('input', update);
+    targetInput?.addEventListener('input', update);
+    dripInput?.addEventListener('change', update);
     update();
   }
 </script>
