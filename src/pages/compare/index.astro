@@ -526,9 +526,9 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
 
       async pullData() {
         const list = this.uniqTickersList();
-        const token = ++(
-          this as { _loadToken?: number }
-        )._loadToken!;
+        const tokenState = this as { _loadToken?: number };
+        tokenState._loadToken = (tokenState._loadToken ?? 0) + 1;
+        const token = tokenState._loadToken;
 
         // No selections: wipe state and destroy any rendered chart immediately.
         if (list.length === 0) {
@@ -581,7 +581,7 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
         );
 
         // A newer pull was triggered; abandon this result so loading state tracks the latest.
-        if (token !== (this as { _loadToken?: number })._loadToken) return;
+        if (token !== (this as { _loadToken?: number })._loadToken!) return;
 
         this.etfByTicker = {};
         this.priceHistByTicker = {};

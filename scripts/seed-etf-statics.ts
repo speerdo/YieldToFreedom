@@ -231,6 +231,7 @@ let updated = 0;
 let skipped = 0;
 
 for (const [ticker, vals] of Object.entries(STATICS)) {
+  const dripEligible = vals.dividendFrequency !== 'n/a';
   const result = await db
     .update(etfs)
     .set({
@@ -238,11 +239,12 @@ for (const [ticker, vals] of Object.entries(STATICS)) {
       aum: vals.aum,
       issuer: vals.issuer,
       dividendFrequency: vals.dividendFrequency,
+      dripEligible,
     })
     .where(eq(etfs.ticker, ticker));
 
   if ((result as unknown as { rowCount?: number }).rowCount ?? 1) {
-    console.log(`  ✓ ${ticker}`);
+    console.log(`  ✓ ${ticker} (DRIP: ${dripEligible ? 'yes' : 'no'})`);
     updated++;
   } else {
     console.log(`  - ${ticker} (not found in DB)`);

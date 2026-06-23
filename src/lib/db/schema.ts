@@ -30,7 +30,7 @@ export const etfs = pgTable(
     expenseRatio: decimal('expense_ratio', { precision: 6, scale: 4 }),
     aum: decimal('aum', { precision: 18, scale: 2 }),
     dividendFrequency: varchar('dividend_frequency', { length: 20 }),
-    dripEligible: boolean('drip_eligible').default(false),
+    dripEligible: boolean('drip_eligible').default(true),
     incomeSynthetic: boolean('income_synthetic').default(false),
     ytfGrade: varchar('ytf_grade', { length: 2 }),
     ytfScore: decimal('ytf_score', { precision: 5, scale: 2 }),

@@ -15,6 +15,20 @@
       "when": 1777675247244,
       "tag": "0001_email_sub_verification_token",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782248330670,
+      "tag": "0002_etf_descriptions",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782248393261,
+      "tag": "0003_drip_eligible_backfill",
+      "breakpoints": true
     }
   ]
 }
