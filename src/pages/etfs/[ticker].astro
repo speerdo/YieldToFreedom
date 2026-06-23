@@ -127,6 +127,93 @@ function fmtUsdWhole(n: number): string {
   return `$${Math.round(n).toLocaleString()}`;
 }
 
+// ETF descriptions are stored as a single run-on string of text (no newlines
+// or breaks), so we split on sentence boundaries and group consecutive
+// sentences into readable paragraphs (target ~360-620 chars each). Splitting
+// avoids false sentence boundaries inside common abbreviations like "Inc.",
+// "U.S.", "LLC.", "Corp.", "S&P" (the trailing S.) so that text continues
+// naturally after "Apple Inc. designs..." instead of breaking mid-sentence.
+const SENTENCE_END_ABBREVIATIONS = new Set([
+  'inc', 's', 'co', 'ltd', 'corp', 'no', 'mr', 'mrs', 'ms', 'dr', 'st',
+  'vs', 'jr', 'sr', 'llc', 'lp', 'plc', 'pm', 'am', 'etc', 'approx',
+  'fig', 'vol', 'pp', 'op', 'ed', 'trans', 'assoc', 'bros', 'dept',
+  'est', 'mo', 'yr', 'min', 'max', 'avg', 'sm', 'tm',
+]);
+
+function splitSentences(text: string): string[] {
+  // Find every [.!?] + whitespace + (Capital letter | digit | opening quote).
+  // Skip split points where the punctuation is the end of a known abbreviation
+  // ("Inc.", "U.S.", "LLC.", single capital letter like "S." in "U.S.").
+  const splits: number[] = [];
+  const re = /([.!?])\s+(?=[A-Z0-9\u201C\u201D"])/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text))) {
+    const periodIdx = m.index;
+    // Examine the token immediately preceding the punctuation.
+    const preceding = text.slice(0, periodIdx).match(/([A-Za-z.]+)$/);
+    let isAbbrev = false;
+    if (preceding) {
+      const token = preceding[1]!;
+      // Single capital letter (e.g. "S" in "U.S") => abbreviation tail.
+      if (/^[A-Z]$/.test(token)) isAbbrev = true;
+      const word = token.replace(/\./g, '').toLowerCase();
+      if (SENTENCE_END_ABBREVIATIONS.has(word)) isAbbrev = true;
+      // Explicit "U.S." pattern: prior chars look like "U.S"
+      const tail = text.slice(Math.max(0, periodIdx - 3), periodIdx + 1);
+      if (/U\.S$/i.test(tail.slice(0, -1))) isAbbrev = true;
+    }
+    if (!isAbbrev) splits.push(m.index + 1);
+  }
+  if (splits.length === 0) return [text.trim()].filter(Boolean);
+  const out: string[] = [];
+  let last = 0;
+  for (const idx of splits) {
+    out.push(text.slice(last, idx).trim());
+    last = idx;
+  }
+  out.push(text.slice(last).trim());
+  return out.filter(Boolean);
+}
+
+function descriptionParagraphs(text: string | null | undefined): string[] {
+  if (!text) return [];
+  const clean = text.replace(/\s+/g, ' ').trim();
+  if (!clean) return [];
+  const sentences = splitSentences(clean);
+  if (sentences.length === 0) return [clean];
+
+  const paragraphs: string[] = [];
+  let buf = '';
+  const MIN = 360;
+  const MAX = 620;
+  for (const s of sentences) {
+    const candidate = buf ? `${buf} ${s}` : s;
+    if (!buf) {
+      buf = s;
+      // A single very long sentence stands alone as its own paragraph.
+      if (buf.length >= MAX) {
+        paragraphs.push(buf);
+        buf = '';
+      }
+      continue;
+    }
+    // Once we're in the target band, flush before adding a sentence that
+    // would push us past the max — keeps paragraphs in a readable range.
+    if (buf.length >= MIN && candidate.length > MAX) {
+      paragraphs.push(buf);
+      buf = s;
+    } else {
+      buf = candidate;
+      if (buf.length >= MAX) {
+        paragraphs.push(buf);
+        buf = '';
+      }
+    }
+  }
+  if (buf) paragraphs.push(buf);
+  return paragraphs;
+}
+
 // ── Related ETFs ──────────────────────────────────────────────────────────────
 const related = await db
   .select()
@@ -332,7 +419,11 @@ const snapshotDripShares = calcPrice > 0 ? snapshotAnnual / calcPrice : 0;
     {etf.description && (
       <section class="mt-10">
         <h2 class="text-xl font-bold text-slate-900">About {etf.ticker}</h2>
-        <p class="mt-3 max-w-4xl text-sm leading-relaxed text-slate-700">{etf.description}</p>
+        <div class="mt-3 space-y-3 text-sm leading-relaxed text-slate-700">
+          {descriptionParagraphs(etf.description).map((p) => (
+            <p>{p}</p>
+          ))}
+        </div>
       </section>
     )}
 

@@ -7,19 +7,22 @@ import { etfDividends, etfPrices, etfs } from '../../../../lib/db/schema';
 
 export const prerender = false;
 
-const RANGE_YEARS: Record<string, number> = {
-  '1y': 1,
-  '3y': 3,
-  '5y': 5,
-  '10y': 10,
+const RANGE_MONTHS: Record<string, number> = {
+  '1m': 1,
+  '3m': 3,
+  '6m': 6,
+  '1y': 12,
+  '3y': 36,
+  '5y': 60,
+  '10y': 120,
 };
 
 function startDateForRange(range: string | null): string | null {
   if (!range || range === 'max') return null;
-  const years = RANGE_YEARS[range.toLowerCase()];
-  if (!years) return null;
+  const months = RANGE_MONTHS[range.toLowerCase()];
+  if (!months) return null;
   const d = new Date();
-  d.setFullYear(d.getFullYear() - years);
+  d.setMonth(d.getMonth() - months);
   return d.toISOString().slice(0, 10);
 }
 

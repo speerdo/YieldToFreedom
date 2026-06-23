@@ -117,7 +117,7 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
               >Total Return</button>
             </div>
             <div class="flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 text-xs font-medium">
-              <template x-for="range in ['1y', '3y', '5y', '10y', 'max']" :key="range">
+              <template x-for="range in ['1m', '3m', '6m', '1y', '3y', '5y', '10y', 'max']" :key="range">
                 <button
                   class="cursor-pointer rounded-md px-2.5 py-1.5 uppercase transition-colors"
                   :class="chartRange === range ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'"
@@ -139,7 +139,7 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
             </template>
           </div>
         </div>
-        <p class="mt-1.5 text-xs text-slate-400" x-text="chartMode === 'total-return' ? 'Adjusted close total return · % return from selected start' : 'Adjusted close · % return from selected start'"></p>
+        <p class="mt-1.5 text-xs text-slate-400" x-text="chartMode === 'total-return' ? 'Adjusted close total return · % return from selected start' : 'Adjusted close price · $ per share'"></p>
         <!-- data range notice -->
         <template x-if="chartDataRanges().length > 0">
           <p class="mt-2 text-xs text-slate-500" x-html="'Data from: ' + chartDataRanges().join(' &nbsp;·&nbsp; ')"></p>
@@ -264,7 +264,7 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
       catalog: [] as CatalogRow[],
       filterPillar: 'all' as string,
       chartMode: 'price' as 'price' | 'total-return',
-      chartRange: '5y' as '1y' | '3y' | '5y' | '10y' | 'max',
+      chartRange: '1y' as '1m' | '3m' | '6m' | '1y' | '3y' | '5y' | '10y' | 'max',
       lineColors: LINE_COLORS,
       pillars: [
         { value: 'all', label: 'All ETFs' },
@@ -298,7 +298,7 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
         const title = row.name.length > 32 ? `${row.name.slice(0, 32)}…` : row.name;
         const cat = row.category ? String(row.category).replace(/-/g, ' ') : '';
         const tail = cat ? ` · ${row.pillar} · ${cat}` : ` · ${row.pillar}`;
-        return `${row.ticker} — ${title}${tail}`;
+        return `${row.ticker} - ${title}${tail}`;
       },
 
       tickerSet(): Set<string> {
@@ -500,38 +500,50 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
 
       renderChartOverlay() {
         const tickersOrdered = this.uniqTickersList();
+        const isTotalReturn = this.chartMode === 'total-return';
 
         const datasets = tickersOrdered.map((tk: string, i: number) => {
           const hist = this.priceHistByTicker[tk];
-          if (this.chartMode === 'total-return') {
-            const pts = hist?.totalReturnPoints ?? [];
-            return {
-              label: tk,
-              borderColor: LINE_COLORS[i % LINE_COLORS.length] ?? LINE_COLORS[0]!,
-              points: pts.map((p: { x: number; value: number }) => ({ x: p.x, y: p.value })),
-            };
-          }
-          // Price mode: normalize to % change from first point so ETFs at different price levels are comparable
-          const pts = hist?.pricePoints ?? [];
-          const firstVal = pts[0]?.value ?? 1;
+          const pts = isTotalReturn ? (hist?.totalReturnPoints ?? []) : (hist?.pricePoints ?? []);
           return {
             label: tk,
             borderColor: LINE_COLORS[i % LINE_COLORS.length] ?? LINE_COLORS[0]!,
-            points: pts.map((p: { x: number; value: number }) => ({ x: p.x, y: ((p.value / firstVal) - 1) * 100 })),
+            points: pts.map((p: { x: number; value: number }) => ({ x: p.x, y: p.value })),
           };
         });
 
         const result = mountCompareYieldChartFromPayload({
           canvasId: this.CANVAS_ID,
           datasets,
-          yMode: 'pct',
+          yMode: isTotalReturn ? 'pct' : 'price',
         });
         this.noDataFor = result.excluded;
       },
 
+      clearChart() {
+        this.renderChartOverlay();
+      },
+
       async pullData() {
         const list = this.uniqTickersList();
+        const token = ++(
+          this as { _loadToken?: number }
+        )._loadToken!;
+
+        // No selections: wipe state and destroy any rendered chart immediately.
+        if (list.length === 0) {
+          this.etfByTicker = {};
+          this.priceHistByTicker = {};
+          this.errors = {};
+          this.noDataFor = [];
+          this.loading = false;
+          this.clearChart();
+          return;
+        }
+
+        const hasChartable = list.length >= 2;
         this.loading = true;
+        if (!hasChartable) this.clearChart();
 
         type PriceHist = { pricePoints: Array<{ x: number; value: number }>; totalReturnPoints: Array<{ x: number; value: number }> };
         const nextEtf: Record<string, EtfApiRow | undefined> = {};
@@ -546,7 +558,7 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
             try {
               const res = await fetch(`/api/etfs/${encodeURIComponent(tk)}`);
               if (!res.ok)
-                throw new Error(res.status === 404 ? `Unknown ticker “${tk}”.` : `HTTP ${res.status}`);
+                throw new Error(res.status === 404 ? `Unknown ticker "${tk}".` : `HTTP ${res.status}`);
               nextEtf[tk] = (await res.json()) as EtfApiRow;
             } catch (e) {
               const msg = e instanceof Error ? e.message : 'Load failed.';
@@ -567,6 +579,9 @@ const CANVAS_ID = 'ytf-compare-yield-chart';
             }
           }),
         );
+
+        // A newer pull was triggered; abandon this result so loading state tracks the latest.
+        if (token !== (this as { _loadToken?: number })._loadToken) return;
 
         this.etfByTicker = {};
         this.priceHistByTicker = {};

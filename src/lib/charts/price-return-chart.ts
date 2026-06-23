@@ -10,10 +10,13 @@ const DISABLED_OPACITY_CLASS = 'opacity-50';
 
 interface PricePoint { x: number; value: number; }
 interface PriceHistBody { pricePoints?: PricePoint[]; totalReturnPoints?: PricePoint[]; }
-type ChartRange = '1y' | '3y' | '5y' | '10y' | 'max';
+type ChartRange = '1m' | '3m' | '6m' | '1y' | '3y' | '5y' | '10y' | 'max';
 type ChartMode = 'price' | 'total-return';
 
 const RANGE_YEARS: Partial<Record<ChartRange, number>> = {
+  '1m': 1 / 12,
+  '3m': 3 / 12,
+  '6m': 6 / 12,
   '1y': 1,
   '3y': 3,
   '5y': 5,
@@ -78,9 +81,10 @@ async function initPriceReturnChart(container: HTMLElement, ticker: string): Pro
   };
 
   const defaultRangeForHistory = (years: number): ChartRange => {
-    if (years + RANGE_TOLERANCE_YEARS >= 5) return '5y';
-    if (years + RANGE_TOLERANCE_YEARS >= 3) return '3y';
+    if (years + RANGE_TOLERANCE_YEARS >= 5) return '1y';
+    if (years + RANGE_TOLERANCE_YEARS >= 3) return '1y';
     if (years + RANGE_TOLERANCE_YEARS >= 1) return '1y';
+    if (years + RANGE_TOLERANCE_YEARS >= 0.5) return '6m';
     return 'max';
   };
 
