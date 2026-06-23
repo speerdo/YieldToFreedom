@@ -1,5 +1,6 @@
 ---
 import ThemeToggle from './ThemeToggle.astro';
+import Logo from './Logo.astro';
 
 const themes = [
   { id: 'light',  label: 'Light',  bg: '#e2e8f0' },
@@ -13,13 +14,7 @@ const themes = [
   <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4">
 
     <!-- Logo -->
-    <a href="/" class="font-heading flex items-center gap-2 font-bold tracking-tight text-[var(--fg)]">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-        <rect width="28" height="28" rx="7" fill="#2563eb"/>
-        <polyline points="3,23 7,16 10,19 14,11 18,14 24,4" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      Yield to Freedom
-    </a>
+    <Logo />
 
     <!-- Desktop nav (hidden on mobile) -->
     <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-[var(--fg-muted)]">

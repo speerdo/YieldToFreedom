@@ -2,6 +2,9 @@
 import Base from '../../layouts/Base.astro';
 import Disclaimer from '../../components/ui/Disclaimer.astro';
 import { publicSiteOrigin } from '../../lib/site/url';
+import { db } from '../../lib/db';
+import { etfs } from '../../lib/db/schema';
+import { eq } from 'drizzle-orm';
 
 const site = publicSiteOrigin();
 const published = '2026-05-05';
@@ -9,58 +12,254 @@ const published = '2026-05-05';
 const schema = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'Income Investing Strategy Overview',
+  headline: 'The Income-First Strategy: Three Pillars to Financial Freedom',
   datePublished: published,
   dateModified: published,
-  author: {
-    '@type': 'Organization',
-    name: 'Yield to Freedom',
-    url: site,
-  },
-  publisher: {
-    '@type': 'Organization',
-    name: 'Creative Bandit LLC',
-    url: site,
-  },
+  author: { '@type': 'Organization', name: 'Yield to Freedom', url: site },
+  publisher: { '@type': 'Organization', name: 'Creative Bandit LLC', url: site },
   description:
-    'How Yield to Freedom maps ETFs to Income, Stability, and Growth pillars for long-horizon builders.',
+    'A complete framework for income-first investing: the three pillars (income, stability, growth), the 40/30/30 allocation, how to tune it, and the honest risks most yield sites skip.',
 };
+
+// Top ETFs for the Explore funds section (highest YTF score within each pillar)
+const exploreCards = await db
+  .select({ ticker: etfs.ticker, name: etfs.name, pillar: etfs.pillar, ytfScore: etfs.ytfScore })
+  .from(etfs)
+  .where(eq(etfs.isActive, true))
+  .orderBy(etfs.ytfScore)
+  .limit(12);
+
+// Keep a small, stable selection across pillars for the Explore grid
+const seenPillars = new Set<string>();
+// sort by score desc in memory (drizzle orderBy asc above; reverse)
+const ranked = [...exploreCards].sort((a, b) => {
+  const sa = a.ytfScore != null ? Number(a.ytfScore) : -Infinity;
+  const sb = b.ytfScore != null ? Number(b.ytfScore) : -Infinity;
+  return sb - sa;
+});
+const explore = ranked.filter((r) => {
+  if (seenPillars.has(r.pillar)) return false;
+  seenPillars.add(r.pillar);
+  return true;
+}).concat(ranked.filter((r) => !seenPillars.has(r.pillar))).slice(0, 6);
+
+// Table-of-contents anchored headings
+const sections = [
+  { id: 'why-three-pillars', text: 'Why three pillars' },
+  { id: 'income-the-engine', text: 'Income: the engine' },
+  { id: 'stability-the-backbone', text: 'Stability: the backbone' },
+  { id: 'growth-the-compounder', text: 'Growth: the compounder' },
+  { id: 'the-40-30-30-allocation', text: 'The 40 / 30 / 30 allocation' },
+  { id: 'pillars-in-a-downturn', text: 'How the pillars work together in a downturn' },
+  { id: 'the-honest-risks', text: 'The honest risks' },
+  { id: 'go-deeper', text: 'Go deeper' },
+  { id: 'explore-funds', text: 'Explore funds' },
+];
+
+function tickerHref(ticker: string): string {
+  return `/etfs/${ticker}`;
+}
 ---
 
 <Base
-  title="Strategy - Yield to Freedom"
-  description="Framework for income-first portfolios: three pillars, dividend cadence, and how we score ETFs for research."
+  title="The Income-First Strategy: Three Pillars to Financial Freedom | Yield to Freedom"
+  description="A complete framework for income-first investing: the three pillars (income, stability, growth), the 40/30/30 allocation, how to tune it, and the honest risks most yield sites skip."
   schema={schema}
 >
-  <article
-    class="max-w-3xl space-y-4 leading-relaxed text-slate-700 [&_a]:font-semibold [&_a]:text-blue-700 hover:[&_a]:text-blue-900 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6 [&_strong]:font-semibold"
-  >
-    <h1 class="text-3xl font-bold tracking-tight text-slate-900">Income-first strategy</h1>
-    <p>
-      Yield to Freedom is built for investors who want their portfolios to contribute meaningfully toward financial
-      independence, not just headline returns on a brokerage statement.
+  <article class="mx-auto max-w-3xl leading-relaxed text-slate-700 [&_a]:font-semibold [&_a]:text-blue-700 hover:[&_a]:text-blue-900 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6 [&_strong]:font-semibold">
+
+    <!-- ── Title + lede ───────────────────────────────────────────────── -->
+    <h1 class="font-heading text-4xl font-bold tracking-tight text-slate-900">The income-first strategy</h1>
+
+    <p class="mt-5 text-lg text-slate-800">
+      Most investing advice optimizes for one number: total return on a brokerage statement you are not allowed to
+      touch until you are old. Income-first investing optimizes for something different and more tangible. It asks
+      what your portfolio can pay you, in actual cash, while you stay invested. The goal is not to get rich on paper.
+      It is to build a stream of distributions that grows over time until it covers your bills, and eventually replaces
+      a paycheck entirely.
     </p>
-    <h2 class="mt-10 text-xl font-bold text-slate-900">Three pillars</h2>
-    <ul>
-      <li><strong>Income:</strong> vehicles designed to maximize distributable yield (often covered-call ETFs, monthly payers).</li>
-      <li><strong>Stability:</strong> dividend growers and quality tilt funds that prioritize durability over raw headline yield.</li>
-      <li><strong>Growth:</strong> core equity beta (and thematic sleeves) where you still want long-term upside alongside some yield.</li>
+
+    <p class="mt-4">
+      Yield to Freedom is built around a single framework for doing that without falling into the traps that sink most
+      income investors. It rests on three pillars, each doing a job the other two cannot.
+    </p>
+
+    <!-- ── Table of contents ─────────────────────────────────────────── -->
+    <nav class="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm" aria-label="Page outline">
+      <p class="mb-2 text-xs font-semibold uppercase tracking-widest text-slate-500">On this page</p>
+      <ol class="grid gap-1 sm:grid-cols-2">
+        {sections.map((s, i) => (
+          <li>
+            <a href={`#${s.id}`} class="text-blue-700 hover:text-blue-900">
+              <span class="tabular-nums text-slate-400">{i + 1}.</span> {s.text}
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+
+    <h2 id="why-three-pillars" class="mt-12 text-2xl font-bold text-slate-900">Why three pillars</h2>
+    <p class="mt-3">
+      The instinct of a new income investor is to find the highest yield and buy it. This is the fastest way to lose
+      money in the income space. Funds advertising 15 percent or more often pay that yield partly by returning your own
+      capital to you, and their share price erodes over time. You collect a big distribution, the NAV grinds lower,
+      and a few years later you have a smaller position paying a smaller check. The headline yield was a mirage.
+    </p>
+    <p class="mt-4">
+      The fix is not to avoid high yield. It is to balance it. Three pillars, each with a distinct role, produce an
+      income stream that is both large today and durable tomorrow.
+    </p>
+
+    <h3 id="income-the-engine" class="mt-10 text-xl font-bold text-slate-900">Income: the engine</h3>
+    <p class="mt-3">
+      The income pillar is where your immediate cash flow comes from. These are the funds engineered to pay, often
+      through covered-call strategies on indexes like the Nasdaq 100 or S&amp;P 500, sometimes through real-asset
+      income or other option-based structures. Funds like
+      <a href={tickerHref('JEPI')}>{'JEPI'}</a>,
+      <a href={tickerHref('JEPQ')}>JEPQ</a>,
+      <a href={tickerHref('SPYI')}>SPYI</a>, and
+      <a href={tickerHref('QQQI')}>QQQI</a> live here. They are the highest-paying part of the portfolio and the part
+      that most directly moves you toward covering monthly expenses.
+    </p>
+    <p class="mt-4">
+      The tradeoff is that pure income funds tend to cap their own upside (a covered call gives away gains above the
+      strike) and some carry structural NAV decay. That is acceptable in this framework, because it is not the income
+      pillar's job to appreciate. Its job is to pay. The growth pillar handles appreciation for the whole portfolio.
+    </p>
+    <p class="mt-4">
+      The key discipline here is judging an income fund by whether the distribution is real and durable, not just large.
+      A fund paying genuine option premium and earned income is a keeper. A fund paying mostly return of your own
+      capital while its price falls is not, no matter how high the headline yield. This distinction is what our A-to-D
+      grade is built to surface.
+    </p>
+
+    <h3 id="stability-the-backbone" class="mt-10 text-xl font-bold text-slate-900">Stability: the backbone</h3>
+    <p class="mt-3">
+      The stability pillar is the ballast. These are dividend-growth and quality-tilt funds
+      (<a href={tickerHref('SCHD')}>{'SCHD'}</a>,
+      <a href={tickerHref('VIG')}>VIG</a>,
+      <a href={tickerHref('DGRO')}>DGRO</a>,
+      <a href={tickerHref('DGRW')}>DGRW</a>) that raise their payouts year after year through recessions and rallies
+      alike. Their yields are lower than the income pillar, often in the 2 to 4 percent range, but their distributions
+      are among the most reliable in the market and their share prices hold up far better in a downturn.
+    </p>
+    <p class="mt-4">
+      Stability does two things. It grows your income organically over time without you adding a dollar, because the
+      underlying companies raise their dividends. And it cushions the portfolio when markets fall, which matters
+      enormously if you are using any leverage or drawing on the portfolio, because it keeps your overall equity from
+      collapsing in a bad month. In a downturn, the stability pillar is what holds the floor while the income pillar
+      keeps paying and the growth pillar recovers.
+    </p>
+
+    <h3 id="growth-the-compounder" class="mt-10 text-xl font-bold text-slate-900">Growth: the compounder</h3>
+    <p class="mt-3">
+      The growth pillar is broad-market and thematic equity
+      (<a href={tickerHref('VOO')}>{'VOO'}</a>,
+      <a href={tickerHref('QQQ')}>QQQ</a>,
+      <a href={tickerHref('VGT')}>VGT</a> and similar) that captures long-term upside while paying little or no yield.
+      At first glance it looks out of place in an income portfolio. It is essential. The growth pillar is what offsets
+      any NAV erosion in the income pillar at the portfolio level, so total net worth keeps rising even as the
+      high-yield funds give back some principal. Without growth, an all-income portfolio slowly shrinks its own capital
+      base. With it, the whole structure compounds.
+    </p>
+    <p class="mt-4">
+      Think of growth as the part of the portfolio that ensures there is a bigger base to generate income from next
+      year, and the year after.
+    </p>
+
+    <h2 id="the-40-30-30-allocation" class="mt-12 text-2xl font-bold text-slate-900">The 40 / 30 / 30 allocation</h2>
+    <p class="mt-3">
+      A sensible starting target is <strong>40 percent income, 30 percent stability, 30 percent growth</strong>. Income
+      gets the largest share because cash flow is the point. Stability and growth split the rest, one protecting the
+      income and one expanding the base.
+    </p>
+    <p class="mt-4">
+      This is a starting point, not a rule. Tune it to your situation:
+    </p>
+    <p class="mt-4">
+      If you are younger and further from needing the income, tilt toward growth (for example 30 income / 30 stability
+      / 40 growth) and let the base compound longer before you lean on it. If you are close to living off the portfolio,
+      tilt toward income and stability (for example 50 income / 30 stability / 20 growth) to maximize current cash flow
+      and durability. If you hold in a taxable account, weight the more tax-efficient structures (some covered-call
+      index funds use favorable options tax treatment) and be mindful that high distributions are taxable events. If
+      you have high risk tolerance and a long horizon, a heavier income tilt with a strong growth backstop can
+      accelerate the snowball, as long as you understand the volatility you are taking on.
+    </p>
+    <p class="mt-4">
+      The ratios are levers. The framework is the constant.
+    </p>
+
+    <h2 id="pillars-in-a-downturn" class="mt-12 text-2xl font-bold text-slate-900">How the pillars work together in a downturn</h2>
+    <p class="mt-3">
+      The real test of any income strategy is a bad year, so it is worth being concrete about what each pillar does
+      when markets fall. The income pillar keeps paying distributions, though some funds may trim them. The stability
+      pillar holds its value far better than the broad market and keeps raising dividends, which props up both your
+      income and your total equity. The growth pillar falls the most in the moment but recovers and compounds over the
+      cycle, and a downturn is when your reinvested distributions buy it cheaply.
+    </p>
+    <p class="mt-4">
+      No single fund does all of that. The combination does. That is the entire argument for diversifying across roles
+      rather than chasing one number.
+    </p>
+
+    <h2 id="the-honest-risks" class="mt-12 text-2xl font-bold text-slate-900">The honest risks</h2>
+    <p class="mt-3">
+      Every income site should tell you where this can go wrong, so here it is plainly. High-yield income funds can and
+      do cut distributions, especially in volatile markets, and several carry structural NAV decay that erodes
+      principal over time. Covered-call funds underperform the underlying index in strong bull markets because they
+      cap upside. Past distributions never guarantee future ones. And if you layer leverage on top of an income
+      portfolio, a deep drawdown can force selling at the worst possible time, which is a risk the high yields
+      themselves do not offset.
+    </p>
+    <p class="mt-4">
+      None of this makes income investing a bad strategy. It makes it a strategy that has to be run with discipline:
+      balance the pillars, judge distributions on durability rather than size, keep a growth backstop, and respect
+      the risks of leverage. Done that way, an income-first portfolio can carry you toward financial freedom faster
+      than a pure accumulation approach, because it pays you along the way.
+    </p>
+
+    <h2 id="go-deeper" class="mt-12 text-2xl font-bold text-slate-900">Go deeper</h2>
+    <ul class="mt-4">
+      <li>
+        <a href="/strategy/drip">DRIP and compounding</a>:
+        why reinvesting distributions matters for income stacks.
+      </li>
+      <li>
+        <a href="/strategy/margin">Margin and borrowing</a>:
+        costs, sequencing, and when leverage breaks the psychology of income investing.
+      </li>
+      <li>
+        <a href="/strategy/fi-timeline">FI Score and timelines</a>:
+        mapping payouts to recurring expenses.
+      </li>
     </ul>
-    <p>
-      A simple target allocation is <strong>40% income / 30% stability / 30% growth</strong>. Tune it to your age, tax
-      situation, and risk tolerance. See also <a href="/about">About</a> for how we think about tradeoffs.
+
+    <h2 id="explore-funds" class="mt-12 text-2xl font-bold text-slate-900">Explore funds</h2>
+    <p class="mt-3">
+      Start with
+      <a href={tickerHref('JEPI')}>{'JEPI'}</a>,
+      <a href={tickerHref('SCHD')}>{'SCHD'}</a>, and
+      <a href={tickerHref('VOO')}>{'VOO'}</a>, then widen from the full
+      <a href="/etfs">ETF directory</a>.
     </p>
-    <h2 class="mt-10 text-xl font-bold text-slate-900">Deep dives</h2>
-    <ul>
-      <li><a href="/strategy/drip">DRIP & compounding</a> - why reinvesting distributions matters for income stacks.</li>
-      <li><a href="/strategy/margin">Margin & borrowing</a> - costs, sequencing, and when leverage breaks the psychology of income investing.</li>
-      <li><a href="/strategy/fi-timeline">FI Score & timelines</a> - mapping payouts to recurring expenses.</li>
-    </ul>
-    <h2 class="mt-10 text-xl font-bold text-slate-900">Explore funds</h2>
-    <p>
-      Start with <a href="/etfs/JEPI">JEPI</a>, <a href="/etfs/SCHD">SCHD</a>, and <a href="/etfs/VOO">VOO</a>, then widen
-      from the full <a href="/etfs">ETF directory</a>.
-    </p>
+
+  {explore.length > 0 && (
+    <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {explore.map((r) => (
+        <a
+          href={`/etfs/${r.ticker}`}
+          class="group block rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+        >
+          <div class="flex items-baseline justify-between">
+            <span class="font-heading text-xl font-extrabold text-blue-900 group-hover:text-blue-700">{r.ticker}</span>
+            <span class="text-xs font-semibold uppercase tracking-wide text-slate-400">{r.pillar}</span>
+          </div>
+          <p class="mt-1 text-xs leading-snug text-slate-600">{r.name}</p>
+        </a>
+      ))}
+    </div>
+  )}
+
     <Disclaimer />
   </article>
 </Base>

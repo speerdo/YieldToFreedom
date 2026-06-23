@@ -31,13 +31,32 @@ const dividends = await db
   .from(etfDividends)
   .where(eq(etfDividends.etfId, etf.id))
   .orderBy(desc(etfDividends.exDate))
-  .limit(48);
+  .limit(120);
 
 // ── Distribution stats ────────────────────────────────────────────────────────
 const now = new Date();
 const oneYearAgo  = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()).toISOString().slice(0, 10);
-const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate()).toISOString().slice(0, 10);
+const twoYearsAgo = new Date(now.getFullYear() - 2, now.getMonth(), now.getDate()).toISOString().slice(0, 10);
 const dividendAmount = (d: typeof dividends[number]) => Number(d.adjAmount ?? d.amount);
+
+// Detect special / anomalous distributions so they do not distort the trend
+// signal. We flag any payment whose size is far off the typical (median)
+// regular payment. This catches year-end specials and one-off distributions
+// (the +222 % / -64.9 % single-period swings the spec calls out) without
+// requiring a per-row "special" flag from the data source.
+const amounts = dividends.map((d) => dividendAmount(d)).filter((n) => Number.isFinite(n) && n > 0).sort((a, b) => a - b);
+const medianAmount =
+  amounts.length === 0
+    ? 0
+    : amounts.length % 2 === 1
+      ? amounts[(amounts.length - 1) / 2]!
+      : (amounts[amounts.length / 2 - 1]! + amounts[amounts.length / 2]!) / 2;
+const specialThresholdHigh = medianAmount > 0 ? medianAmount * 2.5 : Infinity; // 2.5x median
+const specialThresholdLow  = medianAmount > 0 ? medianAmount * 0.4 : 0;         // 0.4x median
+function isSpecial(amount: number): boolean {
+  if (!Number.isFinite(medianAmount) || medianAmount <= 0) return false;
+  return amount > specialThresholdHigh || amount < specialThresholdLow;
+}
 
 const ttmDivs  = dividends.filter((d) => String(d.exDate) >= oneYearAgo);
 const ttmSum   = ttmDivs.reduce((s, d) => s + dividendAmount(d), 0);
@@ -46,26 +65,30 @@ const avgPayment = recentSix.length
   ? recentSix.reduce((s, d) => s + dividendAmount(d), 0) / recentSix.length
   : 0;
 
-// Distribution trend: compare last 6 months vs prior 6 months
-const last6mSum  = dividends.filter((d) => String(d.exDate) >= sixMonthsAgo).reduce((s, d) => s + dividendAmount(d), 0);
-const prior6mSum = dividends.filter((d) => { const dt = String(d.exDate); return dt >= oneYearAgo && dt < sixMonthsAgo; }).reduce((s, d) => s + dividendAmount(d), 0);
+// Distribution trend: trailing-12-month distributions vs prior trailing-12-month
+// distributions (year over year), excluding special / anomalous payments so
+// a single one-off payout can't flip a dividend grower to "Declining".
+const ttmSumReg  = ttmDivs.filter((d) => !isSpecial(dividendAmount(d))).reduce((s, d) => s + dividendAmount(d), 0);
+const priorTtmDivs = dividends.filter((d) => {
+  const dt = String(d.exDate);
+  return dt >= twoYearsAgo && dt < oneYearAgo;
+});
+const priorTtmSumReg = priorTtmDivs.filter((d) => !isSpecial(dividendAmount(d))).reduce((s, d) => s + dividendAmount(d), 0);
+
 let distTrend = 'Stable';
 let trendCls  = 'bg-slate-100 text-slate-600';
-if (prior6mSum > 0) {
-  const chg = (last6mSum - prior6mSum) / prior6mSum;
-  if (chg >  0.05) { distTrend = '↑ Growing';   trendCls = 'bg-emerald-100 text-emerald-800'; }
-  if (chg < -0.10) { distTrend = '↓ Declining';  trendCls = 'bg-rose-100    text-rose-800';   }
+let trendDetail = 'Based on last 12 months';
+if (priorTtmSumReg > 0) {
+  const chg = (ttmSumReg - priorTtmSumReg) / priorTtmSumReg;
+  if (chg >  0.02) { distTrend = '↑ Growing';  trendCls = 'bg-emerald-100 text-emerald-800'; trendDetail = `TTM up ${Math.round(chg * 100)}% YoY`; }
+  if (chg < -0.05) { distTrend = '↓ Declining'; trendCls = 'bg-rose-100    text-rose-800';    trendDetail = `TTM down ${Math.round(-chg * 100)}% YoY`; }
+  if (distTrend === 'Stable') trendDetail = `TTM within 5% of prior year`;
+} else if (dividends.length > 0) {
+  trendDetail = 'Less than 2 years of history';
 }
 
 // Payment streak: consecutive payments not below 98 % of the prior one
-const divChron = [...dividends].sort((a, b) => String(a.exDate).localeCompare(String(b.exDate)));
-let paymentStreak = 0;
-for (let i = divChron.length - 1; i >= 1; i--) {
-  const curr = dividendAmount(divChron[i]!);
-  const prev = dividendAmount(divChron[i - 1]!);
-  if (prev > 0 && curr >= prev * 0.98) paymentStreak++;
-  else break;
-}
+
 
 // Projected annual per share using recent average × inferred payment count
 const PPY: Record<string, number> = { weekly: 52, monthly: 12, quarterly: 4, 'semi-annual': 2, annual: 1 };
@@ -421,8 +444,10 @@ const snapshotDripShares = calcPrice > 0 ? snapshotAnnual / calcPrice : 0;
                   {distTrend}
                 </span>
               </div>
-              <p class="mt-1 text-xs text-slate-400">
-                {paymentStreak > 0 ? `${paymentStreak} consecutive stable payments` : 'Based on last 12 months'}
+              <p class="mt-1 text-xs text-slate-400">{trendDetail}</p>
+              <p class="mt-1 text-[10px] leading-snug text-slate-400">
+                Compares trailing 12-month regular distributions year over year. Special or year-end distributions can
+                cause large single-period swings and are noted where recognised.
               </p>
             </div>
           </div>
@@ -570,9 +595,15 @@ const snapshotDripShares = calcPrice > 0 ? snapshotAnnual / calcPrice : 0;
                   const chg = prev && prev > 0 ? (curr - prev) / prev : null;
                   const chgCls = chg === null ? '' : chg > 0.005 ? 'text-emerald-700' : chg < -0.005 ? 'text-rose-700' : 'text-slate-400';
                   const chgStr = chg === null ? '-' : chg >= 0 ? `+${(chg * 100).toFixed(1)}%` : `${(chg * 100).toFixed(1)}%`;
+                  const special = amounts.length === 0 ? false : isSpecial(curr);
                   return (
                     <tr class="hover:bg-slate-50/60">
-                      <td class="px-4 py-2.5 tabular-nums text-slate-800">{String(d.exDate)}</td>
+                      <td class="px-4 py-2.5 tabular-nums text-slate-800">
+                        {String(d.exDate)}
+                        {special && (
+                          <span class="ml-2 inline-flex rounded-full bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-800 ring-1 ring-inset ring-amber-600/25" title="Anomalous payment; excluded from the year-over-year trend.">special?</span>
+                        )}
+                      </td>
                       <td class="px-4 py-2.5 tabular-nums text-slate-500">{d.paymentDate ? String(d.paymentDate) : '-'}</td>
                       <td class="px-4 py-2.5 text-right tabular-nums font-medium text-slate-900">${curr.toFixed(4)}</td>
                       <td class={`px-4 py-2.5 text-right tabular-nums text-xs font-medium ${chgCls}`}>{chgStr}</td>

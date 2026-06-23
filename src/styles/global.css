@@ -23,6 +23,7 @@
   --link-hover:        #1e3a8a;  /* blue-900 */
   --btn-primary-bg:    #2563eb;  /* blue-600 */
   --btn-primary-hover: #3b82f6;  /* blue-500 */
+  --brand:             #2563eb;  /* logo / accent mark color */
   --section-ink-bg:    #172554;  /* blue-950 */
   --section-ink-fg:    #ffffff;
   --section-ink-muted: #93c5fd;  /* blue-300 */
@@ -43,6 +44,7 @@
   --link-hover:        #93c5fd;  /* blue-300 */
   --btn-primary-bg:    #3b82f6;  /* blue-500 */
   --btn-primary-hover: #60a5fa;  /* blue-400 */
+  --brand:             #60a5fa;  /* logo / accent mark color */
   --section-ink-bg:    #1e293b;  /* slate-800 - distinct from main bg */
   --section-ink-fg:    #f1f5f9;
   --section-ink-muted: #94a3b8;  /* slate-400 */
@@ -63,6 +65,7 @@
   --link-hover:        #1e3a8a;  /* blue-900 */
   --btn-primary-bg:    #1d4ed8;
   --btn-primary-hover: #2563eb;
+  --brand:             #1d4ed8;  /* logo / accent mark color */
   --section-ink-bg:    #3b2410;  /* deep tan-brown (matches --fg) */
   --section-ink-fg:    #f9edd8;
   --section-ink-muted: #c4976a;  /* border color as muted label */
@@ -83,6 +86,7 @@
   --link-hover:        #e9d5ff;  /* purple-100 */
   --btn-primary-bg:    #7c3aed;  /* violet-700 */
   --btn-primary-hover: #8b5cf6;  /* violet-500 */
+  --brand:             #c084fc;  /* logo / accent mark color */
   --section-ink-bg:    #130626;  /* --bg-subtle - very dark purple */
   --section-ink-fg:    #f7e9b0;
   --section-ink-muted: #d4a843;
