@@ -24,6 +24,7 @@ export const etfs = pgTable(
     pillar: varchar('pillar', { length: 20 }).notNull(),
     category: varchar('category', { length: 50 }),
     issuer: varchar('issuer', { length: 100 }),
+    website: text('website'),
     lastPrice: decimal('last_price', { precision: 10, scale: 4 }),
     lastYield: decimal('last_yield', { precision: 6, scale: 4 }),
     trailing12mYield: decimal('trailing_12m_yield', { precision: 6, scale: 4 }),

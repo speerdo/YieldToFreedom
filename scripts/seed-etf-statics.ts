@@ -73,7 +73,7 @@ const STATICS: Record<
   TSLY:  { expenseRatio: '0.0099', aum: '1500000000',    issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   NVDY:  { expenseRatio: '0.0099', aum: '1400000000',    issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   AMZY:  { expenseRatio: '0.0099', aum: '500000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
-  MSFO:  { expenseRatio: '0.0099', aum: '400000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
+  MSFO:  { expenseRatio: '0.0099', aum: '400000000',     issuer: 'ElevateShares',   dividendFrequency: 'monthly'  },
   GOOY:  { expenseRatio: '0.0099', aum: '300000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   APLY:  { expenseRatio: '0.0099', aum: '400000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   MSTY:  { expenseRatio: '0.0099', aum: '4000000000',    issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
@@ -83,7 +83,7 @@ const STATICS: Record<
   FBY:   { expenseRatio: '0.0099', aum: '500000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   NFLY:  { expenseRatio: '0.0099', aum: '200000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   PYPY:  { expenseRatio: '0.0099', aum: '150000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
-  XOMO:  { expenseRatio: '0.0099', aum: '200000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
+  XOMO:  { expenseRatio: '0.0099', aum: '200000000',     issuer: 'ElevateShares',   dividendFrequency: 'monthly'  },
   BRKC:  { expenseRatio: '0.0099', aum: '100000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   DISO:  { expenseRatio: '0.0099', aum: '100000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
   SMCY:  { expenseRatio: '0.0099', aum: '200000000',     issuer: 'YieldMax',        dividendFrequency: 'monthly'  },
@@ -139,13 +139,13 @@ const STATICS: Record<
   // ── High-yield ────────────────────────────────────────────────────────────
   PBDC:  { expenseRatio: '0.0050', aum: '150000000',     issuer: 'Putnam',          dividendFrequency: 'monthly'  },
   BIZD:  { expenseRatio: '0.0040', aum: '800000000',     issuer: 'VanEck',          dividendFrequency: 'quarterly'},
-  KLIP:  { expenseRatio: '0.0050', aum: '400000000',     issuer: 'KFA Funds',       dividendFrequency: 'monthly'  },
+  KLIP:  { expenseRatio: '0.0050', aum: '400000000',     issuer: 'KraneShares',     dividendFrequency: 'monthly'  },
   CSHI:  { expenseRatio: '0.0058', aum: '800000000',     issuer: 'NEOS',            dividendFrequency: 'monthly'  },
-  HNDL:  { expenseRatio: '0.0072', aum: '500000000',     issuer: 'Nationwide',      dividendFrequency: 'monthly'  },
+  HNDL:  { expenseRatio: '0.0072', aum: '500000000',     issuer: 'Strategy Shares', dividendFrequency: 'monthly'  },
   MDIV:  { expenseRatio: '0.0068', aum: '300000000',     issuer: 'First Trust',     dividendFrequency: 'monthly'  },
-  TOPW:  { expenseRatio: '0.0099', aum: '50000000',      issuer: 'Tidal Financial', dividendFrequency: 'monthly'  },
-  GOOW:  { expenseRatio: '0.0099', aum: '30000000',      issuer: 'Tidal Financial', dividendFrequency: 'monthly'  },
-  NVII:  { expenseRatio: '0.0075', aum: '40000000',      issuer: 'NorthStar',       dividendFrequency: 'monthly'  },
+  TOPW:  { expenseRatio: '0.0099', aum: '50000000',      issuer: 'Roundhill',       dividendFrequency: 'monthly'  },
+  GOOW:  { expenseRatio: '0.0099', aum: '30000000',      issuer: 'Roundhill',       dividendFrequency: 'monthly'  },
+  NVII:  { expenseRatio: '0.0075', aum: '40000000',      issuer: 'REX Shares',      dividendFrequency: 'monthly'  },
 
   // ── Preferred stock ───────────────────────────────────────────────────────
   PFF:   { expenseRatio: '0.0046', aum: '13000000000',   issuer: 'iShares',         dividendFrequency: 'monthly'  },
@@ -165,10 +165,10 @@ const STATICS: Record<
   KBWY:  { expenseRatio: '0.0035', aum: '300000000',     issuer: 'Invesco',         dividendFrequency: 'monthly'  },
 
   // ── MLP ───────────────────────────────────────────────────────────────────
-  AMLP:  { expenseRatio: '0.0087', aum: '9000000000',    issuer: 'Alerian',         dividendFrequency: 'quarterly'},
+  AMLP:  { expenseRatio: '0.0087', aum: '9000000000',    issuer: 'ALPS',            dividendFrequency: 'quarterly'},
   MLPA:  { expenseRatio: '0.0045', aum: '1500000000',    issuer: 'Global X',        dividendFrequency: 'quarterly'},
   MLPX:  { expenseRatio: '0.0045', aum: '900000000',     issuer: 'Global X',        dividendFrequency: 'quarterly'},
-  ENFR:  { expenseRatio: '0.0035', aum: '500000000',     issuer: 'Alerian',         dividendFrequency: 'quarterly'},
+  ENFR:  { expenseRatio: '0.0035', aum: '500000000',     issuer: 'ALPS',            dividendFrequency: 'quarterly'},
 
   // ── Bond-income ───────────────────────────────────────────────────────────
   HYG:   { expenseRatio: '0.0048', aum: '14000000000',   issuer: 'iShares',         dividendFrequency: 'monthly'  },

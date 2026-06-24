@@ -1,0 +1,1 @@
+ALTER TABLE "etfs" ADD COLUMN "website" text;

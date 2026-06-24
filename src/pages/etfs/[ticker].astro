@@ -319,6 +319,21 @@ const snapshotDripShares = calcPrice > 0 ? snapshotAnnual / calcPrice : 0;
           <Badge label={etf.pillar} pillar={etf.pillar} />
           {etf.category ? <Badge label={etf.category.replace(/-/g, ' ')} pillar="mixed" /> : null}
         </div>
+        {(etf.issuer || etf.website) && (
+          <p class="mt-3 text-sm text-slate-600">
+            {etf.issuer ? <span>Issued by <span class="font-medium text-slate-800">{etf.issuer}</span></span> : null}
+            {etf.website ? (
+              <a
+                href={etf.website}
+                target="_blank"
+                rel="noopener noreferrer nofollow"
+                class="ml-2 font-medium text-blue-800 underline decoration-blue-800/35 hover:text-blue-950 hover:decoration-blue-950/50"
+              >
+                Visit fund page ↗
+              </a>
+            ) : null}
+          </p>
+        )}
       </div>
 
       <div class="rounded-xl border border-slate-100 bg-slate-50 px-6 py-4 text-xs text-slate-500">
