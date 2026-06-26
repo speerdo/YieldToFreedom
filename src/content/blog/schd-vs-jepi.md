@@ -2,7 +2,7 @@
 title: 'SCHD vs JEPI - Dividend Growth Meets Covered-Call Income'
 description: "A framework for comparing Schwab's dividend achiever ETF against JPMorgan's premium-income fund - without pretending either is universally better."
 pubDate: 2026-05-06
-image: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&w=800&q=80'
+image: '/images/unsplash/1579621970563-ebec7560ff3e.webp'
 imageAlt: 'Green plant sprouting from a pile of coins, representing dividend income growth'
 tags: ['SCHD', 'JEPI', 'comparison']
 relatedEtfs: ['SCHD', 'JEPI']

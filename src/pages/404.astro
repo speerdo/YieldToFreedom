@@ -1,0 +1,35 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="Page not found - Yield to Freedom"
+  description="Sorry, we couldn't find that page. Browse income ETFs, strategy guides, and tools instead."
+  noindex={true}
+>
+  <section class="mx-auto max-w-xl py-20 text-center">
+    <p class="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">404</p>
+    <h1 class="font-heading mt-3 text-4xl font-extrabold tracking-tight text-[var(--fg)]">
+      This page took an early retirement
+    </h1>
+    <p class="mt-4 text-lg text-[var(--fg-muted)]">
+      The page you're looking for doesn't exist or may have moved. Let's get you back to compounding.
+    </p>
+    <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+      <a class="rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-500" href="/">
+        Back home
+      </a>
+      <a class="rounded-xl border border-[var(--border)] px-5 py-3 text-sm font-semibold text-[var(--fg)] transition-colors hover:bg-[var(--bg-subtle,rgba(0,0,0,0.04))]" href="/etfs">
+        Browse ETFs
+      </a>
+    </div>
+    <nav class="mt-10 text-sm text-[var(--fg-muted)]" aria-label="Helpful links">
+      <span>Or try:</span>
+      <a class="ml-2 font-medium text-blue-700 hover:text-blue-900" href="/compare">Compare</a>
+      <span aria-hidden="true" class="mx-1">·</span>
+      <a class="font-medium text-blue-700 hover:text-blue-900" href="/strategy">Strategy</a>
+      <span aria-hidden="true" class="mx-1">·</span>
+      <a class="font-medium text-blue-700 hover:text-blue-900" href="/blog">Blog</a>
+    </nav>
+  </section>
+</Base>

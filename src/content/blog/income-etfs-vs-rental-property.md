@@ -1,8 +1,8 @@
 ---
 title: "Income ETFs vs. Rental Property: A Serious Comparison"
 description: "Both produce monthly income. One involves tenants, toilets, and title insurance. Here's how a $400k income ETF portfolio stacks up against a $400k rental property — honestly."
-pubDate: 2026-05-31
-image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80"
+pubDate: 2026-06-17
+image: "/images/unsplash/1560518883-ce09059eeffa.webp"
 imageAlt: "Aerial view of a residential neighborhood representing real estate investment"
 tags: ["income investing", "passive income", "rental property comparison", "financial independence"]
 relatedEtfs: ["JEPI", "SCHD", "JEPQ", "QYLD"]

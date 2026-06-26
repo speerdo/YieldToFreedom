@@ -2,7 +2,7 @@
 title: "What Is Income Investing? (And Why It's Having a Moment)"
 description: "Income investing means building a portfolio designed to pay you — not just grow in value. Here's the philosophy, the math, and why more investors are taking it seriously."
 pubDate: 2026-05-31
-image: "https://images.unsplash.com/photo-1579621970795-87facc2f976d?auto=format&fit=crop&w=1200&q=80"
+image: "/images/unsplash/1579621970795-87facc2f976d.webp"
 imageAlt: "Person reviewing financial charts on a laptop representing income investing research"
 tags: ["income investing", "financial independence", "passive income", "getting started"]
 relatedEtfs: ["JEPI", "SCHD", "QYLD", "DVY"]

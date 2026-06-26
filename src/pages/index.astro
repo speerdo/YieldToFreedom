@@ -64,7 +64,7 @@ const pillarCopy = [
       { ticker: 'JEPQ', href: '/etfs/JEPQ' },
       { ticker: 'QYLD', href: '/etfs/QYLD' },
     ],
-    image: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=800&q=80',
+    image: '/images/unsplash/1526304640581-d334cdbbf45e.webp',
     imageAlt: 'Fanned-out US dollar bills representing cash income and cashflow',
     color: 'blue' as const,
   },
@@ -78,7 +78,7 @@ const pillarCopy = [
       { ticker: 'VIG', href: '/etfs/VIG' },
       { ticker: 'DGRO', href: '/etfs/DGRO' },
     ],
-    image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80',
+    image: '/images/unsplash/1464822759023-fed622ff2c3b.webp',
     imageAlt: 'Serene mountain lake reflecting stability and permanence',
     color: 'violet' as const,
   },
@@ -92,7 +92,7 @@ const pillarCopy = [
       { ticker: 'QQQ', href: '/etfs/QQQ' },
       { ticker: 'VGT', href: '/etfs/VGT' },
     ],
-    image: 'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&w=800&q=80',
+    image: '/images/unsplash/1466692476868-aef1dfb1e735.webp',
     imageAlt: 'Lush green terraced landscape representing compound growth',
     color: 'emerald' as const,
   },
@@ -154,11 +154,14 @@ const activeEtfStat = fmtCountFloor(activeEtfCount);
   <section class="relative flex min-h-[600px] items-center overflow-hidden sm:min-h-[700px]">
     <div class="absolute inset-0 z-0">
       <img
-        src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1920&q=80"
+        src="/images/unsplash/1460925895917-afdab827c52f.webp"
         alt=""
         aria-hidden="true"
+        width="1920"
+        height="1080"
         class="h-full w-full object-cover"
         loading="eager"
+        fetchpriority="high"
       />
       <div class="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-900/80 to-slate-900/30"></div>
     </div>
