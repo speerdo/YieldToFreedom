@@ -11,89 +11,59 @@ import { join } from 'path';
 const PUBLIC = join(process.cwd(), 'public');
 
 // ── OG Default Image 1200×630 ──────────────────────────────────────────────
+// Uses the site's hero background photo with a slate gradient overlay (like the
+// homepage hero) and the centered Yield to Freedom logo (bar-chart mark +
+// wordmark + tagline) on top.
 
-const og = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+const HERO_BG = join(PUBLIC, 'images/unsplash/1460925895917-afdab827c52f.webp');
+
+// Overlay + centered logo, rendered on top of the hero photo.
+// The bar-chart mark mirrors src/components/layout/Logo.astro (96×96 viewBox),
+// scaled and translated so the whole logo group is centered.
+const overlay = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0f172a"/>
-      <stop offset="100%" style="stop-color:#1e293b"/>
+    <linearGradient id="ov" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#020617" stop-opacity="0.92"/>
+      <stop offset="55%" stop-color="#0f172a" stop-opacity="0.80"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.70"/>
     </linearGradient>
-    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#2563eb"/>
-      <stop offset="100%" style="stop-color:#3b82f6"/>
-    </linearGradient>
+    <radialGradient id="vignette" cx="50%" cy="42%" r="70%">
+      <stop offset="40%" stop-color="#020617" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#020617" stop-opacity="0.55"/>
+    </radialGradient>
   </defs>
 
-  <!-- Background -->
-  <rect width="1200" height="630" fill="url(#bg)"/>
+  <!-- Slate overlay (matches homepage hero) -->
+  <rect width="1200" height="630" fill="url(#ov)"/>
+  <rect width="1200" height="630" fill="url(#vignette)"/>
 
-  <!-- Decorative bar chart (subtle, right side) -->
-  <rect x="820" y="320" width="44" height="180" rx="6" fill="#1e3a5f" opacity="0.7"/>
-  <rect x="878" y="250" width="44" height="250" rx="6" fill="#1e3a5f" opacity="0.7"/>
-  <rect x="936" y="190" width="44" height="310" rx="6" fill="#1e3a5f" opacity="0.7"/>
-  <rect x="994" y="280" width="44" height="220" rx="6" fill="#1e3a5f" opacity="0.7"/>
-  <rect x="1052" y="220" width="44" height="280" rx="6" fill="#1e3a5f" opacity="0.7"/>
-  <rect x="1110" y="160" width="44" height="340" rx="6" fill="#2563eb" opacity="0.5"/>
+  <!-- Logo mark: three ascending bars, centered. 96×96 viewBox scaled ×1.7 (≈163px),
+       centered at x=600 → translate x = 600 - 81.5 = 518.5 -->
+  <g transform="translate(518.5,120) scale(1.7)">
+    <rect x="14" y="60" width="16" height="22" rx="3" fill="#2563eb" opacity="0.35"/>
+    <rect x="38" y="44" width="16" height="38" rx="3" fill="#2563eb" opacity="0.6"/>
+    <rect x="62" y="24" width="16" height="58" rx="3" fill="#2563eb"/>
+  </g>
 
-  <!-- Trend line overlay -->
-  <polyline points="842,460 900,390 958,330 1016,370 1074,300 1132,230"
-    fill="none" stroke="#3b82f6" stroke-width="3" opacity="0.6" stroke-linecap="round" stroke-linejoin="round"/>
-
-  <!-- Accent stripe -->
-  <rect x="80" y="80" width="6" height="120" rx="3" fill="url(#accent)"/>
-
-  <!-- Site name -->
-  <text x="108" y="138" font-family="Georgia, 'Times New Roman', serif"
-    font-size="64" font-weight="700" fill="#f8fafc" letter-spacing="-1">
-    Yield to Freedom
-  </text>
+  <!-- Wordmark -->
+  <text x="600" y="380" text-anchor="middle"
+    font-family="Inter, 'Liberation Sans', 'Helvetica Neue', Arial, sans-serif"
+    font-size="74" font-weight="700" fill="#f8fafc" letter-spacing="-1.5">Yield to Freedom</text>
 
   <!-- Tagline -->
-  <text x="108" y="190" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-    font-size="26" fill="#94a3b8" letter-spacing="0.5">
-    Income ETF Research, Strategy &amp; Tools
-  </text>
+  <text x="600" y="438" text-anchor="middle"
+    font-family="Inter, 'Liberation Sans', 'Helvetica Neue', Arial, sans-serif"
+    font-size="28" font-weight="500" fill="#cbd5e1" letter-spacing="0.5">Build Income. Reach Freedom.</text>
 
-  <!-- Divider -->
-  <rect x="108" y="220" width="480" height="2" rx="1" fill="#334155"/>
-
-  <!-- Three pillars row -->
-  <!-- Income pill -->
-  <rect x="108" y="255" width="130" height="38" rx="19" fill="#1e3a5f"/>
-  <text x="173" y="279" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-    font-size="16" fill="#60a5fa" text-anchor="middle" font-weight="600">📈 Income</text>
-
-  <!-- Stability pill -->
-  <rect x="252" y="255" width="140" height="38" rx="19" fill="#1e1e40"/>
-  <text x="322" y="279" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-    font-size="16" fill="#a78bfa" text-anchor="middle" font-weight="600">🛡 Stability</text>
-
-  <!-- Growth pill -->
-  <rect x="406" y="255" width="120" height="38" rx="19" fill="#0f2e1f"/>
-  <text x="466" y="279" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-    font-size="16" fill="#34d399" text-anchor="middle" font-weight="600">🌱 Growth</text>
-
-  <!-- Main value proposition -->
-  <text x="108" y="380" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-    font-size="30" fill="#e2e8f0" font-weight="500">
-    Build income that pays you — every month.
-  </text>
-  <text x="108" y="422" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-    font-size="22" fill="#64748b">
-    229 ETFs graded, scored, and explained. Free.
-  </text>
-
-  <!-- URL badge -->
-  <rect x="108" y="510" width="290" height="48" rx="10" fill="#2563eb" opacity="0.15"/>
-  <rect x="108" y="510" width="290" height="48" rx="10" fill="none" stroke="#2563eb" stroke-width="1.5" opacity="0.4"/>
-  <text x="253" y="540" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-    font-size="20" fill="#60a5fa" text-anchor="middle" font-weight="600" letter-spacing="0.5">
-    yieldtofreedom.com
-  </text>
+  <!-- URL -->
+  <text x="600" y="540" text-anchor="middle"
+    font-family="Inter, 'Liberation Sans', 'Helvetica Neue', Arial, sans-serif"
+    font-size="22" font-weight="600" fill="#60a5fa" letter-spacing="3">YIELDTOFREEDOM.COM</text>
 </svg>`;
 
-await sharp(Buffer.from(og))
-  .resize(1200, 630)
+await sharp(HERO_BG)
+  .resize(1200, 630, { fit: 'cover', position: 'centre' })
+  .composite([{ input: Buffer.from(overlay), top: 0, left: 0 }])
   .png()
   .toFile(join(PUBLIC, 'og-default.png'));
 
